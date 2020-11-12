@@ -10,7 +10,7 @@ To use it download `mjsr.js` from the releases tab, or build it yourself with we
 
 You can also use the `serve.js` file supplied to host a HTTP server on port 8080, to use mjsr without need of bundling it with webpack.
 
-## Example of usage
+## Example
 
 This example will result in a fullscreen document with a cube in the middle of the screen. You can lock the cursor by pressing on it, then you can move around with `WASD` keys, and use your mouse for rotating.
 
@@ -37,7 +37,9 @@ All objects in the `scene` array should have at least four properties:
   - `i1`, `i2`, and `i3` are the indices of the vertices of the triangle.
   - `c` is the index of the colour in the `colours` array.
 * `colours` - The colours of the faces of the object. Should be an array of HEX colours.
-## Example object
+
+## An example object
+This is an example object in the scene. It is taken directly from `src/objects/cube.js`, and is shipped with mjsr as `mjsr.objects.Cube`
 ```js
 class Cube {
 	constructor(coords = [0,0,0]) {
