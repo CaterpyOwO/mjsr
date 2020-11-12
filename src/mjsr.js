@@ -9,7 +9,7 @@ import { default as Cube } from "./objects/cube.js";
 // import { shuffle } from "./math.js"
 
 let mjsr = {
-	Renderer,
+    Renderer,
     Screen,
     Screen2d,
     Camera,
