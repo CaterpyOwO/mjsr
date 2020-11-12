@@ -3,12 +3,12 @@
 This is a minimalistic WebGL/Canvas2d 3d renderer.
 Designed with simplicity in mind.
 
-## Importing
-
-Download `main.js` from `dist/` or build it yourself with webpack using `npm run build`. Then include it in your html file with:
+To use it download `mjsr.js` from the releases tab, or build it yourself with webpack using `npm i && npm run build`. Then include it in your html file with:
 ```html
 <script src="path/to/main.js"></script>
 ```
+
+You can also use the `serve.js` file supplied to host a HTTP server on port 8080, to use mjsr without need of bundling it with webpack.
 
 ## Example of usage
 
