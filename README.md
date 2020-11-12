@@ -5,9 +5,9 @@ Designed with simplicity in mind.
 
 ## Importing
 
-Download `main.js` from `dist/`, or build it yourself with webpack using `npm run build`. Then include it in your html file with:
+Download `main.js` from `dist/` or build it yourself with webpack using `npm run build`. Then include it in your html file with:
 ```html
-<script src="path/to/main.js"
+<script src="path/to/main.js"></script>
 ```
 
 ## Example of usage
