@@ -120,7 +120,7 @@ export class Renderer {
             // console.log(this.program)
 
             // twgl.setBuffersAndAttributes(gl, this.program, bufferInfo);
-            this.w.buffers(arrays, { colour: 3 });
+            this.w.buffers(arrays, { colour: 4 });
 
             gl.drawArrays(gl.TRIANGLES, 0, arrays.position.length);
         }
