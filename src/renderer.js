@@ -67,7 +67,7 @@ export class Renderer {
 
         this.program = w.program();
 
-        gl.clearColor(0.1, 0.1, 0.1, 1.0);
+        gl.clearColor(1.0, 1.0, 1.0, 1.0);
         gl.enable(gl.DEPTH_TEST);
         gl.enable(gl.CULL_FACE);
 

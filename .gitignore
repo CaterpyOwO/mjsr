@@ -1,5 +1,5 @@
 node_modules
-.vscode
+.vscode/*
 package-lock.json
 index.html
 src/twgl.js
