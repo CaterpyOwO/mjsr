@@ -1,8 +1,9 @@
+const path = require('path');
+
 module.exports = {
     entry: './src/mjsr.js',
-    module: {
-        rules: [
-          { test: /\.glsl$/, use: 'raw-loader' }
-        ]
-      }
+    output: {
+      path: path.resolve(__dirname, 'dist'),
+      filename: 'mjsr.js'
+  }
 }
