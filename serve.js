@@ -3,7 +3,7 @@ let port = 8080;
 let express = require("express");
 
 let app = express();
-app.use("/", express.static(__dirname + "/"));
+app.use("/", express.static(__dirname + "/src/"));
 app.listen(port, host);
 
 console.log("Running server at http://localhost:" + port + "/");
