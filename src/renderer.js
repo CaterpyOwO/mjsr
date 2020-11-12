@@ -60,14 +60,14 @@ export class Renderer {
 
             void main() {
                 // gl_FragColor = v_colour;
-                float intensity = ((dot(normalize(v_normal), vec4(0.0, 1.0, 1.0, 1.0)) + 1.0) / 2.0);
+                float intensity = ((dot(normalize(v_normal), vec4(0.0, 0.5, 1.0, 1.0)) + 1.0) / 2.0);
                 gl_FragColor = vec4(v_colour.xyz * clamp(intensity, 0.1, 1.0), v_colour.w);
             }
         `);
 
         this.program = w.program();
 
-        gl.clearColor(1.0, 1.0, 1.0, 1.0);
+        gl.clearColor(0.1, 0.1, 0.1, 1.0);
         gl.enable(gl.DEPTH_TEST);
         gl.enable(gl.CULL_FACE);
 
