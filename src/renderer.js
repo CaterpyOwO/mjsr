@@ -93,19 +93,19 @@ export class Renderer {
 
                 let cross = crossProduct([object.verts[triangle[0]], object.verts[triangle[1]], object.verts[triangle[2]]]);
                 let colour = parseColour(object.colours[triangle[3]]);
+
+                arrays.position.push()
             
-                arrays.position.push(
-                    ...this.camera.projectVertex(object.verts[triangle[2]], canvas),
-                    ...this.camera.projectVertex(object.verts[triangle[1]], canvas),
-                    ...this.camera.projectVertex(object.verts[triangle[0]], canvas)
-                );
+                arrays.position.push(...this.camera.projectVertex(object.verts[triangle[2]], canvas));
+                arrays.position.push(...this.camera.projectVertex(object.verts[triangle[1]], canvas));
+                arrays.position.push(...this.camera.projectVertex(object.verts[triangle[0]], canvas));
+    
 
                 arrays.colour.push(...colour, ...colour, ...colour);
                 arrays.normal.push(...cross, ...cross, ...cross);
 
                 // if (cross[0] * (object.verts[triangle[0]][0] - cam.pos[0]) + cross[1] * (object.verts[triangle[0]][1] - cam.pos[1]) + cross[2] * (object.verts[triangle[0]][2] - cam.pos[2]) > 0) {
             }
-
 
             // const bufferInfo = twgl.createBufferInfoFromArrays(gl, arrays);
 
@@ -120,6 +120,7 @@ export class Renderer {
             // console.log(this.program)
 
             // twgl.setBuffersAndAttributes(gl, this.program, bufferInfo);
+
             this.w.buffers(arrays, { colour: 4 });
 
             gl.drawArrays(gl.TRIANGLES, 0, arrays.position.length);
