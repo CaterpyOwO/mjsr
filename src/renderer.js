@@ -16,17 +16,39 @@ export class Renderer {
         this.dt = 0, this.last = 0;
 
         return this;
-
     }
 
     setup(scene) {
         this.scene = scene;
+        this.meshes = [];
 
         for (let object of this.scene) {
             if (typeof object.coords !== "object") throw new Error("Object doesn't haves valid property coords.");
             if (typeof object.verts !== "object") throw new Error("Object doesn't haves valid property verts.");
             if (typeof object.faces !== "object") throw new Error("Object doesn't haves valid property faces.");
             if (typeof object.colours !== "object") throw new Error("Object doesn't haves valid property colours.");
+
+            let mesh =  {
+                position: [],
+                colour: [],
+                normal: [],
+            };
+
+            for (let triangle of object.faces) {
+                let cross = crossProduct([object.verts[triangle[0]], object.verts[triangle[1]], object.verts[triangle[2]]]);
+                let colour = parseColour(object.colours[triangle[3]]);
+            
+                mesh.position.push(
+                    ...object.verts[triangle[2]],
+                    ...object.verts[triangle[1]],
+                    ...object.verts[triangle[0]]
+                );
+
+                mesh.colour.push(...colour, ...colour, ...colour);
+                mesh.normal.push(...cross, ...cross, ...cross);
+            }
+
+            this.meshes.push(mesh);
         }
 
         const { gl } = this.screen;
@@ -44,11 +66,41 @@ export class Renderer {
             varying vec4 v_colour;
             varying vec4 v_normal;
 
+            uniform vec3 u_pos;
+            uniform vec3 u_rot;
+
+            uniform vec2 u_canvas;
+            
+
+            vec2 rotateVertex2d(vec2 pos, float rad) {
+                float s = sin(rad);
+                float c = cos(rad);
+        
+                return vec2(pos.x * c - pos.y * s, pos.y * c + pos.x * s);
+            }
+
+
+            vec3 projectVertex(vec3 coords) {
+                coords.x -= u_pos.x;
+                coords.y -= u_pos.y;
+                coords.z -= u_pos.z;
+                
+                coords.xz = rotateVertex2d(coords.xz, u_rot.y);
+                coords.yz = rotateVertex2d(coords.yz, u_rot.x);
+                
+                float f = 600.0 / max(0.0, coords.z);
+                coords.x *= f;
+                coords.y *= f;
+
+                return vec3(coords.x / u_canvas.x * 2.0, -(coords.y / u_canvas.y * 2.0), coords.z / 1000.0);
+            }
+
             void main() {
                 v_colour = colour;
                 v_normal = normal;
 
-                gl_Position = vec4(position.xyz, 1.0);
+                vec3 projected = projectVertex(position.xyz);
+                gl_Position = vec4(projected.xyz, 1.0);
             }
         `);
 
@@ -77,51 +129,21 @@ export class Renderer {
     draw() {
         const { gl, canvas } = this.screen;
 
-        // twgl.resizeCanvasToDisplaySize(gl.canvas);
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        for (let object of this.scene) {
-
-            const arrays = {
-                position: [],
-                colour: [],
-                normal: [],
-            };
-
-            for (let triangle of object.faces) {
-                let cross = crossProduct([object.verts[triangle[0]], object.verts[triangle[1]], object.verts[triangle[2]]]);
-                let colour = parseColour(object.colours[triangle[3]]);
-            
-                arrays.position.push(
-                    ...this.camera.projectVertex(object.verts[triangle[2]], canvas),
-                    ...this.camera.projectVertex(object.verts[triangle[1]], canvas),
-                    ...this.camera.projectVertex(object.verts[triangle[0]], canvas)
-                );
-
-                arrays.colour.push(...colour, ...colour, ...colour);
-                arrays.normal.push(...cross, ...cross, ...cross);
-
-                // if (cross[0] * (object.verts[triangle[0]][0] - cam.pos[0]) + cross[1] * (object.verts[triangle[0]][1] - cam.pos[1]) + cross[2] * (object.verts[triangle[0]][2] - cam.pos[2]) > 0) {
-            }
-
-            // const bufferInfo = twgl.createBufferInfoFromArrays(gl, arrays);
-
+        for (let mesh of this.meshes) {
             gl.useProgram(this.program);
 
-            // console.log(mvp)
 
-            // twgl.setUniforms(this.program, {
-            //     u_projection: mvp,
-            // });
+            gl.uniform3fv(gl.getUniformLocation(this.program, "u_pos"), this.camera.pos);
+            gl.uniform3fv(gl.getUniformLocation(this.program, "u_rot"), this.camera.rot);
 
-            // console.log(this.program)
+            gl.uniform2fv(gl.getUniformLocation(this.program, "u_canvas"), [canvas.width, canvas.height]);
 
-            // twgl.setBuffersAndAttributes(gl, this.program, bufferInfo);
+            this.w.buffers(mesh, { colour: 4 });
 
-            this.w.buffers(arrays, { colour: 4 });
-
-            gl.drawArrays(gl.TRIANGLES, 0, arrays.position.length / 3);
+            gl.drawArrays(gl.TRIANGLES, 0, mesh.position.length / 3);
         }
     }
 
