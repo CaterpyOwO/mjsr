@@ -4,6 +4,7 @@ This is a minimalistic WebGL/Canvas2d 3d renderer.
 Designed with simplicity in mind.
 
 To use it download `mjsr.js` from the releases tab, or build it yourself with webpack using `npm i && npm run build`. Then include it in your html file with:
+
 ```html
 <script src="./path/to/mjsr.js"></script>
 ```
@@ -16,9 +17,9 @@ This example will result in a fullscreen document with a cube in the middle of t
 
 ```js
 const { Renderer, Screen, Camera } = mjsr;
-const r = new Renderer(new Screen().fullscreen(), new Camera([0,0,-7]));
+const r = new Renderer(new Screen().fullscreen(), new Camera([0, 0, -7]));
 
-let scene = [new mjsr.objects.Cube([0,0,0])];
+let scene = [new mjsr.objects.Cube([0, 0, 0])];
 r.setup(scene);
 
 function frame(now) {
@@ -30,22 +31,26 @@ function frame(now) {
 
 requestAnimationFrame(frame);
 ```
+
 All objects in the `scene` array should have at least four properties:
-* `coords` - The coordinatese of the object in model space. Should be an array with three elements: `[x, y, z]`
-* `verts` - The vertices of the object in model space. Should be an array of arrays with three elements: `[x, y, z]`
-* `faces ` - The faces of the object. Should be an array of arrays with four elements: `[i1, i2, i3, c]`, where 
-  - `i1`, `i2`, and `i3` are the indices of the vertices of the triangle.
-  - `c` is the index of the colour in the `colours` array.
-* `colours` - The colours of the faces of the object. Should be an array of HEX colours.
+
+-   `coords` - The coordinatese of the object in model space. Should be an array with three elements: `[x, y, z]`
+-   `verts` - The vertices of the object in model space. Should be an array of arrays with three elements: `[x, y, z]`
+-   `faces ` - The faces of the object. Should be an array of arrays with four elements: `[i1, i2, i3, c]`, where
+    -   `i1`, `i2`, and `i3` are the indices of the vertices of the triangle.
+    -   `c` is the index of the colour in the `colours` array.
+-   `colours` - The colours of the faces of the object. Should be an array of HEX colours.
 
 ## An example object
+
 This is an example object in the scene. It is taken directly from `src/objects/cube.js`, and is shipped with mjsr as `mjsr.objects.Cube`
+
 ```js
 class Cube {
-	constructor(coords = [0,0,0]) {
+	constructor(coords = [0, 0, 0]) {
 		let [x, y, z] = coords;
 
-		this.coords = coords
+		this.coords = coords;
 
 		this.verts = [
 			[x - 1, y - 1, z - 1],

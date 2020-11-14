@@ -1,104 +1,105 @@
 export default class {
-    constructor(gl) {
-        this.gl = gl;
-        
-        this.shaders = [];
-        this.glprogram = null;
+	constructor(gl) {
+		this.gl = gl;
 
-        return this;
-    }
+		this.shaders = [];
+		this.glprogram = null;
 
-    frag(source) {
-        this.shader(source, this.gl.FRAGMENT_SHADER);
-    }
+		return this;
+	}
 
-    vert(source) {
-        this.shader(source, this.gl.VERTEX_SHADER);
-    }
+	frag(source) {
+		this.shader(source, this.gl.FRAGMENT_SHADER);
+	}
 
-    shader(source, type) {
-        source = (source.raw) ? source.raw.join("") : source;
+	vert(source) {
+		this.shader(source, this.gl.VERTEX_SHADER);
+	}
 
-        if (!type) {
-            let vertReg = new RegExp("// ?vert(ex)?( |_|-)shader", "i"),
-                fragReg = new RegExp("// ?frag(ment)?( |_|-)shader", "i");
+	shader(source, type) {
+		source = source.raw ? source.raw.join("") : source;
 
-            if (vertReg.test(source)) type = this.gl.VERTEX_SHADER;
-            else if (fragReg.test(source)) type = this.gl.FRAGMENT_SHADER;
-            else throw new Error("No shader type found.")
-        }
+		if (!type) {
+			let vertReg = new RegExp("// ?vert(ex)?( |_|-)shader", "i"),
+				fragReg = new RegExp("// ?frag(ment)?( |_|-)shader", "i");
 
-        let shader = this.gl.createShader(type);
-        this.gl.shaderSource(shader, source);
-        this.gl.compileShader(shader);
+			if (vertReg.test(source)) type = this.gl.VERTEX_SHADER;
+			else if (fragReg.test(source)) type = this.gl.FRAGMENT_SHADER;
+			else throw new Error("No shader type found.");
+		}
 
-        if (this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) 
-            return this.shaders.push(shader), shader;
+		let shader = this.gl.createShader(type);
+		this.gl.shaderSource(shader, source);
+		this.gl.compileShader(shader);
 
-        console.log(this.gl.getShaderInfoLog(shader));
-        this.gl.deleteShader(shader);
-    }
+		if (this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS))
+			return this.shaders.push(shader), shader;
 
-    program(...shaders) {
-        if (shaders.length == 0) shaders = this.shaders;
-        if (shaders.length == 0) throw new Error("No shaders were supplied.");
+		console.log(this.gl.getShaderInfoLog(shader));
+		this.gl.deleteShader(shader);
+	}
 
-        let program = this.gl.createProgram();
+	program(...shaders) {
+		if (shaders.length == 0) shaders = this.shaders;
+		if (shaders.length == 0) throw new Error("No shaders were supplied.");
 
-        for (let shader of shaders) {
-            this.gl.attachShader(program, shader);
-        }
+		let program = this.gl.createProgram();
 
-        this.gl.linkProgram(program);
+		for (let shader of shaders) {
+			this.gl.attachShader(program, shader);
+		}
 
-        if (this.gl.getProgramParameter(program, this.gl.LINK_STATUS)) 
-            return this.glprogram = program, program;
+		this.gl.linkProgram(program);
 
-        console.log(this.gl.getProgramInfoLog(program));
-        this.gl.deleteProgram(program);
-    }
+		if (this.gl.getProgramParameter(program, this.gl.LINK_STATUS))
+			return (this.glprogram = program), program;
 
-    buffers(arrays, sizes) {
-        if (arrays.length == 0) throw new Error("No buffers were supplied.");
+		console.log(this.gl.getProgramInfoLog(program));
+		this.gl.deleteProgram(program);
+	}
 
-        for (let b in arrays) {
-            let array = arrays[b];
+	buffers(arrays, sizes) {
+		if (arrays.length == 0) throw new Error("No buffers were supplied.");
 
-            this.buffer32f(array, this.gl.ARRAY_BUFFER);
-            
-            let attribute = this.gl.getAttribLocation(this.glprogram, b);
-            this.gl.enableVertexAttribArray(attribute);
+		for (let b in arrays) {
+			let array = arrays[b];
 
-            if (sizes[b]) this.gl.vertexAttribPointer(attribute, sizes[b], this.gl.FLOAT, false, 0, 0)
-            else this.gl.vertexAttribPointer(attribute, 3, this.gl.FLOAT, false, 0, 0)
-        }
-    }
+			this.buffer32f(array, this.gl.ARRAY_BUFFER);
 
-    buffer32f(data, type) {
-        let buffer = this._bufferInit(type);
-        this.gl.bufferData(type, new Float32Array(data), this.gl.STATIC_DRAW);
+			let attribute = this.gl.getAttribLocation(this.glprogram, b);
+			this.gl.enableVertexAttribArray(attribute);
 
-        return buffer;
-    }
+			if (sizes[b])
+				this.gl.vertexAttribPointer(attribute, sizes[b], this.gl.FLOAT, false, 0, 0);
+			else this.gl.vertexAttribPointer(attribute, 3, this.gl.FLOAT, false, 0, 0);
+		}
+	}
 
-    buffer16u(data, type) {
-        let buffer = this._bufferInit(type);
-        this.gl.bufferData(type, new Uint16Array(data), this.gl.STATIC_DRAW);
+	buffer32f(data, type) {
+		let buffer = this._bufferInit(type);
+		this.gl.bufferData(type, new Float32Array(data), this.gl.STATIC_DRAW);
 
-        return buffer;
-    }
+		return buffer;
+	}
 
-    buffer32u(data, type) {
-        let buffer = this._bufferInit(type);
-        this.gl.bufferData(type, new Uint32Array(data), this.gl.STATIC_DRAW);
+	buffer16u(data, type) {
+		let buffer = this._bufferInit(type);
+		this.gl.bufferData(type, new Uint16Array(data), this.gl.STATIC_DRAW);
 
-        return buffer;
-    }
+		return buffer;
+	}
 
-    _bufferInit(type) {
-        const buffer = this.gl.createBuffer();
-        this.gl.bindBuffer(type, buffer);
+	buffer32u(data, type) {
+		let buffer = this._bufferInit(type);
+		this.gl.bufferData(type, new Uint32Array(data), this.gl.STATIC_DRAW);
 
-        return buffer;
-    };
-};
+		return buffer;
+	}
+
+	_bufferInit(type) {
+		const buffer = this.gl.createBuffer();
+		this.gl.bindBuffer(type, buffer);
+
+		return buffer;
+	}
+}

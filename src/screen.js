@@ -1,91 +1,89 @@
 export class Screen {
-    constructor(data = {width: 640, height: 480, appendTo: document.body}) {
-        this.canvas = document.createElement("canvas");
-        this.canvas.width = data.width;
-        this.canvas.height = data.height;
-        
-        this.gl = this.canvas.getContext("webgl2");
+	constructor(data = { width: 640, height: 480, appendTo: document.body }) {
+		this.canvas = document.createElement("canvas");
+		this.canvas.width = data.width;
+		this.canvas.height = data.height;
 
-        data.appendTo.appendChild(this.canvas);
+		this.gl = this.canvas.getContext("webgl2");
 
-        return this;
-    }
-    
-    fullscreen() {
-        this.canvas.width = innerWidth;
-        this.canvas.height = innerHeight;
+		data.appendTo.appendChild(this.canvas);
 
-        window.onresize = () => this.canvas.width = innerWidth, this.canvas.height = innerHeight;
+		return this;
+	}
 
-        
-        let style = document.createElement("style");
-        style.innerText = `html,body{margin:0;overflow:hidden}`;
-        
-        document.head.appendChild(style);
-        
-        return this;
-    }
+	fullscreen() {
+		this.canvas.width = innerWidth;
+		this.canvas.height = innerHeight;
 
-    square(dimens) {
-        this.canvas.width = dimens;
-        this.canvas.height = dimens;
+		(window.onresize = () => (this.canvas.width = innerWidth)),
+			(this.canvas.height = innerHeight);
 
-        return this;
-    }
+		let style = document.createElement("style");
+		style.innerText = `html,body{margin:0;overflow:hidden}`;
 
-    rect(w, h) {
-        this.canvas.width = w;
-        this.canvas.height = h;
+		document.head.appendChild(style);
 
-        return this;
-    }
-};
+		return this;
+	}
+
+	square(dimens) {
+		this.canvas.width = dimens;
+		this.canvas.height = dimens;
+
+		return this;
+	}
+
+	rect(w, h) {
+		this.canvas.width = w;
+		this.canvas.height = h;
+
+		return this;
+	}
+}
 
 export class Screen2d {
-    constructor(data = {width: 640, height: 480, appendTo: document.body}) {
-        this.canvas = document.createElement("canvas");
-        this.canvas.width = data.width;
-        this.canvas.height = data.height;
-        
-        this.c = this.canvas.getContext("2d");
+	constructor(data = { width: 640, height: 480, appendTo: document.body }) {
+		this.canvas = document.createElement("canvas");
+		this.canvas.width = data.width;
+		this.canvas.height = data.height;
 
-        this.c.moveToD = (pos) => 
-            this.c.moveTo(pos[0], pos[1]);
+		this.c = this.canvas.getContext("2d");
 
-        this.c.lineToD = (pos) => 
-            this.c.lineTo(pos[0], pos[1]);
+		this.c.moveToD = (pos) => this.c.moveTo(pos[0], pos[1]);
 
-        data.appendTo.appendChild(this.canvas);
+		this.c.lineToD = (pos) => this.c.lineTo(pos[0], pos[1]);
 
-        return this;
-    }
-    
-    fullscreen() {
-        this.canvas.width = innerWidth;
-        this.canvas.height = innerHeight;
+		data.appendTo.appendChild(this.canvas);
 
-        window.onresize = () => this.canvas.width = innerWidth, this.canvas.height = innerHeight;
+		return this;
+	}
 
-        
-        let style = document.createElement("style");
-        style.innerText = `html,body{margin:0;overflow:hidden}`;
-        
-        document.head.appendChild(style);
-        
-        return this;
-    }
+	fullscreen() {
+		this.canvas.width = innerWidth;
+		this.canvas.height = innerHeight;
 
-    square(dimens) {
-        this.canvas.width = dimens;
-        this.canvas.height = dimens;
+		(window.onresize = () => (this.canvas.width = innerWidth)),
+			(this.canvas.height = innerHeight);
 
-        return this;
-    }
+		let style = document.createElement("style");
+		style.innerText = `html,body{margin:0;overflow:hidden}`;
 
-    rect(w, h) {
-        this.canvas.width = w;
-        this.canvas.height = h;
+		document.head.appendChild(style);
 
-        return this;
-    }
-};
+		return this;
+	}
+
+	square(dimens) {
+		this.canvas.width = dimens;
+		this.canvas.height = dimens;
+
+		return this;
+	}
+
+	rect(w, h) {
+		this.canvas.width = w;
+		this.canvas.height = h;
+
+		return this;
+	}
+}

@@ -1,8 +1,8 @@
 export default class {
-	constructor(coords = [0,0,0]) {
+	constructor(coords = [0, 0, 0]) {
 		let [x, y, z] = coords;
 
-        this.coords = coords
+		this.coords = coords;
 
 		this.verts = [
 			[x - 1, y - 1, z - 1],
@@ -48,8 +48,8 @@ export default class {
 
 			[2, 6, 7, 5],
 			[7, 3, 2, 5],
-        ];
-        
-        this.colours = ["#0ff", "#0f0", "#f0f", "#00f", "#ff0", "#f00"];
+		];
+
+		this.colours = ["#0ff", "#0f0", "#f0f", "#00f", "#ff0", "#f00"];
 	}
 }

@@ -9,20 +9,16 @@ import { default as Cube } from "./objects/cube.js";
 // import { shuffle } from "./math.js"
 
 let mjsr = {
-    Renderer,
-    Screen,
-    Screen2d,
-    Camera,
-    
-    objects: {
-        Cube,
-    },
+	Renderer,
+	Screen,
+	Screen2d,
+	Camera,
+
+	objects: {
+		Cube,
+	},
 };
 
-if (typeof define === 'function' && define.amd)
-    define([], () => mjsr);
-else if (typeof exports === 'object')
-    module.exports = mjsr;
-else
-    window.mjsr = mjsr;
-    
+if (typeof define === "function" && define.amd) define([], () => mjsr);
+else if (typeof exports === "object") module.exports = mjsr;
+else window.mjsr = mjsr;
