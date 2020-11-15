@@ -91,8 +91,8 @@ input.CenterRotate = class {
 		movement[0] *= 0.01;
 		movement[1] *= 0.01;
 
-		this.camera.pos = this.rotate2d(pos, movement[0], [0, 2]);
-		this.camera.rot[1] -= movement[0];
+		this.camera.pos = this.rotate2d(pos, -movement[0], [0, 2]);
+		this.camera.rot[1] += movement[0];
 	}
 
 	rotate2d(pos, rad, axes) {
