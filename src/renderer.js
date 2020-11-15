@@ -10,7 +10,7 @@ export class Renderer {
 	constructor(
 		screen = new Screen(),
 		camera = new Camera(),
-		inputHandler = new input.InputHandler()
+		inputHandler = new input.FirstPerson()
 	) {
 		this.screen = screen;
 		this.camera = camera;
