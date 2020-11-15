@@ -35,8 +35,9 @@ export default class {
 		if (this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS))
 			return this.shaders.push(shader), shader;
 
-		console.log(this.gl.getShaderInfoLog(shader));
+		let err = new Error(this.gl.getShaderInfoLog(shader));
 		this.gl.deleteShader(shader);
+		throw err;
 	}
 
 	program(...shaders) {
@@ -54,8 +55,9 @@ export default class {
 		if (this.gl.getProgramParameter(program, this.gl.LINK_STATUS))
 			return (this.glprogram = program), program;
 
-		console.log(this.gl.getProgramInfoLog(program));
+		let err = new Error(this.gl.getProgramInfoLog(program));
 		this.gl.deleteProgram(program);
+		throw err;
 	}
 
 	buffers(arrays, sizes) {

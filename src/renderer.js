@@ -64,6 +64,8 @@ export class Renderer {
 		this.w = w;
 
 		w.vert(`
+			precision mediump float;
+
             attribute vec4 position;
             attribute vec4 colour;
             attribute vec4 normal;
@@ -77,9 +79,9 @@ export class Renderer {
             uniform vec3 u_rot;
 
             uniform vec2 u_canvas;
-            
 
-            vec2 rotateVertex2d(vec2 pos, float rad) {
+
+            vec2 rotate2d(vec2 pos, float rad) {
                 float s = sin(rad);
                 float c = cos(rad);
         
@@ -87,26 +89,26 @@ export class Renderer {
             }
 
 
-            vec3 projectVertex(vec3 coords) {
-                coords.x -= u_pos.x;
-                coords.y -= u_pos.y;
-                coords.z -= u_pos.z;
+            vec3 project(vec3 vertex) {
+                vertex.x -= u_pos.x;
+                vertex.y -= u_pos.y;
+                vertex.z -= u_pos.z;
                 
-                coords.xz = rotateVertex2d(coords.xz, u_rot.y);
-                coords.yz = rotateVertex2d(coords.yz, u_rot.x);
+                vertex.xz = rotate2d(vertex.xz, u_rot.y);
+                vertex.yz = rotate2d(vertex.yz, u_rot.x);
                 
-                float f = 600.0 / max(0.0, coords.z);
-                coords.x *= f;
-                coords.y *= f;
+                float f = 600.0 / max(0.0, vertex.z);
+                vertex.x *= f;
+                vertex.y *= f;
 
-                return vec3(coords.x / u_canvas.x * 2.0, -(coords.y / u_canvas.y * 2.0), coords.z / 1000.0);
+                return vec3(vertex.x / u_canvas.x * 2.0, -(vertex.y / u_canvas.y * 2.0), vertex.z / 1000.0);
             }
 
             void main() {
                 v_colour = colour;
                 v_normal = normal;
 
-                vec3 projected = projectVertex(position.xyz);
+                vec3 projected = project(position.xyz);
                 gl_Position = vec4(projected.xyz, 1.0);
             }
         `);
@@ -115,14 +117,33 @@ export class Renderer {
             precision mediump float;
 
             varying vec4 v_normal;
-            varying vec4 v_colour;
+			varying vec4 v_colour;
+			
+			vec4 light = vec4(0.0, 0.5, 1.0, 1.0);
 
             void main() {
-                // gl_FragColor = v_colour;
-                float intensity = ((dot(normalize(v_normal), vec4(0.0, 0.5, 1.0, 1.0)) + 1.0) / 2.0);
-                gl_FragColor = vec4(v_colour.xyz * clamp(intensity, 0.1, 1.0), v_colour.w);
+				float intensity = (dot(normalize(v_normal), light) + 1.0) / 2.0;
+				float monoColour = ((v_colour.r + v_colour.g + v_colour.b) / 3.0) * clamp(intensity, 0.1, 1.0);
+
+                gl_FragColor = vec4(v_colour.rgb * clamp(intensity, 0.1, 1.0), v_colour.a);
             }
-        `);
+		`);
+		
+		// w.frag(`
+        //     precision mediump float;
+
+        //     varying vec4 v_normal;
+		// 	varying vec4 v_colour;
+			
+		// 	vec4 light = vec4(0.0, 0.5, 1.0, 1.0);
+
+        //     void main() {
+		// 		float intensity = (dot(normalize(v_normal), light) + 1.0) / 2.0;
+		// 		float monoColour = ((v_colour.r + v_colour.g + v_colour.b) / 3.0) * clamp(intensity, 0.1, 1.0);
+
+        //         gl_FragColor = vec4(monoColour, monoColour, monoColour, v_colour.a);
+        //     }
+        // `);
 
 		this.program = w.program();
 
