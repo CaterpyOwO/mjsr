@@ -7,7 +7,11 @@ import { parseColour, distance, shadeColour, normalize, crossProduct, dotProduct
 import { default as webglu } from "./webgl.js";
 
 export class Renderer {
-	constructor(screen = new Screen(), camera = new Camera(), inputHandler = new input.InputHandler()) {
+	constructor(
+		screen = new Screen(),
+		camera = new Camera(),
+		inputHandler = new input.InputHandler()
+	) {
 		this.screen = screen;
 		this.camera = camera;
 
@@ -130,22 +134,22 @@ export class Renderer {
                 gl_FragColor = vec4(v_colour.rgb * clamp(intensity, 0.1, 1.0), v_colour.a);
             }
 		`);
-		
-		// w.frag(`
-        //     precision mediump float;
 
-        //     varying vec4 v_normal;
+		// w.frag(`
+		//     precision mediump float;
+
+		//     varying vec4 v_normal;
 		// 	varying vec4 v_colour;
-			
+
 		// 	vec4 light = vec4(0.0, 0.5, 1.0, 1.0);
 
-        //     void main() {
+		//     void main() {
 		// 		float intensity = (dot(normalize(v_normal), light) + 1.0) / 2.0;
 		// 		float monoColour = ((v_colour.r + v_colour.g + v_colour.b) / 3.0) * clamp(intensity, 0.1, 1.0);
 
-        //         gl_FragColor = vec4(monoColour, monoColour, monoColour, v_colour.a);
-        //     }
-        // `);
+		//         gl_FragColor = vec4(monoColour, monoColour, monoColour, v_colour.a);
+		//     }
+		// `);
 
 		this.program = w.program();
 

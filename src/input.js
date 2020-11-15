@@ -1,16 +1,16 @@
 const input = {};
 
 input.FirstPerson = class {
-    constructor() {
-        this.keys = [];
-    }
+	constructor() {
+		this.keys = [];
+	}
 
-    setAttributes(screen, camera) {
-        this.screen = screen;
-        this.camera = camera;
-    }
+	setAttributes(screen, camera) {
+		this.screen = screen;
+		this.camera = camera;
+	}
 
-    setupMovement() {
+	setupMovement() {
 		let { canvas } = this.screen;
 
 		window.onkeydown = (event) => (this.keys[event.keyCode] = true);
@@ -64,53 +64,53 @@ input.FirstPerson = class {
 		if (this.keys[65]) (this.camera.pos[0] += y), (this.camera.pos[2] -= x); // a
 		if (this.keys[68]) (this.camera.pos[0] -= y), (this.camera.pos[2] += x); // d
 	}
-}
+};
 
 input.CenterRotate = class {
-    constructor() {
-        this.keys = [];
-    }
-
-    setAttributes(screen, camera) {
-        this.screen = screen;
-        this.camera = camera;
-    }
-
-    setupMovement() {
-        let { canvas } = this.screen;
-        
-        const mouse = event => this.mouseRotation([event.movementX, event.movementY]);
-
-        canvas.onmousedown = () => canvas.onmousemove = mouse;
-        canvas.onmouseup = () => canvas.onmousemove = null;
-    }
-
-    mouseRotation(movement) {
-        let { pos } = this.camera;
-
-        movement[0] *= .01;
-        movement[1] *= .01;
-
-        this.camera.pos = this.rotate2d(pos, movement[0], [0, 2]);
-        this.camera.rot[1] -= movement[0];
-    }
-    
-	rotate2d(pos, rad, axes) {
-        let [a0, a1] = axes;
-        let [x, y] = [pos[a0], pos[a1]];
-
-        let s = Math.sin(rad),
-            c = Math.cos(rad);
-
-        pos[a0] = (x * c - y * s);
-        pos[a1] = (y * c + x * s);
-    
-        return pos;
+	constructor() {
+		this.keys = [];
 	}
 
-    update() {}
+	setAttributes(screen, camera) {
+		this.screen = screen;
+		this.camera = camera;
+	}
 
-    // mouseRotation
-}
+	setupMovement() {
+		let { canvas } = this.screen;
+
+		const mouse = (event) => this.mouseRotation([event.movementX, event.movementY]);
+
+		canvas.onmousedown = () => (canvas.onmousemove = mouse);
+		canvas.onmouseup = () => (canvas.onmousemove = null);
+	}
+
+	mouseRotation(movement) {
+		let { pos } = this.camera;
+
+		movement[0] *= 0.01;
+		movement[1] *= 0.01;
+
+		this.camera.pos = this.rotate2d(pos, movement[0], [0, 2]);
+		this.camera.rot[1] -= movement[0];
+	}
+
+	rotate2d(pos, rad, axes) {
+		let [a0, a1] = axes;
+		let [x, y] = [pos[a0], pos[a1]];
+
+		let s = Math.sin(rad),
+			c = Math.cos(rad);
+
+		pos[a0] = x * c - y * s;
+		pos[a1] = y * c + x * s;
+
+		return pos;
+	}
+
+	update() {}
+
+	// mouseRotation
+};
 
 export default input;

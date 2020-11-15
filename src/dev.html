@@ -34,7 +34,10 @@
 							];
 
 							let [a0, a1] = [0, 2];
-							let [x, y] = [this.verts[i + j * sides][a0], this.verts[i + j * sides][a1]];
+							let [x, y] = [
+								this.verts[i + j * sides][a0],
+								this.verts[i + j * sides][a1],
+							];
 
 							this.verts[i + j * sides][a0] = this.coords[0] + (x * c - y * s);
 							this.verts[i + j * sides][a1] = this.coords[2] + (y * c + x * s);
@@ -83,7 +86,11 @@
 				}
 			}
 
-			const r = new Renderer(new Screen().fullscreen(), new Camera([0,-1,-5]), new input.CenterRotate());
+			const r = new Renderer(
+				new Screen().fullscreen(),
+				new Camera([0, -1, -5]),
+				new input.CenterRotate()
+			);
 
 			let scene = [new Torus([0, 0, 0], 10)];
 			r.setup(scene);

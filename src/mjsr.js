@@ -6,7 +6,6 @@ import { Screen, Screen2d } from "./screen.js";
 
 import { default as input } from "./input.js";
 
-
 import { default as Cube } from "./objects/cube.js";
 
 // import { shuffle } from "./math.js"
