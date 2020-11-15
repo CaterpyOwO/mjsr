@@ -4,6 +4,9 @@ import { Camera } from "./camera.js";
 import { Renderer } from "./renderer.js";
 import { Screen, Screen2d } from "./screen.js";
 
+import { default as input } from "./input.js";
+
+
 import { default as Cube } from "./objects/cube.js";
 
 // import { shuffle } from "./math.js"
@@ -13,6 +16,8 @@ let mjsr = {
 	Screen,
 	Screen2d,
 	Camera,
+
+	input,
 
 	objects: {
 		Cube,
