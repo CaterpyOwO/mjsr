@@ -147,7 +147,6 @@ export class Renderer {
             }
 		`);
 
-
 		this.program = w.program();
 
 		gl.clearColor(1.0, 1.0, 1.0, 1.0);
@@ -193,7 +192,9 @@ export class Renderer {
 
 		c.clearRect(0, 0, canvas.width, canvas.height);
 
-		this.scene.sort((a, b) => distance(this.camera.pos, b.coords) - distance(this.camera.pos, a.coords));
+		this.scene.sort(
+			(a, b) => distance(this.camera.pos, b.coords) - distance(this.camera.pos, a.coords)
+		);
 
 		for (let object of this.scene) {
 			if (!object.faces || object.faces.length == 0) {
