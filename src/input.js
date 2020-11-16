@@ -82,14 +82,13 @@ input.CenterRotate = class {
 		const mouse = (event) => this.mouseRotation([event.movementX, event.movementY]);
 
 		canvas.onmousedown = () => (canvas.onmousemove = mouse);
-		canvas.onmouseup = () => (canvas.onmousemove = null);
+		window.onmouseup = () => (canvas.onmousemove = null);
 	}
 
 	mouseRotation(movement) {
 		let { pos } = this.camera;
 
 		movement[0] *= 0.01;
-		movement[1] *= 0.01;
 
 		this.camera.pos = this.rotate2d(pos, -movement[0], [0, 2]);
 		this.camera.rot[1] += movement[0];

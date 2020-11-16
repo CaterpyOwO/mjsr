@@ -84,7 +84,9 @@ export class Renderer {
             uniform vec3 u_pos;
             uniform vec3 u_rot;
 
-            uniform vec2 u_canvas;
+			uniform vec2 u_canvas;
+			
+			varying vec3 v_surfaceLight;
 
 
             vec2 rotate2d(vec2 pos, float rad) {
@@ -108,14 +110,19 @@ export class Renderer {
                 vertex.y *= f;
 
                 return vec3(vertex.x / u_canvas.x * 2.0, -(vertex.y / u_canvas.y * 2.0), vertex.z / 1000.0);
-            }
+			}
 
-            void main() {
+
+			vec4 light = vec4(0.0, 5.0, 5.0, 1.0);
+
+			void main() {
                 v_colour = colour;
                 v_normal = normal;
 
                 vec3 projected = project(position.xyz);
-                gl_Position = vec4(projected.xyz, 1.0);
+				gl_Position = vec4(projected.xyz, 1.0);
+				
+				v_surfaceLight = light.xyz - position.xyz;
             }
         `);
 
@@ -124,32 +131,22 @@ export class Renderer {
 
             varying vec4 v_normal;
 			varying vec4 v_colour;
+
+			varying vec3 v_surfaceLight;
 			
-			vec4 light = vec4(0.0, 0.5, 1.0, 1.0);
+			vec4 lightd = vec4(0.0, 5.0, 5.0, 1.0);
 
             void main() {
-				float intensity = (dot(normalize(v_normal), light) + 1.0) / 2.0;
-				float monoColour = ((v_colour.r + v_colour.g + v_colour.b) / 3.0) * clamp(intensity, 0.1, 1.0);
+				// float lum = (v_colour.r + v_colour.g + v_colour.b) / 3.0;
+				// vec2 monoColour = vec2(lum, v_colour.a);
 
-                gl_FragColor = vec4(v_colour.rgb * clamp(intensity, 0.1, 1.0), v_colour.a);
+				gl_FragColor = v_colour;
+
+				float light = dot(normalize(v_normal.xyz), normalize(v_surfaceLight));
+				gl_FragColor.rgb *= clamp(light, 0.3, 1.0);
             }
 		`);
 
-		// w.frag(`
-		//     precision mediump float;
-
-		//     varying vec4 v_normal;
-		// 	varying vec4 v_colour;
-
-		// 	vec4 light = vec4(0.0, 0.5, 1.0, 1.0);
-
-		//     void main() {
-		// 		float intensity = (dot(normalize(v_normal), light) + 1.0) / 2.0;
-		// 		float monoColour = ((v_colour.r + v_colour.g + v_colour.b) / 3.0) * clamp(intensity, 0.1, 1.0);
-
-		//         gl_FragColor = vec4(monoColour, monoColour, monoColour, v_colour.a);
-		//     }
-		// `);
 
 		this.program = w.program();
 
@@ -187,7 +184,7 @@ export class Renderer {
 	// #region Experimantal
 	setup2d(scene) {
 		this.scene = scene;
-		this.__setupMovement();
+		this.input.setupMovement();
 	}
 
 	draw2d() {
@@ -196,7 +193,7 @@ export class Renderer {
 
 		c.clearRect(0, 0, canvas.width, canvas.height);
 
-		this.scene.sort((a, b) => distance(cam.pos, b.coords) - distance(cam.pos, a.coords));
+		this.scene.sort((a, b) => distance(this.camera.pos, b.coords) - distance(this.camera.pos, a.coords));
 
 		for (let object of this.scene) {
 			if (!object.faces || object.faces.length == 0) {
@@ -268,7 +265,7 @@ export class Renderer {
 
 						if (object.lighting) {
 							let light = normalize(object.lighting);
-							let dp = dotProduct(cross, light);
+							let dp = dotProduct(normal, light);
 
 							let colour = shadeColour(object.colours[triangle[3]], -dp);
 							(c.strokeStyle = colour), (c.fillStyle = colour);

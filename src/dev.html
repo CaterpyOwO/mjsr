@@ -42,7 +42,7 @@
 							// this.edges.push((j !== sides - 1) ? [i + j * sides, i + (j + 1) * sides] : [i + j * sides, i]);
 							// this.edges.push((i !== sides - 1) ? [i + j * sides, i + j * sides + 1] : [i + j * sides, j * sides]);
 
-							let colour = this.verts[i + j * sides][1] < this.coords[1] - size / 2 ? 1 : 0;
+							let colour = this.verts[i + j * sides][1] < this.coords[1] - size / 4 ? 1 : 0;
 
 							if (j !== sides - 1 && i !== sides - 1) {
 								this.faces.push([ i + (j + 1) * sides, i + j * sides + 1, i + j * sides, colour]);
@@ -64,7 +64,7 @@
 
 			const r = new Renderer(
 				new Screen().fullscreen(),
-				new Camera([0, -1, -5]),
+				new Camera([0,-2,-5], [.4,0,0]),
 				new input.FirstPerson()
 			);
 
