@@ -6,4 +6,4 @@ let app = express();
 app.use("/", express.static(__dirname + "/src/"));
 app.listen(port, host);
 
-console.log("Running server at http://localhost:" + port + "/");
+console.log("Running server at http://localhost:" + port + "/dev.html");

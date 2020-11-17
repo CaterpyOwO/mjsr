@@ -159,25 +159,26 @@ export class Renderer {
 	draw() {
 		const { gl, canvas } = this.screen;
 
-		gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+		gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+
+		gl.useProgram(this.program);
+
+		gl.uniform3fv(gl.getUniformLocation(this.program, "u_pos"), this.camera.pos);
+		gl.uniform3fv(gl.getUniformLocation(this.program, "u_rot"), this.camera.rot);
+
+		gl.uniform2fv(gl.getUniformLocation(this.program, "u_canvas"), [
+			canvas.clientWidth,
+			canvas.clientHeight,
+		]);
+
 		for (let mesh of this.meshes) {
-			gl.useProgram(this.program);
-
-			gl.uniform3fv(gl.getUniformLocation(this.program, "u_pos"), this.camera.pos);
-			gl.uniform3fv(gl.getUniformLocation(this.program, "u_rot"), this.camera.rot);
-
-			gl.uniform2fv(gl.getUniformLocation(this.program, "u_canvas"), [
-				canvas.width,
-				canvas.height,
-			]);
-
 			this.w.buffers(mesh, { colour: 4 });
-
 			gl.drawArrays(gl.TRIANGLES, 0, mesh.position.length / 3);
-			gl.useProgram(null);
 		}
+
+		gl.useProgram(null);
 	}
 
 	// #region Experimantal

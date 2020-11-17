@@ -4,7 +4,7 @@ export class Screen {
 		this.canvas.width = data.width;
 		this.canvas.height = data.height;
 
-		this.gl = this.canvas.getContext("webgl2");
+		this.gl = this.canvas.getContext("webgl");
 
 		data.appendTo.appendChild(this.canvas);
 

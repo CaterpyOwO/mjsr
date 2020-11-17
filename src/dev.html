@@ -64,11 +64,11 @@
 
 			const r = new Renderer(
 				new Screen().fullscreen(),
-				new Camera([0, -2, -5], [0.4, 0, 0]),
+				new Camera([0,-2,-5], [.4,0,0]),
 				new input.FirstPerson()
 			);
 
-			let scene = [new Torus([0, 0, 0], 100)];
+			let scene = [new Torus([0, 0, 0], 20)];
 			r.setup(scene);
 
 			function frame(now) {
