@@ -1,5 +1,11 @@
 const Input = {};
 
+Input.None = class {
+	update() {}
+	setAttributes() {}
+	setupMovement() {}
+};
+
 Input.FirstPerson = class {
 	constructor() {
 		this.keys = [];
@@ -13,8 +19,8 @@ Input.FirstPerson = class {
 	setupMovement() {
 		let { canvas } = this.screen;
 
-		window.onkeydown = (event) => (this.keys[event.keyCode] = true);
-		window.onkeyup = (event) => (this.keys[event.keyCode] = false);
+		window.addEventListener("keydown", (event) => (this.keys[event.key] = true));
+		window.addEventListener("keyup", (event) => (this.keys[event.key] = false));
 
 		let movement = (event) => {
 			if (Math.abs(event.movementX) > 50 || Math.abs(event.movementY) > 50) return;
@@ -32,8 +38,8 @@ Input.FirstPerson = class {
 			else canvas.onmousemove = null;
 		};
 
-		document.onpointerlockchange = () => lock();
-		document.onmozpointerlockchange = () => lock();
+		document.addEventListener("pointerlockchange", lock);
+		document.addEventListener("mozpointerlockchange", lock);
 	}
 
 	mouseRotation(movement, sensitivity = 3) {
@@ -50,23 +56,27 @@ Input.FirstPerson = class {
 	}
 
 	update(dt) {
-		let s = dt / 160;
+		let { canvas } = this.screen;
 
-		if (this.keys[81] || this.keys[16]) this.camera.pos[1] += s; // q, shift
-		if (this.keys[69] || this.keys[32]) this.camera.pos[1] -= s; // e, space
+		if (document.pointerLockElement == canvas || document.mozPointerLockElement == canvas) {
+			let s = dt / 160;
 
-		let x = s * Math.sin(this.camera.rot[1]),
-			y = s * Math.cos(this.camera.rot[1]);
+			if (this.keys["q"] || this.keys[" "]) this.camera.pos[1] += s; // q, shift
+			if (this.keys["e"] || this.keys["Shift"]) this.camera.pos[1] -= s; // e, space
 
-		if (this.keys[87]) (this.camera.pos[0] -= x), (this.camera.pos[2] -= y); // w
-		if (this.keys[83]) (this.camera.pos[0] += x), (this.camera.pos[2] += y); // s
+			let x = s * Math.sin(this.camera.rot[1]),
+				y = s * Math.cos(this.camera.rot[1]);
 
-		if (this.keys[65]) (this.camera.pos[0] += y), (this.camera.pos[2] -= x); // a
-		if (this.keys[68]) (this.camera.pos[0] -= y), (this.camera.pos[2] += x); // d
+			if (this.keys["w"]) (this.camera.pos[0] -= x), (this.camera.pos[2] -= y); // w
+			if (this.keys["s"]) (this.camera.pos[0] += x), (this.camera.pos[2] += y); // s
+
+			if (this.keys["a"]) (this.camera.pos[0] += y), (this.camera.pos[2] -= x); // a
+			if (this.keys["d"]) (this.camera.pos[0] -= y), (this.camera.pos[2] += x); // d
+		}
 	}
 };
 
-Input.CenterRotate = class {
+Input.ModelRotate = class {
 	constructor() {
 		this.keys = [];
 	}
@@ -108,8 +118,6 @@ Input.CenterRotate = class {
 	}
 
 	update() {}
-
-	// mouseRotation
 };
 
 export default Input;

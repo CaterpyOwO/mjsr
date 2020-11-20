@@ -17,7 +17,10 @@ export class Screen {
 		this.canvas.width = innerWidth;
 		this.canvas.height = innerHeight;
 
-		window.onresize = () => (this.canvas.width = innerWidth, this.canvas.height = innerHeight);
+		window.addEventListener(
+			"resize",
+			() => ((this.canvas.width = innerWidth), (this.canvas.height = innerHeight))
+		);
 
 		let style = document.createElement("style");
 		style.innerText = `html,body{margin:0;overflow:hidden}`;
@@ -63,8 +66,10 @@ export class Screen2d {
 		this.canvas.width = innerWidth;
 		this.canvas.height = innerHeight;
 
-		(window.onresize = () => (this.canvas.width = innerWidth)),
-			(this.canvas.height = innerHeight);
+		window.addEventListener(
+			"resize",
+			() => ((this.canvas.width = innerWidth), (this.canvas.height = innerHeight))
+		);
 
 		let style = document.createElement("style");
 		style.innerText = `html,body{margin:0;overflow:hidden}`;

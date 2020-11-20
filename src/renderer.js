@@ -7,11 +7,7 @@ import { parseColour, distance, shadeColour, normalize, crossProduct, dotProduct
 import { default as webglu } from "./webgl.js";
 
 export class Renderer {
-	constructor(
-		screen = new Screen(),
-		camera = new Camera(),
-		inputHandler = new input.FirstPerson()
-	) {
+	constructor(screen = new Screen(), camera = new Camera(), inputHandler = new input.None()) {
 		this.screen = screen;
 		this.camera = camera;
 
@@ -28,6 +24,8 @@ export class Renderer {
 		this.meshes = [];
 
 		for (let object of this.scene) {
+			if (typeof object !== "object") throw new Error(`Invalid object in scene.`);
+
 			const props = ["coords", "verts", "faces", "colours"];
 
 			for (let prop of props)
