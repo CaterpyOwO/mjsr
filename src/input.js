@@ -1,6 +1,6 @@
-const input = {};
+const Input = {};
 
-input.FirstPerson = class {
+Input.FirstPerson = class {
 	constructor() {
 		this.keys = [];
 	}
@@ -66,7 +66,7 @@ input.FirstPerson = class {
 	}
 };
 
-input.CenterRotate = class {
+Input.CenterRotate = class {
 	constructor() {
 		this.keys = [];
 	}
@@ -112,4 +112,4 @@ input.CenterRotate = class {
 	// mouseRotation
 };
 
-export default input;
+export default Input;

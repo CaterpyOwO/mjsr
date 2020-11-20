@@ -28,14 +28,11 @@ export class Renderer {
 		this.meshes = [];
 
 		for (let object of this.scene) {
-			if (typeof object.coords !== "object")
-				throw new Error("Object doesn't haves valid property coords.");
-			if (typeof object.verts !== "object")
-				throw new Error("Object doesn't haves valid property verts.");
-			if (typeof object.faces !== "object")
-				throw new Error("Object doesn't haves valid property faces.");
-			if (typeof object.colours !== "object")
-				throw new Error("Object doesn't haves valid property colours.");
+			const props = ["coords", "verts", "faces", "colours"];
+
+			for (let prop of props)
+				if (typeof object[prop] !== "object")
+					throw new Error(`Object doesn't have required property ${prop}.`);
 
 			let mesh = {
 				position: [],
@@ -76,7 +73,7 @@ export class Renderer {
             attribute vec4 colour;
             attribute vec4 normal;
 
-            uniform mat4 u_projection;
+            // uniform mat4 u_projection;
             
             varying vec4 v_colour;
             varying vec4 v_normal;
@@ -157,11 +154,12 @@ export class Renderer {
 	}
 
 	draw() {
-		const { gl, canvas } = this.screen;
+		const { gl } = this.screen;
 
 		gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+		// console.log(gl.drawingBufferWidth)
 
 		gl.useProgram(this.program);
 
@@ -169,8 +167,8 @@ export class Renderer {
 		gl.uniform3fv(gl.getUniformLocation(this.program, "u_rot"), this.camera.rot);
 
 		gl.uniform2fv(gl.getUniformLocation(this.program, "u_canvas"), [
-			canvas.clientWidth,
-			canvas.clientHeight,
+			gl.drawingBufferWidth,
+			gl.drawingBufferHeight,
 		]);
 
 		for (let mesh of this.meshes) {

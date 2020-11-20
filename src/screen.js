@@ -1,12 +1,14 @@
 export class Screen {
-	constructor(data = { width: 640, height: 480, appendTo: document.body }) {
-		this.canvas = document.createElement("canvas");
-		this.canvas.width = data.width;
-		this.canvas.height = data.height;
+	constructor(size = { width: 640, height: 480 }, parent = document.body, canvas) {
+		if (canvas instanceof HTMLCanvasElement) this.canvas = canvas;
+		else this.canvas = document.createElement("canvas");
+
+		this.canvas.width = size.width;
+		this.canvas.height = size.height;
 
 		this.gl = this.canvas.getContext("webgl");
 
-		data.appendTo.appendChild(this.canvas);
+		if (parent instanceof HTMLElement) parent.appendChild(this.canvas);
 
 		return this;
 	}
@@ -15,8 +17,7 @@ export class Screen {
 		this.canvas.width = innerWidth;
 		this.canvas.height = innerHeight;
 
-		(window.onresize = () => (this.canvas.width = innerWidth)),
-			(this.canvas.height = innerHeight);
+		window.onresize = () => (this.canvas.width = innerWidth, this.canvas.height = innerHeight);
 
 		let style = document.createElement("style");
 		style.innerText = `html,body{margin:0;overflow:hidden}`;
