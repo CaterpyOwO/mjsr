@@ -6,7 +6,7 @@ Designed with simplicity in mind.
 To use it download `mjsr.js` from the releases tab, or build it yourself with webpack using `npm i && npm run build`. Then include it in your html file with:
 
 ```html
-<script src="./path/to/mjsr.js"></script>
+<script src="./mjsr.js"></script>
 ```
 
 You can also use the `serve.js` file supplied to host a HTTP server on port 8080, to use mjsr without need of bundling it with webpack.
@@ -16,8 +16,8 @@ You can also use the `serve.js` file supplied to host a HTTP server on port 8080
 This example will result in a fullscreen document with a cube in the middle of the screen. You can lock the cursor by pressing on it, then you can move around with `WASD` keys, and use your mouse for rotating.
 
 ```js
-const { Renderer, Screen, Camera } = mjsr;
-const r = new Renderer(new Screen().fullscreen(), new Camera([0, 0, -7]));
+const { Renderer, Screen, Camera, input } = mjsr;
+const r = new Renderer(new Screen().fullscreen(), new Camera([0, 0, -7]), new input.FirstPerson());
 
 let scene = [new mjsr.objects.Cube([0, 0, 0])];
 r.setup(scene);
