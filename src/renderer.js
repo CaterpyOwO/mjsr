@@ -40,6 +40,7 @@ export class Renderer {
 				primitives.includes(object.primitive) !== undefined
 			)
 				primitive = primitives.indexOf(object.primitive);
+			else throw new Error("No primitive type supplied.");
 
 			for (let prop of props[primitive])
 				if (object[prop] === undefined)
