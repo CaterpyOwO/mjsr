@@ -32,14 +32,30 @@ function frame(now) {
 requestAnimationFrame(frame);
 ```
 
-All objects in the `scene` array should have at least four properties:
+All objects in the `scene` array should have at these four properties:
 
--   `coords` - The coordinatese of the object in model space. Should be an array with three elements: `[x, y, z]`
+-   `coords` - The coordinates of the object in model space. Should be an array with three elements: `[x, y, z]`
+-   `primitive` - The primitive type which should be drawn: "triangles" | "lines" | "points"
 -   `verts` - The vertices of the object in model space. Should be an array of arrays with three elements: `[x, y, z]`
+-   `colours` - The colours of the faces of the object. Should be an array of HEX colours.
+
+In case of `triangles` you should also include:
+
 -   `faces ` - The faces of the object. Should be an array of arrays with four elements: `[i1, i2, i3, c]`, where
     -   `i1`, `i2`, and `i3` are the indices of the vertices of the triangle.
     -   `c` is the index of the colour in the `colours` array.
--   `colours` - The colours of the faces of the object. Should be an array of HEX colours.
+
+In case of `lines` you should include:
+
+-   `edges ` - The edges of the object. Should be an array of arrays with three elements: `[i1, i2, c]`, where
+    -   `i1`, `i2` are the indices of the vertices of the line.
+    -   `c` is the index of the colour in the `colours` array.
+
+While in case of `points` no other properties are required, although each element of the `verts` array should have an additional property:
+
+-   `verts` - The vertices of the object in model space. Should be an array of arrays with three elements: `[x, y, z, c]`, where
+    -   `x`, `y`, and `z` are the coordinates of the vertex.
+    -   `c` is the index of the colour in the `colours` array.
 
 ## An example object
 
@@ -51,6 +67,8 @@ class Cube {
 		let [x, y, z] = coords;
 
 		this.coords = coords;
+
+		this.primitive = "triangles";
 
 		this.verts = [
 			[x - 1, y - 1, z - 1],

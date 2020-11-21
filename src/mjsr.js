@@ -2,7 +2,7 @@
 
 import { Camera } from "./camera.js";
 import { Renderer } from "./renderer.js";
-import { Screen, Screen2d } from "./screen.js";
+import { Screen } from "./screen.js";
 
 import { default as input } from "./input.js";
 
@@ -13,7 +13,6 @@ import { default as Cube } from "./objects/cube.js";
 let mjsr = {
 	Renderer,
 	Screen,
-	Screen2d,
 	Camera,
 
 	input,

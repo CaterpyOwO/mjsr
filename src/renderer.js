@@ -26,34 +26,69 @@ export class Renderer {
 		for (let object of this.scene) {
 			if (typeof object !== "object") throw new Error(`Invalid object in scene.`);
 
-			const props = ["coords", "verts", "faces", "colours"];
+			const props = {
+				0: ["coords", "verts", "colours", "primitive"],
+				1: ["coords", "verts", "edges", "colours", "primitive"],
+				2: ["coords", "verts", "faces", "colours", "primitive"],
+			};
 
-			for (let prop of props)
-				if (typeof object[prop] !== "object")
+			const primitives = ["points", "lines", "triangles"];
+			let primitive;
+
+			if (
+				typeof object.primitive === "string" &&
+				primitives.includes(object.primitive) !== undefined
+			)
+				primitive = primitives.indexOf(object.primitive);
+
+			for (let prop of props[primitive])
+				if (object[prop] === undefined)
 					throw new Error(`Object doesn't have required property ${prop}.`);
 
 			let mesh = {
 				position: [],
 				colour: [],
 				normal: [],
+				primitive,
 			};
 
-			for (let triangle of object.faces) {
-				let cross = crossProduct([
-					object.verts[triangle[0]],
-					object.verts[triangle[1]],
-					object.verts[triangle[2]],
-				]);
-				let colour = parseColour(object.colours[triangle[3]]);
+			switch (primitive) {
+				case 0:
+					for (let vert of object.verts) {
+						let colour = parseColour(object.colours[vert[3]]);
 
-				mesh.position.push(
-					...object.verts[triangle[2]],
-					...object.verts[triangle[1]],
-					...object.verts[triangle[0]]
-				);
+						mesh.position.push(vert[0], vert[1], vert[2]);
+						mesh.colour.push(...colour);
+					}
+					break;
+				case 1:
+					for (let edge of object.edges) {
+						let colour = parseColour(object.colours[edge[2]]);
 
-				mesh.colour.push(...colour, ...colour, ...colour);
-				mesh.normal.push(...cross, ...cross, ...cross);
+						mesh.position.push(...object.verts[edge[1]], ...object.verts[edge[0]]);
+
+						mesh.colour.push(...colour, ...colour);
+					}
+					break;
+				case 2:
+					for (let triangle of object.faces) {
+						let cross = crossProduct([
+							object.verts[triangle[0]],
+							object.verts[triangle[1]],
+							object.verts[triangle[2]],
+						]);
+						let colour = parseColour(object.colours[triangle[3]]);
+
+						mesh.position.push(
+							...object.verts[triangle[2]],
+							...object.verts[triangle[1]],
+							...object.verts[triangle[0]]
+						);
+
+						mesh.colour.push(...colour, ...colour, ...colour);
+						mesh.normal.push(...cross, ...cross, ...cross);
+					}
+					break;
 			}
 
 			this.meshes.push(mesh);
@@ -71,7 +106,8 @@ export class Renderer {
             attribute vec4 colour;
             attribute vec4 normal;
 
-            // uniform mat4 u_projection;
+			uniform int u_primitive;
+			// varying int v_primitive;
             
             varying vec4 v_colour;
             varying vec4 v_normal;
@@ -79,7 +115,7 @@ export class Renderer {
             uniform vec3 u_pos;
             uniform vec3 u_rot;
 
-			uniform vec2 u_canvas;
+			uniform vec2 u_canvas;			
 			
 			varying vec3 v_surfaceLight;
 
@@ -111,13 +147,18 @@ export class Renderer {
 			vec4 light = vec4(0.0, 5.0, 5.0, 1.0);
 
 			void main() {
-                v_colour = colour;
-                v_normal = normal;
+				v_colour = colour;
+				// v_primitive = u_primitive;
+
+				if (u_primitive == 2) {
+					v_surfaceLight = light.xyz - position.xyz;
+					v_normal = normal;
+				} else if (u_primitive == 0) gl_PointSize = 5.0;
+
 
                 vec3 projected = project(position.xyz);
 				gl_Position = vec4(projected.xyz, 1.0);
 				
-				v_surfaceLight = light.xyz - position.xyz;
             }
         `);
 
@@ -126,6 +167,8 @@ export class Renderer {
 
             varying vec4 v_normal;
 			varying vec4 v_colour;
+
+			uniform highp int u_primitive;
 
 			varying vec3 v_surfaceLight;
 			
@@ -137,8 +180,10 @@ export class Renderer {
 
 				gl_FragColor = v_colour;
 
-				float light = dot(normalize(v_normal.xyz), normalize(v_surfaceLight));
-				gl_FragColor.rgb *= clamp(light, 0.3, 1.0);
+				if (u_primitive == 2) {
+					float light = dot(normalize(v_normal.xyz), normalize(v_surfaceLight));
+					gl_FragColor.rgb *= clamp(light, 0.3, 1.0);
+				}
             }
 		`);
 
@@ -170,118 +215,22 @@ export class Renderer {
 		]);
 
 		for (let mesh of this.meshes) {
-			this.w.buffers(mesh, { colour: 4 });
-			gl.drawArrays(gl.TRIANGLES, 0, mesh.position.length / 3);
+			let primitive = mesh.primitive;
+
+			gl.uniform1i(gl.getUniformLocation(this.program, "u_primitive"), primitive);
+
+			this.w.buffers(
+				{ position: mesh.position, normal: mesh.normal, colour: mesh.colour },
+				{ colour: 4 }
+			);
+
+			let primitives = [gl.POINTS, gl.LINES, gl.TRIANGLES];
+
+			gl.drawArrays(primitives[primitive], 0, mesh.position.length / (primitive + 1));
 		}
 
 		gl.useProgram(null);
 	}
-
-	// #region Experimantal
-	setup2d(scene) {
-		this.scene = scene;
-		this.input.setupMovement();
-	}
-
-	draw2d() {
-		// const {context: c, canvas: canvasElement} = cam.rcanvas;
-		const { c, canvas } = this.screen;
-
-		c.clearRect(0, 0, canvas.width, canvas.height);
-
-		this.scene.sort(
-			(a, b) => distance(this.camera.pos, b.coords) - distance(this.camera.pos, a.coords)
-		);
-
-		for (let object of this.scene) {
-			if (!object.faces || object.faces.length == 0) {
-				for (let edge of object.edges) {
-					c.lineWidth = 1;
-
-					c.beginPath();
-
-					c.moveToD(this.camera.projectVertex2d(object.verts[edge[0]], canvas));
-					c.lineToD(this.camera.projectVertex2d(object.verts[edge[1]], canvas));
-
-					c.strokeStyle = "#111";
-
-					c.stroke();
-					c.closePath();
-				}
-
-				for (let vert of object.verts) {
-					let [x, y] = this.camera.projectVertex2d(vert, canvas);
-					let dst = distance(this.camera.pos, vert);
-
-					c.beginPath();
-					c.arc(x, y, 30 / dst, 0, 2 * Math.PI, false);
-					c.closePath();
-
-					c.fillStyle = "#ff00ff";
-					c.strokeStyle = "#111";
-
-					c.fill();
-					c.stroke();
-				}
-			} else {
-				let facesSorted = object.faces;
-				facesSorted.sort((a, b) => {
-					let za =
-							this.camera.projectVertex2d(object.verts[a[0]], canvas)[2] +
-							this.camera.projectVertex2d(object.verts[a[1]], canvas)[2] +
-							this.camera.projectVertex2d(object.verts[a[2]], canvas)[2] / 3,
-						zb =
-							this.camera.projectVertex2d(object.verts[b[0]], canvas)[2] +
-							this.camera.projectVertex2d(object.verts[b[1]], canvas)[2] +
-							this.camera.projectVertex2d(object.verts[b[2]], canvas)[2] / 3;
-
-					return zb - za;
-				});
-
-				for (let triangle of facesSorted) {
-					let normal = crossProduct([
-						object.verts[triangle[0]],
-						object.verts[triangle[1]],
-						object.verts[triangle[2]],
-					]);
-
-					if (
-						normal[0] * (object.verts[triangle[0]][0] - this.camera.pos[0]) +
-							normal[1] * (object.verts[triangle[0]][1] - this.camera.pos[1]) +
-							normal[2] * (object.verts[triangle[0]][2] - this.camera.pos[2]) >
-						0
-					) {
-						c.lineWidth = 1;
-
-						c.beginPath();
-
-						c.moveToD(this.camera.projectVertex2d(object.verts[triangle[0]], canvas));
-						c.lineToD(this.camera.projectVertex2d(object.verts[triangle[1]], canvas));
-						c.lineToD(this.camera.projectVertex2d(object.verts[triangle[2]], canvas));
-
-						c.closePath();
-
-						if (object.lighting) {
-							let light = normalize(object.lighting);
-							let dp = dotProduct(normal, light);
-
-							let colour = shadeColour(object.colours[triangle[3]], -dp);
-							(c.strokeStyle = colour), (c.fillStyle = colour);
-						} else
-							(c.strokeStyle = object.colours[triangle[3]]),
-								(c.fillStyle = object.colours[triangle[3]]);
-
-						c.fill();
-						c.stroke();
-
-						c.strokeStyle = "#111";
-						c.fillStyle = "#111";
-					}
-				}
-			}
-		}
-	}
-	// #endregion
 
 	update(now) {
 		this.dt = this.last - now;

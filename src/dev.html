@@ -21,7 +21,7 @@
 					this.verts = [];
 					this.faces = [];
 
-					// this.lighting = [1, -1, -1];
+					this.primitive = "triangles";
 
 					for (let j = 0; j <= sides - 1; j++) {
 						let s = Math.sin(((2 * Math.PI) / sides) * j),
@@ -63,9 +63,9 @@
 			}
 
 			const r = new Renderer(
-				new Screen().fullscreen(),
+				new Screen({}, document.querySelector(".screen")).fillParent(),
 				new Camera([0, -2, -5], [0.4, 0, 0]),
-				new input.FirstPerson()
+				new input.ModelRotate()
 			);
 
 			let scene = [new Torus([0, 0, 0], 20)];
@@ -80,6 +80,15 @@
 
 			requestAnimationFrame(frame);
 		</script>
+		<style>
+			.screen {
+				width: 100%;
+				max-width: 500px;
+				height: 300px;
+			}
+		</style>
 	</head>
-	<body></body>
+	<body>
+		<div class="screen"></div>
+	</body>
 </html>

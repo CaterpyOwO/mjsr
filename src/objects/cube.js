@@ -4,6 +4,8 @@ export default class {
 
 		this.coords = coords;
 
+		this.primitive = "triangles";
+
 		this.verts = [
 			[x - 1, y - 1, z - 1],
 			[x + 1, y - 1, z - 1],
