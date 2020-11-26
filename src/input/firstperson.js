@@ -66,6 +66,6 @@ class FirstPerson {
 			if (this.keys["d"]) (this.camera.pos[0] -= y), (this.camera.pos[2] += x); // d
 		}
 	}
-};
+}
 
 export { FirstPerson };

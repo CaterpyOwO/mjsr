@@ -24,4 +24,4 @@ vec3 project(vec3 vertex) {
     vertex.y *= f;
 
     return vec3(vertex.x / u_canvas.x * 2.0, -(vertex.y / u_canvas.y * 2.0), vertex.z / 1000.0);
-}`
+}`;

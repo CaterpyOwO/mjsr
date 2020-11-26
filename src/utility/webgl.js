@@ -1,4 +1,4 @@
-export class Webglu  {
+export class Webglu {
 	constructor(gl) {
 		this.gl = gl;
 

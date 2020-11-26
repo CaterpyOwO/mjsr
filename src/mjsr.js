@@ -8,13 +8,12 @@ import { Input } from "./input/input.js";
 
 import { Geometry } from "./geometry/geometry.js";
 
-
 const mjsr = {
 	Renderer,
 	Screen,
 	Camera,
 	Input,
-	Geometry
+	Geometry,
 };
 
 if (typeof define === "function" && define.amd) define([], () => mjsr);

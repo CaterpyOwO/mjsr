@@ -60,6 +60,6 @@ class ModelRotate {
 	}
 
 	update() {}
-};
+}
 
 export { ModelRotate };

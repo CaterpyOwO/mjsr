@@ -2,14 +2,13 @@ import { Screen } from "./screen.js";
 import { Camera } from "./camera.js";
 import { Input } from "../input/input.js";
 
-import { crossProduct  } from "../utility/math.js";
+import { crossProduct } from "../utility/math.js";
 import { parseColour } from "../utility/colour.js";
 
 import { Webglu } from "../utility/webgl.js";
 
 import { generate as vertex } from "./shaders/vert.js";
 import { generate as fragment } from "./shaders/frag.js";
-
 
 export class Renderer {
 	constructor(screen = new Screen(), camera = new Camera(), inputHandler = new Input.None()) {
@@ -109,17 +108,15 @@ export class Renderer {
 		for (let primitive of this.primitives) {
 			let shader = new Webglu(gl);
 
-			let lighting = (primitive == 2);
+			let lighting = primitive == 2;
 
-			shader.vert(vertex({lighting, primitive}));
-			shader.frag(fragment({lighting, primitive}));
+			shader.vert(vertex({ lighting, primitive }));
+			shader.frag(fragment({ lighting, primitive }));
 
 			shader.program();
 
 			this.shaders[primitive] = shader;
 		}
-
-		// this.program = w.program();
 
 		gl.clearColor(1.0, 1.0, 1.0, 1.0);
 		gl.enable(gl.DEPTH_TEST);
@@ -135,10 +132,6 @@ export class Renderer {
 		gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-		// console.log(gl.drawingBufferWidth)
-		
-		// console.log(this.shaders);
-
 		for (let sh in this.shaders) {
 			let shader = this.shaders[sh];
 
@@ -146,7 +139,7 @@ export class Renderer {
 
 			gl.uniform3fv(gl.getUniformLocation(shader.glprogram, "u_pos"), this.camera.pos);
 			gl.uniform3fv(gl.getUniformLocation(shader.glprogram, "u_rot"), this.camera.rot);
-	
+
 			gl.uniform2fv(gl.getUniformLocation(shader.glprogram, "u_canvas"), [
 				gl.drawingBufferWidth,
 				gl.drawingBufferHeight,
@@ -166,14 +159,12 @@ export class Renderer {
 			let buffers = { position: mesh.position, colour: mesh.colour };
 			if (mesh.primitive == 2) buffers.normal = mesh.normal;
 
-			shader.buffers(buffers,
-				{ colour: 4 }
-			);
+			shader.buffers(buffers, { colour: 4 });
 
 			gl.drawArrays(primitives[primitive], 0, mesh.position.length / (primitive + 1));
-		}
 
-		gl.useProgram(null);
+			gl.useProgram(null);
+		}
 	}
 
 	update(now) {
