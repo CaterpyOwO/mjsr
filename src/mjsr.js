@@ -1,25 +1,20 @@
 "use strict";
 
-import { Camera } from "./camera.js";
-import { Renderer } from "./renderer.js";
-import { Screen } from "./screen.js";
+import { Camera } from "./core/camera.js";
+import { Renderer } from "./core/renderer.js";
+import { Screen } from "./core/screen.js";
 
-import { default as input } from "./input.js";
+import { Input } from "./input/input.js";
 
-import { default as Cube } from "./objects/cube.js";
+import { Geometry } from "./geometry/geometry.js";
 
-// import { shuffle } from "./math.js"
 
-let mjsr = {
+const mjsr = {
 	Renderer,
 	Screen,
 	Camera,
-
-	input,
-
-	objects: {
-		Cube,
-	},
+	Input,
+	Geometry
 };
 
 if (typeof define === "function" && define.amd) define([], () => mjsr);

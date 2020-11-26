@@ -1,13 +1,13 @@
 import { Screen } from "./screen.js";
 import { Camera } from "./camera.js";
-import { default as input } from "./input.js";
+import { Input } from "../input/input.js";
 
-import { parseColour, distance, shadeColour, normalize, crossProduct, dotProduct } from "./math.js";
+import { parseColour, distance, shadeColour, normalize, crossProduct, dotProduct } from "../utility/math.js";
 
-import { default as webglu } from "./webgl.js";
+import { default as webglu } from "../utility/webgl.js";
 
 export class Renderer {
-	constructor(screen = new Screen(), camera = new Camera(), inputHandler = new input.None()) {
+	constructor(screen = new Screen(), camera = new Camera(), inputHandler = new Input.None()) {
 		this.screen = screen;
 		this.camera = camera;
 

@@ -9,7 +9,7 @@
 		<script src="mjsr.js" type="module"></script>
 
 		<script type="module">
-			const { Renderer, Screen, Camera, input } = mjsr;
+			const { Renderer, Screen, Camera, Input } = mjsr;
 
 			// prettier-ignore
 			class Torus {
@@ -65,7 +65,7 @@
 			const r = new Renderer(
 				new Screen({}, document.querySelector(".screen")).fillParent(),
 				new Camera([0, -2, -5], [0.4, 0, 0]),
-				new input.ModelRotate()
+				new Input.ModelRotate()
 			);
 
 			let scene = [new Torus([0, 0, 0], 20)];
