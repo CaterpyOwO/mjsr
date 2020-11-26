@@ -36,13 +36,16 @@
 								this.verts[i + j * sides][a1],
 							];
 
+							let colour = this.verts[i + j * sides][1] < this.coords[1] - size / 4 ? 1 : 0;
+
+							// this.verts[i + j * sides][3] = colour
+
 							this.verts[i + j * sides][a0] = this.coords[0] + (x * c - y * s);
 							this.verts[i + j * sides][a1] = this.coords[2] + (y * c + x * s);
 
 							// this.edges.push((j !== sides - 1) ? [i + j * sides, i + (j + 1) * sides] : [i + j * sides, i]);
 							// this.edges.push((i !== sides - 1) ? [i + j * sides, i + j * sides + 1] : [i + j * sides, j * sides]);
 
-							let colour = this.verts[i + j * sides][1] < this.coords[1] - size / 4 ? 1 : 0;
 
 							if (j !== sides - 1 && i !== sides - 1) {
 								this.faces.push([ i + (j + 1) * sides, i + j * sides + 1, i + j * sides, colour]);

@@ -2,9 +2,14 @@ import { Screen } from "./screen.js";
 import { Camera } from "./camera.js";
 import { Input } from "../input/input.js";
 
-import { parseColour, distance, shadeColour, normalize, crossProduct, dotProduct } from "../utility/math.js";
+import { crossProduct  } from "../utility/math.js";
+import { parseColour } from "../utility/colour.js";
 
-import { default as webglu } from "../utility/webgl.js";
+import { Webglu } from "../utility/webgl.js";
+
+import { generate as vertex } from "./shaders/vert.js";
+import { generate as fragment } from "./shaders/frag.js";
+
 
 export class Renderer {
 	constructor(screen = new Screen(), camera = new Camera(), inputHandler = new Input.None()) {
@@ -22,6 +27,9 @@ export class Renderer {
 	setup(scene) {
 		this.scene = scene;
 		this.meshes = [];
+
+		this.primitives = new Set();
+		this.shaders = {};
 
 		for (let object of this.scene) {
 			if (typeof object !== "object") throw new Error(`Invalid object in scene.`);
@@ -92,103 +100,26 @@ export class Renderer {
 					break;
 			}
 
+			this.primitives.add(primitive);
 			this.meshes.push(mesh);
 		}
 
 		const { gl } = this.screen;
 
-		const w = new webglu(gl);
-		this.w = w;
+		for (let primitive of this.primitives) {
+			let shader = new Webglu(gl);
 
-		w.vert(`
-			precision mediump float;
+			let lighting = (primitive == 2);
 
-            attribute vec4 position;
-            attribute vec4 colour;
-            attribute vec4 normal;
+			shader.vert(vertex({lighting, primitive}));
+			shader.frag(fragment({lighting, primitive}));
 
-			uniform int u_primitive;
-			// varying int v_primitive;
-            
-            varying vec4 v_colour;
-            varying vec4 v_normal;
+			shader.program();
 
-            uniform vec3 u_pos;
-            uniform vec3 u_rot;
+			this.shaders[primitive] = shader;
+		}
 
-			uniform vec2 u_canvas;			
-			
-			varying vec3 v_surfaceLight;
-
-
-            vec2 rotate2d(vec2 pos, float rad) {
-                float s = sin(rad);
-                float c = cos(rad);
-        
-                return vec2(pos.x * c - pos.y * s, pos.y * c + pos.x * s);
-            }
-
-
-            vec3 project(vec3 vertex) {
-                vertex.x -= u_pos.x;
-                vertex.y -= u_pos.y;
-                vertex.z -= u_pos.z;
-                
-                vertex.xz = rotate2d(vertex.xz, u_rot.y);
-                vertex.yz = rotate2d(vertex.yz, u_rot.x);
-                
-                float f = 600.0 / max(0.0, vertex.z);
-                vertex.x *= f;
-                vertex.y *= f;
-
-                return vec3(vertex.x / u_canvas.x * 2.0, -(vertex.y / u_canvas.y * 2.0), vertex.z / 1000.0);
-			}
-
-
-			vec4 light = vec4(0.0, 5.0, 5.0, 1.0);
-
-			void main() {
-				v_colour = colour;
-				// v_primitive = u_primitive;
-
-				if (u_primitive == 2) {
-					v_surfaceLight = light.xyz - position.xyz;
-					v_normal = normal;
-				} else if (u_primitive == 0) gl_PointSize = 5.0;
-
-
-                vec3 projected = project(position.xyz);
-				gl_Position = vec4(projected.xyz, 1.0);
-				
-            }
-        `);
-
-		w.frag(`
-            precision mediump float;
-
-            varying vec4 v_normal;
-			varying vec4 v_colour;
-
-			uniform highp int u_primitive;
-
-			varying vec3 v_surfaceLight;
-			
-			vec4 lightd = vec4(0.0, 5.0, 5.0, 1.0);
-
-            void main() {
-				// float lum = (v_colour.r + v_colour.g + v_colour.b) / 3.0;
-				// vec2 monoColour = vec2(lum, v_colour.a);
-
-				gl_FragColor = v_colour;
-
-				if (u_primitive == 2) {
-					float light = dot(normalize(v_normal.xyz), normalize(v_surfaceLight));
-					gl_FragColor.rgb *= clamp(light, 0.3, 1.0);
-				}
-            }
-		`);
-
-		this.program = w.program();
+		// this.program = w.program();
 
 		gl.clearColor(1.0, 1.0, 1.0, 1.0);
 		gl.enable(gl.DEPTH_TEST);
@@ -199,33 +130,45 @@ export class Renderer {
 
 	draw() {
 		const { gl } = this.screen;
+		let primitives = [gl.POINTS, gl.LINES, gl.TRIANGLES];
 
 		gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 		// console.log(gl.drawingBufferWidth)
+		
+		// console.log(this.shaders);
 
-		gl.useProgram(this.program);
+		for (let sh in this.shaders) {
+			let shader = this.shaders[sh];
 
-		gl.uniform3fv(gl.getUniformLocation(this.program, "u_pos"), this.camera.pos);
-		gl.uniform3fv(gl.getUniformLocation(this.program, "u_rot"), this.camera.rot);
+			gl.useProgram(shader.glprogram);
 
-		gl.uniform2fv(gl.getUniformLocation(this.program, "u_canvas"), [
-			gl.drawingBufferWidth,
-			gl.drawingBufferHeight,
-		]);
+			gl.uniform3fv(gl.getUniformLocation(shader.glprogram, "u_pos"), this.camera.pos);
+			gl.uniform3fv(gl.getUniformLocation(shader.glprogram, "u_rot"), this.camera.rot);
+	
+			gl.uniform2fv(gl.getUniformLocation(shader.glprogram, "u_canvas"), [
+				gl.drawingBufferWidth,
+				gl.drawingBufferHeight,
+			]);
+
+			gl.useProgram(null);
+		}
 
 		for (let mesh of this.meshes) {
-			let primitive = mesh.primitive;
+			const primitive = mesh.primitive;
+			const shader = this.shaders[primitive];
 
-			gl.uniform1i(gl.getUniformLocation(this.program, "u_primitive"), primitive);
+			gl.useProgram(shader.glprogram);
 
-			this.w.buffers(
-				{ position: mesh.position, normal: mesh.normal, colour: mesh.colour },
+			// gl.uniform1i(gl.getUniformLocation(shader.glprogram, "u_primitive"), primitive);
+
+			let buffers = { position: mesh.position, colour: mesh.colour };
+			if (mesh.primitive == 2) buffers.normal = mesh.normal;
+
+			shader.buffers(buffers,
 				{ colour: 4 }
 			);
-
-			let primitives = [gl.POINTS, gl.LINES, gl.TRIANGLES];
 
 			gl.drawArrays(primitives[primitive], 0, mesh.position.length / (primitive + 1));
 		}

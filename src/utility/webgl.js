@@ -1,4 +1,4 @@
-export default class {
+export class Webglu  {
 	constructor(gl) {
 		this.gl = gl;
 
