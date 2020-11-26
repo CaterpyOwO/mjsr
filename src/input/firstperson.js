@@ -11,8 +11,8 @@ class FirstPerson {
 	setupMovement() {
 		let { canvas } = this.screen;
 
-		window.addEventListener("keydown", (event) => (this.keys[event.key] = true));
-		window.addEventListener("keyup", (event) => (this.keys[event.key] = false));
+		window.addEventListener("keydown", (event) => (this.keys[event.key.toLowerCase()] = true));
+		window.addEventListener("keyup", (event) => (this.keys[event.key.toLowerCase()] = false));
 
 		let movement = (event) => {
 			if (Math.abs(event.movementX) > 50 || Math.abs(event.movementY) > 50) return;
