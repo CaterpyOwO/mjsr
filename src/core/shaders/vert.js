@@ -11,8 +11,6 @@ return `
     varying vec4 v_colour;
     varying vec4 v_normal;
 
-    uniform mat4 u_model;
-
     ${project}
 
     ${options.lighting ? "varying vec3 v_surfaceLight; vec4 light = vec4(0.0, 5.0, 5.0, 1.0);":""}
