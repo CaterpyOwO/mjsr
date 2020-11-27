@@ -1,8 +1,8 @@
 import { preprocess } from "../../utility/preprocess.js";
 
-
 export function generate(options = { primitive: 2, lighting: true, mono: false }) {
-return preprocess(`
+	return preprocess(
+		`
 precision mediump float;
 
 varying vec4 v_normal;
@@ -27,5 +27,7 @@ void main() {
 		float light = dot(normalize(v_normal.xyz), normalize(v_surfaceLight));
 		gl_FragColor.rgb *= clamp(light, 0.3, 1.0);
 	#endif
-}`, options);
+}`,
+		options
+	);
 }

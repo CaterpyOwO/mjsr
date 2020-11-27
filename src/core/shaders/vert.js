@@ -2,7 +2,8 @@ import { preprocess } from "../../utility/preprocess.js";
 import { fragment as project } from "./fragments/project.glsl.js";
 
 export function generate(options = { primitive: 2, lighting: true }) {
-	return preprocess(`
+	return preprocess(
+		`
     precision mediump float;
 
     attribute vec4 position;
@@ -35,5 +36,7 @@ export function generate(options = { primitive: 2, lighting: true }) {
         vec3 projected = project(position.xyz);
         gl_Position = vec4(projected.xyz, 1.0);
     }
-    `, options);
+    `,
+		options
+	);
 }
