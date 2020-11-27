@@ -111,7 +111,7 @@ export class Renderer {
 			let lighting = primitive == 2;
 
 			shader.vert(vertex({ lighting, primitive }));
-			shader.frag(fragment({ lighting, primitive }));
+			shader.frag(fragment({ lighting, primitive, mono: false}));
 
 			shader.program();
 

@@ -1,7 +1,8 @@
+import { preprocess } from "../../utility/preprocess.js";
 import { fragment as project } from "./fragments/project.glsl.js";
 
 export function generate(options = { primitive: 2, lighting: true }) {
-	return `
+	return preprocess(`
     precision mediump float;
 
     attribute vec4 position;
@@ -13,22 +14,26 @@ export function generate(options = { primitive: 2, lighting: true }) {
 
     ${project}
 
-    ${options.lighting ? "varying vec3 v_surfaceLight; vec4 light = vec4(0.0, 5.0, 5.0, 1.0);" : ""}
+    #if (options.lighting)
+        varying vec3 v_surfaceLight; 
+        vec4 light = vec4(0.0, 5.0, 5.0, 1.0);
+    #endif
+
 
     void main() {
         v_colour = colour;
 
-        ${
-			options.primitive == 2 && options.lighting
-				? `
-        v_surfaceLight = light.xyz - position.xyz;
-        v_normal = normal;`
-				: ""
-		}
+        #if (options.primitive == 2 && options.lighting) 
+            v_surfaceLight = light.xyz - position.xyz;
+            v_normal = normal;
+        #endif
 
-        ${options.primitive == 0 ? "gl_PointSize = 5.0;" : ""}
+        #if (options.primitive == 0)
+            gl_PointSize = 5.0;
+        #endif
 
         vec3 projected = project(position.xyz);
         gl_Position = vec4(projected.xyz, 1.0);
-    }`;
+    }
+    `, options);
 }
