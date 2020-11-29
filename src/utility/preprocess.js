@@ -23,9 +23,6 @@ export function preprocess(source, options) {
 					break;
 				default:
 					// lines.splice(0, parseInt(l));
-
-					console.log(line);
-
 					if (condition) output += `${line}\n`;
 					break;
 			}
@@ -34,9 +31,5 @@ export function preprocess(source, options) {
 		return output.trim();
 	}
 
-	let out = traverse(source.split(/\n/));
-
-	console.info(out);
-
-	return out;
+	return traverse(source.split(/\n/));
 }
