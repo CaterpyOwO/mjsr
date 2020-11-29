@@ -1,5 +1,7 @@
 import { preprocess } from "../../utility/preprocess.js";
 
+import { fragment as mono } from "./fragments/mono.glsl.js";
+
 export function generate(options = { primitive: 2, lighting: true, mono: false }) {
 	return preprocess(
 		`
@@ -15,10 +17,7 @@ varying vec4 v_colour;
 
 void main() {
 	#if options.mono
-		float lum = (v_colour.r + v_colour.g + v_colour.b) / 3.0;
-		vec2 monoColour = vec2(lum, v_colour.a);
-
-		gl_FragColor = monoColour.xxxy;
+		${mono}
 	#else
 		gl_FragColor = v_colour;
 	#endif
