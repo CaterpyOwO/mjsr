@@ -25,3 +25,11 @@ vec3 project(vec3 vertex) {
 
     return vec3(vertex.x / u_canvas.x * 2.0, -(vertex.y / u_canvas.y * 2.0), vertex.z / 1000.0);
 }`;
+
+export const fragment2 = `    
+    vec4 project(vec4 vertex) {
+        mat4 mvp = u_vp * u_model;
+
+        return mvp * vertex;
+    }
+`;

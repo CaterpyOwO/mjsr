@@ -59,7 +59,6 @@ class Donut {
 	}
 }
 
-
 let scene = [new Donut([0, 0, 0], 20)];
 r.setup(scene);
 

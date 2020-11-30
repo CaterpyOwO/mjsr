@@ -6,4 +6,7 @@ module.exports = {
 		path: path.resolve(__dirname, "dist"),
 		filename: "mjsr.js",
 	},
+	optimization: {
+		usedExports: true,
+	},
 };

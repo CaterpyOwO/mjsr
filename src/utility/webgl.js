@@ -35,6 +35,12 @@ export class Webglu {
 		if (this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS))
 			return this.shaders.push(shader), shader;
 
+		console.error(
+			`Error in shader:\n${source
+				.split(/\n/)
+				.map((v, i) => `${i + 1}: ${v}`)
+				.join("\n")}`
+		);
 		let err = new Error(this.gl.getShaderInfoLog(shader));
 		this.gl.deleteShader(shader);
 		throw err;

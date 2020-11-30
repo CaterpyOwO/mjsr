@@ -1,15 +1,15 @@
 const { Renderer, Screen, Camera, Input } = mjsr;
 const r = new Renderer(
 	new Screen({}, document.querySelector(".parent")).fillParent(),
-    new Camera([3.3,-3,-6.3], [0.35, 5.83, 0]),
+	new Camera([3.3, -3, -6.3], [0.35, 5.83, 0])
 );
 
 class Nice {
 	constructor(coords) {
-        let [x, y, z] = coords;
-        this.coords = [x + 1.75, y, z];
+		let [x, y, z] = coords;
+		this.coords = [x + 1.75, y, z];
 
-        this.primitive = "lines";
+		this.primitive = "lines";
 
 		this.verts = [
 			[x, y, z],
@@ -51,18 +51,16 @@ class Nice {
 			[14, 15, 0],
 
 			[15, 13, 0], //e
-        ];
-        
-        this.colours = [
-            "#000"
-        ]
+		];
+
+		this.colours = ["#000"];
 	}
 }
 
 let scene = [
-    new Nice([-1.75, 0, 0]), 
-    new mjsr.Geometry.Plane([1,0.3,0]),
-    new mjsr.Geometry.Plane([-1,0.3,0])
+	new Nice([-1.75, 0, 0]),
+	new mjsr.Geometry.Plane([1, 0.3, 0]),
+	new mjsr.Geometry.Plane([-1, 0.3, 0]),
 ];
 r.setup(scene);
 

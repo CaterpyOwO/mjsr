@@ -7,8 +7,8 @@ import { parseColour } from "../utility/colour.js";
 
 import { Webglu } from "../utility/webgl.js";
 
-import { generate as vertex } from "./shaders/vert.js";
-import { generate as fragment } from "./shaders/frag.js";
+import { default as vertex } from "./shaders/vert.js";
+import { default as fragment } from "./shaders/frag.js";
 
 export class Renderer {
 	constructor(screen = new Screen(), camera = new Camera(), inputHandler = new Input.None()) {
@@ -138,12 +138,22 @@ export class Renderer {
 			gl.useProgram(shader.glprogram);
 
 			gl.uniform3fv(gl.getUniformLocation(shader.glprogram, "u_pos"), this.camera.pos);
-			gl.uniform3fv(gl.getUniformLocation(shader.glprogram, "u_rot"), this.camera.rot);
 
-			gl.uniform2fv(gl.getUniformLocation(shader.glprogram, "u_canvas"), [
-				gl.drawingBufferWidth,
-				gl.drawingBufferHeight,
-			]);
+			gl.uniformMatrix4fv(
+				gl.getUniformLocation(shader.glprogram, "u_modelivt"),
+				false,
+				this.camera.modelivt()
+			);
+			gl.uniformMatrix4fv(
+				gl.getUniformLocation(shader.glprogram, "u_model"),
+				false,
+				this.camera.model()
+			);
+			gl.uniformMatrix4fv(
+				gl.getUniformLocation(shader.glprogram, "u_vp"),
+				false,
+				this.camera.mvp(this.screen.canvas)
+			);
 
 			gl.useProgram(null);
 		}

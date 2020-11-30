@@ -1,18 +1,17 @@
 import { preprocess } from "../../utility/preprocess.js";
-
 import { fragment as mono } from "./fragments/mono.glsl.js";
 
-export function generate(options = { primitive: 2, lighting: true, mono: false }) {
+export default function generate(options = { primitive: 2, lighting: true, mono: false }) {
 	return preprocess(
 		`
 precision mediump float;
 
-varying vec4 v_normal;
+varying vec3 v_normal;
 varying vec4 v_colour;
 
 #if options.lighting
-	varying vec3 v_surfaceLight;
-	vec4 lightd = vec4(0.0, 5.0, 5.0, 1.0);
+	varying vec3 v_fragPos, v_viewPos;
+	vec3 light = vec3(0.0, 2.0, -5.0);
 #endif
 
 void main() {
@@ -23,8 +22,48 @@ void main() {
 	#endif
 
 	#if options.lighting
-		float light = dot(normalize(v_normal.xyz), normalize(v_surfaceLight));
-		gl_FragColor.rgb *= clamp(light, 0.3, 1.0);
+		// vec3 normal = normalize(v_normal);
+
+		// vec3 sToLightD = normalize(v_sToLight);
+		// vec3 sToViewD = normalize(v_sToView);
+
+		// vec3 halfVector = normalize(sToLightD + sToViewD);
+
+		// float light = dot(normal, sToLightD);
+		// float specular = 0.0;
+		
+		// gl_FragColor = v_colour;
+
+		// gl_FragColor.rgb += 0.1;
+		// gl_FragColor.rgb *= light;
+
+		// if (light > 0.0) {
+		// 	specular = pow(dot(normal, halfVector), 100.0);
+		// 	gl_FragColor.rgb += specular;
+		// }
+
+		vec3 lightColour = vec3(1.0, 1.0, 1.0);
+
+		vec3 normal = normalize(v_normal);
+		vec3 lightd = normalize(light - v_fragPos);
+
+		// specular
+		float strength = 0.3;
+		vec3 viewd = normalize(v_viewPos - v_fragPos);
+		vec3 reflectd = reflect(-lightd, normal);
+
+		float sp = pow(max(dot(viewd, reflectd), 0.0), 32.0);
+		vec3 specular = strength * sp * lightColour;  
+
+		// diffuse
+		float df = max(dot(normal, lightd), 0.0);
+		vec3 diffuse = df * lightColour;
+
+		// ambient
+		vec3 ambient = 0.1 * lightColour;
+		
+
+		gl_FragColor = vec4(clamp((ambient + diffuse + specular), 0.2, 1.5) * v_colour.rgb, v_colour.a);	
 	#endif
 }`,
 		options

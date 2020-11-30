@@ -1,15 +1,15 @@
 export default class {
 	constructor(coords = [0, 0, 0]) {
 		this.coords = coords;
-        let [x, y, z] = coords;
-        
-        this.primitive = "triangles";
+		let [x, y, z] = coords;
+
+		this.primitive = "triangles";
 
 		this.verts = [
-			[x-1, y, z-1],
-			[x-1, y, z+1],
-			[x+1, y, z+1],
-			[x+1, y, z-1],
+			[x - 1, y, z - 1],
+			[x - 1, y, z + 1],
+			[x + 1, y, z + 1],
+			[x + 1, y, z - 1],
 		];
 
 		this.faces = [
@@ -19,9 +19,6 @@ export default class {
 			[0, 3, 2, 1],
 		];
 
-		this.colours = [
-			"#faf",
-			"#aff",
-		];
+		this.colours = ["#faf", "#aff"];
 	}
 }
