@@ -11,26 +11,11 @@ To use it download `mjsr.js` from the releases tab, or build it yourself with we
 
 You can also use the `serve.js` file supplied to host a HTTP server on port 8080, to use mjsr without need of bundling it with webpack.
 
-## Example
+## Usage
 
-This example will result in a fullscreen document with a cube in the middle of the screen. You can lock the cursor by pressing on it, then you can move around with `WASD` keys, and use your mouse for rotating.
+See the [`examples`](examples)folder for examples of usage.
 
-```js
-const { Renderer, Screen, Camera, input } = mjsr;
-const r = new Renderer(new Screen().fullscreen(), new Camera([0, 0, -7]), new input.FirstPerson());
-
-let scene = [new mjsr.objects.Cube([0, 0, 0])];
-r.setup(scene);
-
-function frame(now) {
-	requestAnimationFrame(frame);
-
-	r.draw();
-	r.update(now);
-}
-
-requestAnimationFrame(frame);
-```
+## Scenes
 
 All objects in the `scene` array should have at these four properties:
 
@@ -57,9 +42,9 @@ While in case of `points` no other properties are required, although each elemen
     -   `x`, `y`, and `z` are the coordinates of the vertex.
     -   `c` is the index of the colour in the `colours` array.
 
-## An example object
+## Objects
 
-This is an example object in the scene. It is taken directly from `src/objects/cube.js`, and is shipped with mjsr as `mjsr.objects.Cube`
+This is an example object in the scene. It is taken directly from [`src/geometry/cube.js`](src/geometry/cube.js), and is shipped with mjsr as `mjsr.Geometry.Cube`
 
 ```js
 class Cube {
