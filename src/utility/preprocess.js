@@ -1,35 +1,33 @@
 export function preprocess(source, options) {
-	source += "\n#endif\n";
+    let lines = source.split(/\n/),
+		lineCount = lines.length;
+		
+    let output = "";
 
-	function traverse(lines, condition = true) {
-		let output = "";
+	traverse();
+	return output.trim();
 
-		for (let l in lines) {
-			let line = lines[l].trim();
+    function traverse(currentLine = 0, condition = true) {
+        while (currentLine < lineCount) {
+            let line = lines[currentLine];
+    
+            if (line.trim().startsWith("#")) {
+                switch (line.trim().substr(1).split(/\s/)[0]) {
+                    case "if": 
+                        currentLine = traverse(currentLine + 1, eval(line.trim().substr(3)));
+                    break;
+                    case "else": 
+                        currentLine = traverse(currentLine + 1, !condition);
+                    break;
+                    case "endif":
+                        currentLine = traverse(currentLine + 1, true);
+                    break;
+                }
+            } else if (condition) output += line + "\n";
+    
+            currentLine++;
+        }
 
-			switch (line.split(/\s/)[0]) {
-				case "#if":
-					lines.splice(0, parseInt(l) + 1);
-					output += traverse(lines, eval(line.substr(3).trim()));
-					break;
-				case "#else":
-					lines.splice(0, parseInt(l) + 1);
-					output += traverse(lines, !condition);
-					break;
-				case "#endif":
-					lines.splice(0, parseInt(l) + 1);
-					output += traverse(lines, true);
-					// condition = true
-					break;
-				default:
-					// lines.splice(0, parseInt(l));
-					if (condition) output += `${line}\n`;
-					break;
-			}
-		}
-
-		return output.trim();
-	}
-
-	return traverse(source.split(/\n/));
+        return currentLine;
+    }
 }
