@@ -1,4 +1,4 @@
-import { rotateY } from "../utility/gl-matrix/mat4.js";
+import { rotateY, rotateZ } from "../utility/gl-matrix/mat4.js";
 
 class ModelRotate {
 	constructor() {
@@ -40,9 +40,7 @@ class ModelRotate {
 	}
 
 	mouseRotation(movement) {
-		movement[0] *= 0.01;
-
-		rotateY(this.camera.model, this.camera.model, movement[0])
+		rotateY(this.camera.model, this.camera.model, movement[0] * 0.01);
 	}
 
 	update() {}

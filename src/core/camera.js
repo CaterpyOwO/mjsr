@@ -23,9 +23,9 @@ export class Camera {
 
 		// let view = mat4.translate(mat4.create(), mat4.create(), [0,0,-7])
 		let view = mat4.create();
-		view = mat4.rotateX(view, mat4.create(), this.rot[0]);
-		view = mat4.rotateY(view, view, this.rot[1]);
-		view = mat4.translate(view, view, this.pos);
+		mat4.rotateX(view, mat4.create(), this.rot[0]);
+		mat4.rotateY(view, view, this.rot[1]);
+		mat4.translate(view, view, this.pos);
 
 		this.view = view;
 
