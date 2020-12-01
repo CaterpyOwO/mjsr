@@ -1,5 +1,5 @@
 import { preprocess } from "../../utility/preprocess.js";
-import { fragment2 as project } from "./fragments/project.glsl.js";
+import { fragment as project } from "./fragments/project.glsl.js";
 
 export default function generate(options = { primitive: 2, lighting: true }) {
 	return preprocess(
