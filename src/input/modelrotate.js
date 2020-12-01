@@ -1,3 +1,5 @@
+import { rotateY } from "../utility/gl-matrix/mat4.js";
+
 class ModelRotate {
 	constructor() {
 		this.keys = [];
@@ -38,25 +40,9 @@ class ModelRotate {
 	}
 
 	mouseRotation(movement) {
-		let { pos } = this.camera;
-
 		movement[0] *= 0.01;
 
-		this.camera.pos = this.rotate2d(pos, -movement[0], [0, 2]);
-		this.camera.rot[1] += movement[0];
-	}
-
-	rotate2d(pos, rad, axes) {
-		let [a0, a1] = axes;
-		let [x, y] = [pos[a0], pos[a1]];
-
-		let s = Math.sin(rad),
-			c = Math.cos(rad);
-
-		pos[a0] = x * c - y * s;
-		pos[a1] = y * c + x * s;
-
-		return pos;
+		rotateY(this.camera.model, this.camera.model, movement[0])
 	}
 
 	update() {}

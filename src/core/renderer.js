@@ -142,17 +142,17 @@ export class Renderer {
 			gl.uniformMatrix4fv(
 				gl.getUniformLocation(shader.glprogram, "u_modelivt"),
 				false,
-				this.camera.modelivt()
+				this.camera.modelit()
 			);
 			gl.uniformMatrix4fv(
 				gl.getUniformLocation(shader.glprogram, "u_model"),
 				false,
-				this.camera.model()
+				this.camera.model
 			);
 			gl.uniformMatrix4fv(
 				gl.getUniformLocation(shader.glprogram, "u_vp"),
 				false,
-				this.camera.mvp(this.screen.canvas)
+				this.camera.vp(this.screen.canvas)
 			);
 
 			gl.useProgram(null);

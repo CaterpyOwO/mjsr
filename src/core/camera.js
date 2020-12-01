@@ -5,11 +5,15 @@ export class Camera {
 		this.pos = position;
 		this.rot = rotation;
 
+		this.model = mat4.create();
+		this.view = mat4.create();
+		this.projection = mat4.create();
+
 		return this;
 	}
 
-	mvp(canvas) {
-		let projection = mat4.perspective(
+	vp(canvas) {
+		this.projection = mat4.perspective(
 			mat4.create(),
 			45 * (Math.PI / 180),
 			canvas.width / canvas.height,
@@ -18,22 +22,18 @@ export class Camera {
 		);
 
 		// let view = mat4.translate(mat4.create(), mat4.create(), [0,0,-7])
-		let view = mat4.create()
-		view = mat4.rotateX(view, view, this.rot[0]);
+		let view = mat4.create();
+		view = mat4.rotateX(view, mat4.create(), this.rot[0]);
 		view = mat4.rotateY(view, view, this.rot[1]);
 		view = mat4.translate(view, view, this.pos);
 
-		return mat4.multiply(mat4.create(), projection, view);
+		this.view = view;
+
+		return mat4.multiply(mat4.create(), this.projection, this.view);
 	}
 
-	model() {
-		let model = mat4.create();
-		// mat4.rotate(model, model, 5e-4 * Date.now(), 0)
-		return model;
-	}
-
-	modelivt() {
-		let model = mat4.create();
+	modelit() {
+		let model = this.model;
 		mat4.invert(model, model);
 		mat4.transpose(model, model);
 
