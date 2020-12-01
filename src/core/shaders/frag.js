@@ -11,7 +11,7 @@ varying vec4 v_colour;
 
 #if options.lighting
 	varying vec3 v_fragPos, v_viewPos;
-	vec3 light = vec3(0.0, 2.0, -5.0);
+	vec3 light = vec3(0.0, -2.0, -5.0);
 #endif
 
 void main() {
@@ -22,26 +22,6 @@ void main() {
 	#endif
 
 	#if options.lighting
-		// vec3 normal = normalize(v_normal);
-
-		// vec3 sToLightD = normalize(v_sToLight);
-		// vec3 sToViewD = normalize(v_sToView);
-
-		// vec3 halfVector = normalize(sToLightD + sToViewD);
-
-		// float light = dot(normal, sToLightD);
-		// float specular = 0.0;
-		
-		// gl_FragColor = v_colour;
-
-		// gl_FragColor.rgb += 0.1;
-		// gl_FragColor.rgb *= light;
-
-		// if (light > 0.0) {
-		// 	specular = pow(dot(normal, halfVector), 100.0);
-		// 	gl_FragColor.rgb += specular;
-		// }
-
 		vec3 lightColour = vec3(1.0, 1.0, 1.0);
 
 		vec3 normal = normalize(v_normal);
@@ -63,7 +43,7 @@ void main() {
 		vec3 ambient = 0.1 * lightColour;
 		
 
-		gl_FragColor = vec4(clamp((ambient + diffuse + specular), 0.2, 1.5) * v_colour.rgb, v_colour.a);	
+		gl_FragColor = vec4((ambient + diffuse + specular) * v_colour.rgb, v_colour.a);	
 	#endif
 }`,
 		options

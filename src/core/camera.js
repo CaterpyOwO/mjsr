@@ -18,7 +18,10 @@ export class Camera {
 		);
 
 		// let view = mat4.translate(mat4.create(), mat4.create(), [0,0,-7])
-		let view = mat4.lookAt(mat4.create(), this.pos, [0, 0, 0], [0, -1, 0]);
+		let view = mat4.create()
+		view = mat4.rotateX(view, view, this.rot[0]);
+		view = mat4.rotateY(view, view, this.rot[1]);
+		view = mat4.translate(view, view, this.pos);
 
 		return mat4.multiply(mat4.create(), projection, view);
 	}
