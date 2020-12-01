@@ -1,5 +1,7 @@
 # Minimalistic JavaScript Renderer
 
+[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/CaterpyOwO/mjsr.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/CaterpyOwO/mjsr/context:javascript)
+
 This is a minimalistic WebGL/Canvas2d 3d renderer.
 Designed with simplicity in mind.
 
