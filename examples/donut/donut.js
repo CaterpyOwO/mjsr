@@ -30,7 +30,7 @@ class Donut {
 					this.verts[i + j * sides][a1],
 				];
 
-				let colour = this.verts[i + j * sides][1] < this.coords[1] - size / 4 ? 1 : 0;
+				let colour = this.verts[i + j * sides][1] < size / 4 - this.coords[1] ? 0 : 1;
 
 				// this.verts[i + j * sides][3] = colour
 
