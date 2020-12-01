@@ -1,7 +1,7 @@
 const { Renderer, Screen, Camera, Input } = mjsr;
 const r = new Renderer(
 	new Screen({}, document.querySelector(".parent")).fillParent(),
-	new Camera([3.3, -3, -6.3], [0.35, 5.83, 0])
+	new Camera([-3.22, -1.64, -3.93], [0.29, 5.77, 0]),
 );
 
 class Nice {
@@ -13,25 +13,25 @@ class Nice {
 
 		this.verts = [
 			[x, y, z],
-			[x, y - 1.5, z],
+			[x, y + 1.5, z],
 			[x + 1, y, z],
-			[x + 1, y - 1.5, z], // N
+			[x + 1, y + 1.5, z], // N
 
 			[x + 1.5, y, z],
-			[x + 1.5, y - 1, z], // i
-			[x + 1.5, y - 1.5, z],
+			[x + 1.5, y + 1, z], // i
+			[x + 1.5, y + 1.5, z],
 
 			[x + 2.5, y, z],
-			[x + 2, y - 0.3, z],
-			[x + 2, y - 0.7, z],
-			[x + 2.5, y - 1, z], // c
+			[x + 2, y + 0.3, z],
+			[x + 2, y + 0.7, z],
+			[x + 2.5, y + 1, z], // c
 
 			[x + 3.5, y, z],
-			[x + 3, y - 0.3, z],
+			[x + 3, y + 0.3, z],
 
-			[x + 3, y - 0.7, z],
-			[x + 3.4, y - 1, z],
-			[x + 3.8, y - 0.7, z], //e
+			[x + 3, y + 0.7, z],
+			[x + 3.4, y + 1, z],
+			[x + 3.8, y + 0.7, z], //e
 		];
 
 		this.edges = [
@@ -59,8 +59,8 @@ class Nice {
 
 let scene = [
 	new Nice([-1.75, 0, 0]),
-	new mjsr.Geometry.Plane([1, 0.3, 0]),
-	new mjsr.Geometry.Plane([-1, 0.3, 0]),
+	new mjsr.Geometry.Plane([1, -0.3, 0]),
+	new mjsr.Geometry.Plane([-1, -0.3, 0]),
 ];
 r.setup(scene);
 
