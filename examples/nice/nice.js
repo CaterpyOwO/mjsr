@@ -1,7 +1,7 @@
 const { Renderer, Screen, Camera, Input } = mjsr;
 const r = new Renderer(
 	new Screen({}, document.querySelector(".parent")).fillParent(),
-	new Camera([-3.22, -1.64, -3.93], [0.29, 5.77, 0]),
+	new Camera([-3.22, -1.64, -3.93], [0.29, 5.77, 0])
 );
 
 class Nice {

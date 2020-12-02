@@ -2,9 +2,9 @@ import { preprocess } from "../../utility/preprocess.js";
 import { fragment as mono } from "./fragments/mono.glsl.js";
 import { fragment as phong } from "./fragments/lighting.glsl.js";
 
-
 export default function generate(options = { primitive: 2, lighting: true, mono: true }) {
-	return preprocess(`
+	return preprocess(
+		`
 	precision mediump float;
 
 	varying vec3 v_normal;

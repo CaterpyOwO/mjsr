@@ -18,7 +18,7 @@ const mjsr = {
 	Input,
 	Geometry,
 	Material,
-	Object3d
+	Object3d,
 };
 
 if (typeof define === "function" && define.amd) define([], () => mjsr);

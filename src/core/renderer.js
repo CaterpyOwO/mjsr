@@ -57,7 +57,7 @@ export class Renderer {
 
 			let mesh = {
 				position: [],
-				colour: [],	
+				colour: [],
 				normal: [],
 				shinyness: [],
 				primitive,
@@ -88,8 +88,9 @@ export class Renderer {
 							object.verts[triangle[1]],
 							object.verts[triangle[2]],
 						]);
-					
-						let colour = [], shinyness = 32;
+
+						let colour = [],
+							shinyness = 32;
 						if (object.materials) {
 							colour = object.materials[triangle[3]].colour;
 							shinyness = object.materials[triangle[3]].shinyness;
@@ -107,7 +108,7 @@ export class Renderer {
 					}
 					break;
 				default:
-					throw new Error("Invalid primitive")
+					throw new Error("Invalid primitive");
 			}
 
 			this.primitives.add(primitive);
@@ -149,7 +150,10 @@ export class Renderer {
 			gl.useProgram(shader.glprogram);
 
 			gl.uniform3fv(gl.getUniformLocation(shader.glprogram, "u_pos"), this.camera.pos);
-			gl.uniform2fv(gl.getUniformLocation(shader.glprogram, "u_resolution"), [gl.drawingBufferWidth, gl.drawingBufferHeight]);
+			gl.uniform2fv(gl.getUniformLocation(shader.glprogram, "u_resolution"), [
+				gl.drawingBufferWidth,
+				gl.drawingBufferHeight,
+			]);
 
 			gl.uniformMatrix4fv(
 				gl.getUniformLocation(shader.glprogram, "u_modelit"),
@@ -178,7 +182,11 @@ export class Renderer {
 
 			// gl.uniform1i(gl.getUniformLocation(shader.glprogram, "u_primitive"), primitive);
 
-			let buffers = { position: mesh.position, colour: mesh.colour, shinyness: mesh.shinyness };
+			let buffers = {
+				position: mesh.position,
+				colour: mesh.colour,
+				shinyness: mesh.shinyness,
+			};
 			if (mesh.primitive == 2) buffers.normal = mesh.normal;
 
 			shader.buffers(buffers, { colour: 4, shinyness: 1 });

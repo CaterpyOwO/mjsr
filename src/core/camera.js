@@ -27,7 +27,6 @@ export class Camera {
 		mat4.rotateY(view, view, this.rot[1]);
 		mat4.translate(view, view, this.pos);
 
-
 		return mat4.multiply(mat4.create(), projection, view);
 	}
 

@@ -10,9 +10,10 @@ export function parseColour(colour, type) {
 	}
 
 	switch (type) {
-		case ("hex"): 
+		case "hex":
 			colour = colour.substr(1);
-			if (colour.length == 3) colour = colour.split("").reduce((r, e) => r.push(e + e) && r, []);
+			if (colour.length == 3)
+				colour = colour.split("").reduce((r, e) => r.push(e + e) && r, []);
 			else colour = colour.match(/.{1,2}/g);
 
 			return [...colour.map((c) => clamp(parseInt(c, 16) / 255, 0.0, 1.0)), 1.0];
@@ -23,8 +24,6 @@ export function parseColour(colour, type) {
 			return [...colour.map((c) => clamp(parseInt(c) / 255, 0.0, 1.0)), 1.0];
 
 		default:
-			throw new Error(`${type} is not a valid colour type.`)
-	}	
-
-	
+			throw new Error(`${type} is not a valid colour type.`);
+	}
 }

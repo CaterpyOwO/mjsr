@@ -13,8 +13,8 @@
 	},
 	"scripts": {
 		"start": "npm run dev",
-		"dev": "node serve", 
-		"build": "webpack",
+		"dev": "node serve",
+		"build": "webpack && prettier --write .",
 		"format": "prettier --write ."
 	}
 }
