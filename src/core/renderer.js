@@ -140,7 +140,7 @@ export class Renderer {
 			gl.uniform3fv(gl.getUniformLocation(shader.glprogram, "u_pos"), this.camera.pos);
 
 			gl.uniformMatrix4fv(
-				gl.getUniformLocation(shader.glprogram, "u_modelivt"),
+				gl.getUniformLocation(shader.glprogram, "u_modelit"),
 				false,
 				this.camera.modelit()
 			);
