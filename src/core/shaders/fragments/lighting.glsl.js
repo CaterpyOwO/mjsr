@@ -9,7 +9,7 @@ export const fragment = `
     vec3 viewd = normalize(v_viewPos - v_fragPos);
     vec3 reflectd = reflect(-lightd, normal);
 
-    float sp = pow(max(dot(viewd, reflectd), 0.0), 32.0);
+    float sp = pow(max(dot(viewd, reflectd), 0.0), v_shinyness);
     vec3 specular = strength * sp * lightColour;  
 
     // diffuse

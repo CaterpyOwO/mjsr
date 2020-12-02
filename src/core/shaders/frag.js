@@ -9,6 +9,7 @@ export default function generate(options = { primitive: 2, lighting: true, mono:
 
 	varying vec3 v_normal;
 	varying vec4 v_colour;
+	varying float v_shinyness;
 
 	#if options.lighting
 		varying vec3 v_fragPos, v_viewPos;

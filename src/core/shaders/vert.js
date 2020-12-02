@@ -7,9 +7,11 @@ export default function generate(options = { primitive: 2, lighting: true }) {
     attribute vec4 position;
     attribute vec4 colour;
     attribute vec3 normal;
+    attribute float shinyness;
 
     varying vec4 v_colour;
     varying vec3 v_normal;
+    varying float v_shinyness;
 
 	varying vec3 v_fragPos, v_viewPos;
 
@@ -22,6 +24,7 @@ export default function generate(options = { primitive: 2, lighting: true }) {
 
     void main() {
         v_colour = colour;
+        v_shinyness = shinyness;
 
         #if (options.primitive == 2 && options.lighting) 
             v_fragPos = vec3(u_model * position);

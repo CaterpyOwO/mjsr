@@ -12,16 +12,13 @@
 			const { Renderer, Screen, Camera, Input } = mjsr;
 
 			// prettier-ignore
-			class Torus {
+			class Torus extends mjsr.Object3d {
 				constructor(coords = [0, 0, 0], sides = 8, size = 0.5, hole = 1) {
-					this.coords = coords;
+					super(coords, "triangles", true);
 
-					this.colours = ["#ca3", "#f6f"];
-
-					this.verts = [];
-					this.faces = [];
-
-					this.primitive = "triangles";
+					this.materials = [
+						new mjsr.Material("#ca3", 64), new mjsr.Material("#f6f", 1)
+					];
 
 					for (let j = 0; j <= sides - 1; j++) {
 						let s = Math.sin(((2 * Math.PI) / sides) * j),
@@ -71,14 +68,14 @@
 				new Input.FirstPerson()
 			);
 
-			let scene = [new Torus([0, 0, 0], 50)];
+			let scene = [new Torus([0, 0, 0], 100)];
 			r.setup(scene);
 
 			function frame(now) {
-				requestAnimationFrame(frame);
-
 				r.draw();
 				r.update(now);
+
+				requestAnimationFrame(frame);
 			}
 
 			requestAnimationFrame(frame);

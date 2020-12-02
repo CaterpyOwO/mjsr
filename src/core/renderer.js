@@ -40,7 +40,7 @@ export class Renderer {
 			};
 
 			const primitives = ["points", "lines", "triangles"];
-			let primitive;
+			let primitive = -1;
 
 			if (
 				typeof object.primitive === "string" &&
@@ -50,13 +50,16 @@ export class Renderer {
 			else throw new Error("No primitive type supplied.");
 
 			for (let prop of props[primitive])
-				if (object[prop] === undefined)
+				if (object[prop] === undefined) {
+					if (prop == "colours" && object["materials"]) continue;
 					throw new Error(`Object doesn't have required property ${prop}.`);
+				}
 
 			let mesh = {
 				position: [],
-				colour: [],
+				colour: [],	
 				normal: [],
+				shinyness: [],
 				primitive,
 			};
 
@@ -85,7 +88,12 @@ export class Renderer {
 							object.verts[triangle[1]],
 							object.verts[triangle[2]],
 						]);
-						let colour = parseColour(object.colours[triangle[3]]);
+					
+						let colour = [], shinyness = 32;
+						if (object.materials) {
+							colour = object.materials[triangle[3]].colour;
+							shinyness = object.materials[triangle[3]].shinyness;
+						} else colour = parseColour(object.colours[triangle[3]]);
 
 						mesh.position.push(
 							...object.verts[triangle[2]],
@@ -94,9 +102,12 @@ export class Renderer {
 						);
 
 						mesh.colour.push(...colour, ...colour, ...colour);
+						mesh.shinyness.push(shinyness, shinyness, shinyness);
 						mesh.normal.push(...cross, ...cross, ...cross);
 					}
 					break;
+				default:
+					throw new Error("Invalid primitive")
 			}
 
 			this.primitives.add(primitive);
@@ -138,6 +149,7 @@ export class Renderer {
 			gl.useProgram(shader.glprogram);
 
 			gl.uniform3fv(gl.getUniformLocation(shader.glprogram, "u_pos"), this.camera.pos);
+			gl.uniform2fv(gl.getUniformLocation(shader.glprogram, "u_resolution"), [gl.drawingBufferWidth, gl.drawingBufferHeight]);
 
 			gl.uniformMatrix4fv(
 				gl.getUniformLocation(shader.glprogram, "u_modelit"),
@@ -166,10 +178,10 @@ export class Renderer {
 
 			// gl.uniform1i(gl.getUniformLocation(shader.glprogram, "u_primitive"), primitive);
 
-			let buffers = { position: mesh.position, colour: mesh.colour };
+			let buffers = { position: mesh.position, colour: mesh.colour, shinyness: mesh.shinyness };
 			if (mesh.primitive == 2) buffers.normal = mesh.normal;
 
-			shader.buffers(buffers, { colour: 4 });
+			shader.buffers(buffers, { colour: 4, shinyness: 1 });
 
 			gl.drawArrays(primitives[primitive], 0, mesh.position.length / (primitive + 1));
 
