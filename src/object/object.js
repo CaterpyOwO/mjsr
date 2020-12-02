@@ -4,16 +4,14 @@ export class Object3d {
 		this.primitive = primitive;
 
 		this.verts = [];
+		this.edges = [];
+		this.faces = [];
 
 		switch (primitive) {
 			case "triangles":
-				this.faces = [];
 				materials ? (this.materials = []) : (this.colours = []);
 				break;
 			case "lines":
-				this.edges = [];
-				this.colours = [];
-				break;
 			case "points":
 				this.colours = [];
 				break;
