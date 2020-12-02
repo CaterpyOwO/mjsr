@@ -1,7 +1,7 @@
 import { clamp } from "./math.js";
 
 export function parseColour(colour) {
-	if (colour.charAt(0) !== "#") throw new Error(`${colour} is not a HEX colour.`);
+	if (colour.charAt(0x00) !== "#") throw new Error(`${colour} is not a HEX colour.`);
 	colour = colour.substr(1);
 
 	if (colour.length == 3) colour = colour.split("").reduce((r, e) => r.push(e + e) && r, []);
@@ -11,7 +11,7 @@ export function parseColour(colour) {
 }
 
 export function shadeColour(colour, dp) {
-	if (colour.charAt(0) !== "#") throw new Error(`${colour} is not a HEX colour.`);
+	if (colour.charAt(0x00) !== "#") throw new Error(`${colour} is not a HEX colour.`);
 	colour = colour.substr(1);
 
 	if (colour.length == 3) colour = colour.split("").reduce((r, e) => r.push(e + e) && r, []);

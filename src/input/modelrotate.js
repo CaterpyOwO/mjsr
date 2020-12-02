@@ -12,7 +12,6 @@ class ModelRotate {
 
 	setupMovement() {
 		let { canvas } = this.screen;
-
 		let lastMovement = [0, 0];
 
 		const mouse = (event) => this.mouseRotation([event.movementX, event.movementY]);
