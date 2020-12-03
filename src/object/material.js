@@ -7,5 +7,5 @@ export class Material {
 		else throw new Error(`${colour} is not a valid colour.`);
 
 		this.shinyness = shinyness;
-	}
+	} 
 }
