@@ -8,11 +8,11 @@
 [license]: https://img.shields.io/github/license/CaterpyOwO/mjsr
 [release]: https://img.shields.io/github/v/release/CaterpyOwO/mjsr
 
-
 This is a minimalistic WebGL/Canvas2d 3d renderer.
 Designed with simplicity in mind.
- 
+
 You can use it in your page by including this snippet
+
 ```html
 <script src="https://cdn.jsdelivr.net/gh/caterpyowo/mjsr@v0.7-alpha/dist/mjsr.js"></script>
 ```
