@@ -19,15 +19,11 @@ export default function generate(options = { primitive: 2, lighting: true }) {
     uniform mat4 u_vp, u_model, u_modelit;
     uniform vec3 u_pos;
 
-    #if (options.lighting)
-        vec3 light = vec3(0.0, 2.0, -5.0);
-    #endif
-
     void main() {
         v_colour = colour;
         v_shinyness = shinyness;
 
-        #if (options.primitive == 2 && options.lighting) 
+        #if (options.primitive == 2 && options.mode !== 0) 
             v_fragPos = vec3(u_model * position);
             v_viewPos = u_pos;
             v_normal = mat3(u_modelit) * normal;

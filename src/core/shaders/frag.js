@@ -1,8 +1,8 @@
 import { preprocess } from "../../utility/preprocess.js";
 import { fragment as mono } from "./fragments/mono.glsl.js";
-import { fragment as phong } from "./fragments/lighting.glsl.js";
+import { fragment as lighting } from "./fragments/lighting.glsl.js";
 
-export default function generate(options = { primitive: 2, lighting: true, mono: true }) {
+export default function generate(options = { primitive: 2, mono: true, mode: 0 }) {
 	return preprocess(
 		`
 	precision mediump float;
@@ -11,7 +11,7 @@ export default function generate(options = { primitive: 2, lighting: true, mono:
 	varying vec4 v_colour;
 	varying float v_shinyness;
 
-	#if options.lighting
+	#if (options.mode !== 0)
 		varying vec3 v_fragPos, v_viewPos;
 		vec3 light = vec3(0.0, -2.0, -5.0);
 	#endif
@@ -23,8 +23,8 @@ export default function generate(options = { primitive: 2, lighting: true, mono:
 			gl_FragColor = v_colour;
 		#endif
 
-		#if options.lighting
-			${phong}
+		#if (options.mode !== 0)
+			${lighting}
 		#endif
 	}`,
 		options
