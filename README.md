@@ -5,7 +5,7 @@
 This is a minimalistic WebGL/Canvas2d 3d renderer.
 Designed with simplicity in mind.
  
- Include it in your page by including this snippet
+You can use it in your page by including this snippet
 ```html
 <script src="https://cdn.jsdelivr.net/gh/caterpyowo/mjsr@v0.7-alpha/dist/mjsr.js"></script>
 ```
