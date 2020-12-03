@@ -1,6 +1,1 @@
 node_modules
-.vscode/*
-package-lock.json
-src/twgl.js
-
-rendererm.js
