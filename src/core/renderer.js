@@ -120,10 +120,10 @@ export class Renderer {
 		for (let primitive of this.primitives) {
 			let shader = new Webglu(gl);
 
-			let lighting = primitive == 2;
+			let mode = (primitive == 2) ? 2 : 0;
 
-			shader.vert(vertex({ lighting, primitive }));
-			shader.frag(fragment({ lighting, primitive, mono: false }));
+			shader.vert(vertex({ mode, primitive }));
+			shader.frag(fragment({ mode, primitive, mono: false }));
 
 			shader.program();
 
