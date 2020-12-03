@@ -1,6 +1,13 @@
 # Minimalistic JavaScript Renderer
 
-[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/CaterpyOwO/mjsr.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/CaterpyOwO/mjsr/context:javascript)
+[![Language grade: JavaScript][lgtm]](https://lgtm.com/projects/g/CaterpyOwO/mjsr/context:javascript)
+[![Github Release][release]](https://github.com/CaterpyOwO/mjsr/releases)
+[![Github License][license]](https://github.com/CaterpyOwO/mjsr/blob/master/LICENSE)
+
+[lgtm]: https://img.shields.io/lgtm/grade/javascript/g/CaterpyOwO/mjsr.svg?logo=lgtm&logoWidth=18
+[license]: https://img.shields.io/github/license/CaterpyOwO/mjsr
+[release]: https://img.shields.io/github/v/release/CaterpyOwO/mjsr
+
 
 This is a minimalistic WebGL/Canvas2d 3d renderer.
 Designed with simplicity in mind.
