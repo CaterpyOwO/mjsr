@@ -17,6 +17,8 @@ You can use it in your page by including this snippet
 <script src="https://cdn.jsdelivr.net/gh/caterpyowo/mjsr@v0.7-alpha/dist/mjsr.js"></script>
 ```
 
+There is a [project board](https://github.com/CaterpyOwO/mjsr/projects) where you can see the current development progress, planned features & more
+
 ## Usage
 
 You can visit [the wiki](https://github.com/CaterpyOwO/mjsr/wiki) to find the documentation
