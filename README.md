@@ -11,13 +11,13 @@
 This is a minimalistic WebGL/Canvas2d 3d renderer.
 Designed with simplicity in mind.
 
+[Here](https://github.com/CaterpyOwO/mjsr/projects) is the project board where you can see the current development progress, planned features & more
+
 You can use it in your page by including this snippet
 
 ```html
 <script src="https://cdn.jsdelivr.net/gh/caterpyowo/mjsr@v0.7-alpha/dist/mjsr.js"></script>
 ```
-
-There is a [project board](https://github.com/CaterpyOwO/mjsr/projects) where you can see the current development progress, planned features & more
 
 ## Usage
 
