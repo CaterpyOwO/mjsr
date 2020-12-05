@@ -11,7 +11,11 @@ import { Geometry } from "./geometry/geometry.js";
 import { Material } from "./object/material.js";
 import { Object3d } from "./object/object.js";
 
+import * as constants from "./core/constants.js";
+
 const mjsr = {
+	...constants,
+
 	Renderer,
 	Screen,
 	Camera,

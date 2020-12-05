@@ -10,8 +10,19 @@ import { Webglu } from "../utility/webgl.js";
 import { default as vertex } from "./shaders/vert.js";
 import { default as fragment } from "./shaders/frag.js";
 
+import * as constants from "../core/constants.js";
+
 export class Renderer {
-	constructor(screen = new Screen(), camera = new Camera(), inputHandler = new Input.None()) {
+	constructor(
+		screen = new Screen(),
+		camera = new Camera(),
+		inputHandler = new Input.None(),
+		options = { mono: false }
+	) {
+		this.options = {};
+		this.options.mono = options.mono ?? false;
+		this.options.lighting = options.lighting ?? constants.BLINN_PHONG;
+
 		this.screen = screen;
 		this.camera = camera;
 
@@ -47,6 +58,7 @@ export class Renderer {
 				primitives.includes(object.primitive) !== undefined
 			)
 				primitive = primitives.indexOf(object.primitive);
+			else if (typeof object.primitive == "number") primitive = object.primitive;
 			else throw new Error("No primitive type supplied.");
 
 			for (let prop of props[primitive])
@@ -120,10 +132,10 @@ export class Renderer {
 		for (let primitive of this.primitives) {
 			let shader = new Webglu(gl);
 
-			let mode = (primitive == 2) ? 2 : 0;
+			let mode = primitive == 2 ? this.options.lighting : 0;
 
 			shader.vert(vertex({ mode, primitive }));
-			shader.frag(fragment({ mode, primitive, mono: false }));
+			shader.frag(fragment({ mode, primitive, mono: this.options.mono }));
 
 			shader.program();
 
