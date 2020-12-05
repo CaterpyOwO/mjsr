@@ -14,7 +14,7 @@
 			// prettier-ignore
 			class Torus extends mjsr.Object3d {
 				constructor(coords = [0, 0, 0], sides = 8, size = 0.5, hole = 1) {
-					super(coords, "triangles", true);
+					super(coords, mjsr.TRIANGLES, true);
 
 					this.materials = [
 						new mjsr.Material("#ca3", 4), new mjsr.Material("#f7f", 64)
@@ -65,7 +65,8 @@
 			const r = new Renderer(
 				new Screen({}).fullscreen(),
 				new Camera([0, -2, -5], [0.4, 0, 0]),
-				new Input.FirstPerson()
+				new Input.FirstPerson(),
+				{ mono: false, lighting: mjsr.BLINN_PHONG }
 			);
 
 			let scene = [new Torus([0, 0, 0], 100)];

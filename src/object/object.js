@@ -1,3 +1,5 @@
+import * as constants from "../core/constants.js";
+
 export class Object3d {
 	constructor(coords, primitive, materials = false) {
 		this.coords = coords;
@@ -8,11 +10,11 @@ export class Object3d {
 		this.faces = [];
 
 		switch (primitive) {
-			case "triangles":
+			case constants.TRIANGLES:
 				materials ? (this.materials = []) : (this.colours = []);
 				break;
-			case "lines":
-			case "points":
+			case constants.LINES:
+			case constants.POINTS:
 				this.colours = [];
 				break;
 			default:
