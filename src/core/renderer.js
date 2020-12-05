@@ -13,7 +13,12 @@ import { default as fragment } from "./shaders/frag.js";
 import * as constants from "../core/constants.js";
 
 export class Renderer {
-	constructor(screen = new Screen(), camera = new Camera(), inputHandler = new Input.None(), options = { mono: false }) {
+	constructor(
+		screen = new Screen(),
+		camera = new Camera(),
+		inputHandler = new Input.None(),
+		options = { mono: false }
+	) {
 		this.options = {};
 		this.options.mono = options.mono ?? false;
 		this.options.lighting = options.lighting ?? constants.BLINN_PHONG;
