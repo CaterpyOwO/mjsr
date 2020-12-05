@@ -13,15 +13,15 @@ Designed with simplicity in mind.
 
 [Here](https://github.com/CaterpyOwO/mjsr/projects) is the project board where you can see the current development progress, planned features & more
 
+## Usage
+
 You can use it in your page by including this snippet
 
 ```html
 <script src="https://cdn.jsdelivr.net/gh/caterpyowo/mjsr@v0.7-alpha/dist/mjsr.js"></script>
 ```
 
-## Usage
-
-You can visit [the wiki](https://github.com/CaterpyOwO/mjsr/wiki) to find the documentation
+[Here](https://github.com/CaterpyOwO/mjsr/wiki) is a link to the wiki, where you can find the documentation
 
 ## Examples
 
