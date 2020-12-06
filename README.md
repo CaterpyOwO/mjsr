@@ -18,11 +18,14 @@ Designed with simplicity in mind.
 You can use it in your page by including this snippet
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/caterpyowo/mjsr@v0.8-alpha/dist/mjsr.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/caterpyowo/mjsr@v0.8-alpha/dist/mjsr.min.js"></script>
 ```
 
 [Here](https://github.com/CaterpyOwO/mjsr/wiki) is a link to the wiki, where you can find the documentation
 
 ## Examples
+
+<img src="./examples/donut.png" width="400px" alt="A image of a donut">
+
 
 See the [`examples`](examples) folder for examples of usage

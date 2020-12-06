@@ -4,7 +4,7 @@ module.exports = {
 	entry: "./src/mjsr.js",
 	output: {
 		path: path.resolve(__dirname, "dist"),
-		filename: "mjsr.js",
+		filename: "mjsr.min.js",
 	},
 	optimization: {
 		usedExports: true,
