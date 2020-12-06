@@ -1,7 +1,7 @@
 # Minimalistic JavaScript Renderer
 
 [![Language grade: JavaScript][lgtm]](https://lgtm.com/projects/g/CaterpyOwO/mjsr/context:javascript)
-[![Github Release][release]](https://github.com/CaterpyOwO/mjsr/releases)
+[![Github Release][release]](https://github.com/CaterpyOwO/mjsr/releases/latest)
 [![Github License][license]](https://github.com/CaterpyOwO/mjsr/blob/master/LICENSE)
 
 [lgtm]: https://img.shields.io/lgtm/grade/javascript/g/CaterpyOwO/mjsr.svg?logo=lgtm&logoWidth=18
