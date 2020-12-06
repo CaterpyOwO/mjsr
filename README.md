@@ -25,7 +25,8 @@ You can use it in your page by including this snippet
 
 ## Examples
 
-<img src="./examples/donut.png" width="400px" alt="A image of a donut">
+<img src="./examples/donut.png" width="300px" alt="A image of a donut">
 
+This is a donut renderer using the [`dev.html`](./src/dev.html).
 
 See the [`examples`](examples) folder for examples of usage
