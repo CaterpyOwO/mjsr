@@ -1,7 +1,7 @@
 # Minimalistic JavaScript Renderer
 
 [![Language grade: JavaScript][lgtm]](https://lgtm.com/projects/g/CaterpyOwO/mjsr/context:javascript)
-[![Github Release][release]](https://github.com/CaterpyOwO/mjsr/releases)
+[![Github Release][release]](https://github.com/CaterpyOwO/mjsr/releases/latest)
 [![Github License][license]](https://github.com/CaterpyOwO/mjsr/blob/master/LICENSE)
 
 [lgtm]: https://img.shields.io/lgtm/grade/javascript/g/CaterpyOwO/mjsr.svg?logo=lgtm&logoWidth=18
@@ -18,11 +18,13 @@ Designed with simplicity in mind.
 You can use it in your page by including this snippet
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/caterpyowo/mjsr@v0.8-alpha/dist/mjsr.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/caterpyowo/mjsr@v0.8-alpha/dist/mjsr.min.js"></script>
 ```
 
 [Here](https://github.com/CaterpyOwO/mjsr/wiki) is a link to the wiki, where you can find the documentation
 
 ## Examples
+
+<img src="./examples/donut.png" width="300px" alt="A image of a donut">
 
 See the [`examples`](examples) folder for examples of usage

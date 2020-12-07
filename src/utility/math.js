@@ -1,21 +1,25 @@
 export function crossProduct(triangle) {
-	let line1 = [
-			triangle[1][0] - triangle[0][0],
-			triangle[1][1] - triangle[0][1],
-			triangle[1][2] - triangle[0][2],
-		],
-		line2 = [
-			triangle[2][0] - triangle[0][0],
-			triangle[2][1] - triangle[0][1],
-			triangle[2][2] - triangle[0][2],
+	try {
+		let line1 = [
+				triangle[1][0] - triangle[0][0],
+				triangle[1][1] - triangle[0][1],
+				triangle[1][2] - triangle[0][2],
+			],
+			line2 = [
+				triangle[2][0] - triangle[0][0],
+				triangle[2][1] - triangle[0][1],
+				triangle[2][2] - triangle[0][2],
+			];
+		let normal = [
+			line1[1] * line2[2] - line1[2] * line2[1],
+			line1[2] * line2[0] - line1[0] * line2[2],
+			line1[0] * line2[1] - line1[1] * line2[0],
 		];
-	let normal = [
-		line1[1] * line2[2] - line1[2] * line2[1],
-		line1[2] * line2[0] - line1[0] * line2[2],
-		line1[0] * line2[1] - line1[1] * line2[0],
-	];
 
-	return normalize(normal);
+		return normalize(normal);
+	} catch (error) {
+		throw error;
+	}
 }
 
 export function dotProduct(vec1, vec2) {
