@@ -1,7 +1,7 @@
 import * as constants from "../core/constants.js";
 
 export class Object3d {
-	constructor(coords, primitive, materials = false) {
+	constructor(coords = [0, 0, 0], primitive = constants.TRIANGLES, materials = false) {
 		this.coords = coords;
 		this.primitive = primitive;
 
