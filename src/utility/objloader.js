@@ -7,9 +7,8 @@ export class OBJLoader {
 		url,
 		normals = constants.CLOCKWISE,
 		object = new Object3d([0, 0, 0], constants.TRIANGLES, true),
-		material = new Material("#f88", 128)
+		material = new Material("#fff", 128)
 	) {
-		console.log(object);
 		this.url = url;
 		this.object = object;
 		this.normals = normals;

@@ -11,75 +11,28 @@
 		<script type="module">
 			const { Renderer, Screen, Camera, Input } = mjsr;
 
-			// prettier-ignore
-			class Torus extends mjsr.Object3d {
-				constructor(coords = [0, 0, 0], sides = 8, size = 0.5, hole = 1) {
-					super(coords, mjsr.TRIANGLES, true);
-
-					this.materials = [
-						new mjsr.Material("#ca3", 4), new mjsr.Material("#f7f", 64)
-					];
-
-					for (let j = 0; j <= sides - 1; j++) {
-						let s = Math.sin(((2 * Math.PI) / sides) * j),
-							c = Math.cos(((2 * Math.PI) / sides) * j);
-
-						for (let i = 0; i <= sides - 1; i++) {
-							this.verts[i + j * sides] = [hole + size * Math.cos((i * 2 * Math.PI) / sides), this.coords[1] + size * Math.sin((i * 2 * Math.PI) / sides), 0];
-
-							let [a0, a1] = [0, 2];
-							let [x, y] = [
-								this.verts[i + j * sides][a0],
-								this.verts[i + j * sides][a1],
-							];
-
-							let colour = this.verts[i + j * sides][1] < size / 4 - this.coords[1] ? 0 : 1;
-
-							// this.verts[i + j * sides][3] = colour
-
-							this.verts[i + j * sides][a0] = this.coords[0] + (x * c - y * s);
-							this.verts[i + j * sides][a1] = this.coords[2] + (y * c + x * s);
-
-							// this.edges.push((j !== sides - 1) ? [i + j * sides, i + (j + 1) * sides] : [i + j * sides, i]);
-							// this.edges.push((i !== sides - 1) ? [i + j * sides, i + j * sides + 1] : [i + j * sides, j * sides]);
-
-
-							if (j !== sides - 1 && i !== sides - 1) {
-								this.faces.push([ i + (j + 1) * sides, i + j * sides + 1, i + j * sides, colour]);
-								this.faces.push([ i + j * sides + 1, i + (j + 1) * sides, i + (j + 1) * sides + 1, colour]);
-							} else if (j == sides - 1 && i !== sides - 1) {
-								this.faces.push([i, i + j * sides + 1, i + j * sides, colour]);
-								this.faces.push([i + j * sides + 1, i, i + 1, colour]);
-							} else if (j !== sides - 1 && i == sides - 1) {
-								this.faces.push([ i + (j + 1) * sides, j * sides, i + j * sides, colour]);
-								this.faces.push([ i + (j + 1) * sides, (j + 1) * sides, j * sides, colour]);
-							} else if (j == sides - 1 && i == sides - 1) {
-								this.faces.push([i, j * sides, i + j * sides, colour]);
-								this.faces.push([i, i - (sides - 1), j * sides, colour]);
-							}
-						}
-					}
-				}
-			}
-
 			const r = new Renderer(
 				new Screen({}).fullscreen(),
-				new Camera([0, -2, -5], [0.4, 0, 0]),
+				new Camera([0, -2, -8], [0, 0, 0]),
 				new Input.FirstPerson(),
-				{ mono: false, lighting: mjsr.BLINN_PHONG }
+				{ mono: false, lighting: mjsr.BLINN_PHONG, culling: false }
 			);
 
-			let scene = [new Torus([0, 0, 0], 100)];
-			r.setup(scene);
+			let teapot = new mjsr.OBJLoader("./geometry/teapot.obj", mjsr.COUNTER_CLOCKWISE, new mjsr.Object3d([0,0,0], mjsr.TRIANGLES, true), new mjsr.Material("#f88", 64));
+			teapot.load().then((tp) => {
+				let scene = [tp];
+				r.setup(scene);
 
-			function frame(now) {
-				r.draw();
-				r.update(now);
+				function frame(now) {
+					r.draw();
+					r.update(now);
+
+					requestAnimationFrame(frame);
+				}
 
 				requestAnimationFrame(frame);
-			}
+			});
 
-			requestAnimationFrame(frame);
 		</script>
 		<style>
 			.screen {

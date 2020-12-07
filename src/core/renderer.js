@@ -17,11 +17,12 @@ export class Renderer {
 		screen = new Screen(),
 		camera = new Camera(),
 		inputHandler = new Input.None(),
-		options = { mono: false }
+		options = { mono: false, lighting: constants.BLINN_PHONG, culling: true }
 	) {
 		this.options = {};
 		this.options.mono = options.mono ?? false;
 		this.options.lighting = options.lighting ?? constants.BLINN_PHONG;
+		this.options.culling = options.culling ?? true;
 
 		this.screen = screen;
 		this.camera = camera;
@@ -144,7 +145,9 @@ export class Renderer {
 
 		gl.clearColor(1.0, 1.0, 1.0, 1.0);
 		gl.enable(gl.DEPTH_TEST);
-		gl.enable(gl.CULL_FACE);
+
+		if (this.options.culling)
+			gl.enable(gl.CULL_FACE);
 
 		this.input.setupMovement();
 	}
