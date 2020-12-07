@@ -146,8 +146,7 @@ export class Renderer {
 		gl.clearColor(1.0, 1.0, 1.0, 1.0);
 		gl.enable(gl.DEPTH_TEST);
 
-		if (this.options.culling)
-			gl.enable(gl.CULL_FACE);
+		if (this.options.culling) gl.enable(gl.CULL_FACE);
 
 		this.input.setupMovement();
 	}

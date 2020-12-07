@@ -16,6 +16,7 @@ import { OBJLoader } from "./utility/objloader.js";
 import * as constants from "./core/constants.js";
 
 const mjsr = {
+	VERSION: "v0.9-alpha",
 	...constants,
 
 	Renderer,
@@ -31,3 +32,5 @@ const mjsr = {
 if (typeof define === "function" && define.amd) define([], () => mjsr);
 else if (typeof exports === "object") module.exports = mjsr;
 else window.mjsr = mjsr;
+
+console.log(`Loaded mjsr version: %c${mjsr.VERSION}`, "text-decoration:underline");
