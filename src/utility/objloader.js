@@ -24,14 +24,15 @@ export class OBJLoader {
 			let ltype = line.shift();
 
 			switch (ltype) {
+				case "#":
+					break;
 				case "v":
-					this.object.verts.push(line.map((v, i) => parseFloat(v)));
+					this.object.verts.push(line.map((v, i) => parseFloat(v) + this.object.coords[i]));
 					break;
 				case "f":
-					line = line.map((v) => parseInt(v) - 1);
-					if (this.normals == constants.CLOCKWISE) this.object.faces.push([...line, 0]);
+					line = line.map((v) => parseInt(v.split(/\//)[0]) - 1);
+					if (this.normals == constants.CLOCKWISE) this.object.faces.push([line[0], line[1], line[2], 0]);
 					else this.object.faces.push([line[2], line[1], line[0], 0]);
-
 					break;
 			}
 		}
