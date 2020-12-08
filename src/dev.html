@@ -24,8 +24,9 @@
 				new mjsr.Object3d([0, 0, 0], mjsr.TRIANGLES, true),
 				new mjsr.Material("#f88", 64)
 			);
-			teapot.load().then((tp) => {
-				let scene = [tp];
+
+			(async () => {
+				let scene = [await teapot.load()];
 				r.setup(scene);
 
 				function frame(now) {
@@ -36,7 +37,7 @@
 				}
 
 				requestAnimationFrame(frame);
-			});
+			})();
 		</script>
 		<style>
 			.screen {
