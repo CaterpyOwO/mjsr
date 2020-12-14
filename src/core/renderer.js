@@ -13,16 +13,40 @@ import { default as fragment } from "./shaders/frag.js";
 import * as constants from "../core/constants.js";
 
 export class Renderer {
+	/**
+	 * Creates a new Renderer
+	 *
+	 * @constructor
+	 *
+	 * @param {Screen} [screen=new Screen()] - The screen to render to
+	 * @param {Camera} [camera=new Camera()] - The camera
+	 * @param {Object} [inputHandler=new Input.None()] - Input handler
+	 *
+	 * @param {Object} [options={ mono: false, lighting: constants.BLINN_PHONG, culling: true, posterization: false }] - Additional rendering options
+	 * @param {Number} [options.lighting=mjsr.BLINN_PHONG] - Change lighting modes
+	 * @param {Boolean} [options.culling=true] - Enable face culling
+	 *
+	 * @param {Boolean} [options.mono=false] - Convert image to mono
+	 * @param {Boolean} [options.posterization=false] - Posterize rendered image
+	 *
+	 * @returns {Renderer}
+	 */
 	constructor(
 		screen = new Screen(),
 		camera = new Camera(),
 		inputHandler = new Input.None(),
-		options = { mono: false, lighting: constants.BLINN_PHONG, culling: true }
+		options = {
+			mono: false,
+			lighting: constants.BLINN_PHONG,
+			culling: true,
+			posterization: false,
+		}
 	) {
 		this.options = {};
 		this.options.mono = options.mono ?? false;
 		this.options.lighting = options.lighting ?? constants.BLINN_PHONG;
 		this.options.culling = options.culling ?? true;
+		this.options.posterization = options.posterization ?? false;
 
 		this.screen = screen;
 		this.camera = camera;
@@ -35,6 +59,11 @@ export class Renderer {
 		return this;
 	}
 
+	/**
+	 * Setup the renderer's scene
+	 *
+	 * @param {Object[]} scene - An array of Objects
+	 */
 	setup(scene) {
 		this.scene = scene;
 		this.meshes = [];
@@ -136,7 +165,14 @@ export class Renderer {
 			let mode = primitive == 2 ? this.options.lighting : 0;
 
 			shader.vert(vertex({ mode, primitive }));
-			shader.frag(fragment({ mode, primitive, mono: this.options.mono }));
+			shader.frag(
+				fragment({
+					mode,
+					primitive,
+					mono: this.options.mono,
+					posterization: this.options.posterization,
+				})
+			);
 
 			shader.program();
 
@@ -151,6 +187,9 @@ export class Renderer {
 		this.input.setupMovement();
 	}
 
+	/**
+	 * Draws the frame
+	 */
 	draw() {
 		const { gl } = this.screen;
 		let primitives = [gl.POINTS, gl.LINES, gl.TRIANGLES];
@@ -211,6 +250,12 @@ export class Renderer {
 		}
 	}
 
+	/**
+	 *
+	 * Update the renderer
+	 *
+	 * @param {DOMHighResTimeStamp} now - The timestamp
+	 */
 	update(now) {
 		this.dt = this.last - now;
 		this.last = now;
