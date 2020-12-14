@@ -6,9 +6,10 @@
 		<title>Document</title>
 
 		<!-- <script src="twgl.js" type="module"></script> -->
-		<script src="mjsr.js" type="module"></script>
+		<!-- <script src="mjsr.js" type="module"></script> -->
 
 		<script type="module">
+			import { mjsr } from "./mjsr.js";
 			const { Renderer, Screen, Camera, Input } = mjsr;
 
 			const r = new Renderer(
