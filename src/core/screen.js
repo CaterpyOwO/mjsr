@@ -1,7 +1,24 @@
 export class Screen {
-	constructor(size = { width: 640, height: 480 }, parent = document.body, canvas) {
-		if (canvas instanceof HTMLCanvasElement) this.canvas = canvas;
-		else this.canvas = document.createElement("canvas");
+	/**
+	 * Creates a new Screen that handles canvas resizing
+	 *
+	 * @constructor
+	 *
+	 * @param {Object} size - The size of the canvas to create
+	 * @param {Number} [size.width=640] - The width of the canvas in pixels
+	 * @param {Number} [size.height=480] - The height of the canvas in pixels
+	 *
+	 * @param {HTMLElement} [parent=document.body] - The parent  to which the canvas should be attached to.
+	 *
+	 * @param {HTMLCanvasElement} [canvas=document.createElement("canvas")] - The canvas
+	 * @returns {Screen}
+	 */
+	constructor(
+		size = { width: 640, height: 480 },
+		parent = document.body,
+		canvas = document.createElement("canvas")
+	) {
+		this.canvas = canvas;
 
 		this.canvas.width = size.width;
 		this.canvas.height = size.height;
