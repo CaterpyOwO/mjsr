@@ -15,7 +15,7 @@
 				new Screen().fullscreen(),
 				new Camera([0, -2, -8], [0, 0, 0]),
 				new Input.FirstPerson(),
-				{ mono: false, lighting: mjsr.BLINN_PHONG, culling: false }
+				{ mono: false, lighting: mjsr.BLINN_PHONG, culling: false, posterization: true }
 			);
 
 			let teapot = new mjsr.OBJLoader(

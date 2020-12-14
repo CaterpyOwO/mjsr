@@ -15,8 +15,8 @@ import { OBJLoader } from "./utility/objloader.js";
 
 import * as constants from "./core/constants.js";
 
-const mjsr = {
-	VERSION: "v0.9-alpha",
+export const mjsr = {
+	VERSION: "v0.9.1-alpha",
 	...constants,
 
 	Renderer,
