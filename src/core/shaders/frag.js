@@ -1,8 +1,11 @@
 import { preprocess } from "../../utility/preprocess.js";
 import { fragment as mono } from "./fragments/mono.glsl.js";
+import { fragment as posteriz } from "./fragments/posterization.glsl.js";
 import { fragment as lighting } from "./fragments/lighting.glsl.js";
 
-export default function generate(options = { primitive: 2, mono: true, mode: 0 }) {
+export default function generate(
+	options = { primitive: 2, mono: false, mode: 0, posterization: false }
+) {
 	return preprocess(
 		`
 	precision mediump float;
@@ -17,14 +20,18 @@ export default function generate(options = { primitive: 2, mono: true, mode: 0 }
 	#endif
 
 	void main() {
-		#if options.mono
-			${mono}
-		#else
-			gl_FragColor = v_colour;
-		#endif
+		gl_FragColor = v_colour;
 
 		#if (options.mode !== 0)
 			${lighting}
+		#endif
+
+		#if options.mono
+			${mono}
+		#endif
+
+		#if options.posterization
+			${posteriz}
 		#endif
 	}`,
 		options
