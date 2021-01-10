@@ -2,13 +2,12 @@ import { Screen } from "./screen.js";
 import { Camera } from "./camera.js";
 import { Input } from "../input/input.js";
 
-import { crossProduct } from "../utility/math.js";
-import { parseColour } from "../utility/colour.js";
-
 import { Webglu } from "../utility/webgl.js";
 
 import { default as vertex } from "./shaders/vert.js";
 import { default as fragment } from "./shaders/frag.js";
+
+import { Object3d } from "../object/object.js";
 
 import * as constants from "../core/constants.js";
 
@@ -72,86 +71,14 @@ export class Renderer {
 		this.shaders = {};
 
 		for (let object of this.scene) {
+			let mesh = {}, primitive = -1;
 			if (typeof object !== "object") throw new Error(`Invalid object in scene.`);
 
-			const props = {
-				0: ["coords", "verts", "colours", "primitive"],
-				1: ["coords", "verts", "edges", "colours", "primitive"],
-				2: ["coords", "verts", "faces", "colours", "primitive"],
-			};
+			if (!object.generateMesh)
+				object = Object3d.from(object);
 
-			const primitives = ["points", "lines", "triangles"];
-			let primitive = -1;
-
-			if (
-				typeof object.primitive === "string" &&
-				primitives.includes(object.primitive) !== undefined
-			)
-				primitive = primitives.indexOf(object.primitive);
-			else if (typeof object.primitive == "number") primitive = object.primitive;
-			else throw new Error("No primitive type supplied.");
-
-			for (let prop of props[primitive])
-				if (object[prop] === undefined) {
-					if (prop == "colours" && object["materials"]) continue;
-					throw new Error(`Object doesn't have required property ${prop}.`);
-				}
-
-			let mesh = {
-				position: [],
-				colour: [],
-				normal: [],
-				shinyness: [],
-				primitive,
-			};
-
-			switch (primitive) {
-				case 0:
-					for (let vert of object.verts) {
-						let colour = parseColour(object.colours[vert[3]]);
-
-						mesh.position.push(vert[0], vert[1], vert[2]);
-						mesh.colour.push(...colour);
-					}
-					break;
-				case 1:
-					for (let edge of object.edges) {
-						let colour = parseColour(object.colours[edge[2]]);
-
-						mesh.position.push(...object.verts[edge[1]], ...object.verts[edge[0]]);
-
-						mesh.colour.push(...colour, ...colour);
-					}
-					break;
-				case 2:
-					for (let triangle of object.faces) {
-						let cross = crossProduct([
-							object.verts[triangle[0]],
-							object.verts[triangle[1]],
-							object.verts[triangle[2]],
-						]);
-
-						let colour = [],
-							shinyness = 32;
-						if (object.materials) {
-							colour = object.materials[triangle[3]].colour;
-							shinyness = object.materials[triangle[3]].shinyness;
-						} else colour = parseColour(object.colours[triangle[3]]);
-
-						mesh.position.push(
-							...object.verts[triangle[2]],
-							...object.verts[triangle[1]],
-							...object.verts[triangle[0]]
-						);
-
-						mesh.colour.push(...colour, ...colour, ...colour);
-						mesh.shinyness.push(shinyness, shinyness, shinyness);
-						mesh.normal.push(...cross, ...cross, ...cross);
-					}
-					break;
-				default:
-					throw new Error("Invalid primitive");
-			}
+			mesh = object.generateMesh();
+			primitive = mesh.primitive;
 
 			this.primitives.add(primitive);
 			this.meshes.push(mesh);
