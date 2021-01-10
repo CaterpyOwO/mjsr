@@ -71,11 +71,11 @@ export class Renderer {
 		this.shaders = {};
 
 		for (let object of this.scene) {
-			let mesh = {}, primitive = -1;
+			let mesh = {},
+				primitive = -1;
 			if (typeof object !== "object") throw new Error(`Invalid object in scene.`);
 
-			if (!object.generateMesh)
-				object = Object3d.from(object);
+			if (!object.generateMesh) object = Object3d.from(object);
 
 			mesh = object.generateMesh();
 			primitive = mesh.primitive;
