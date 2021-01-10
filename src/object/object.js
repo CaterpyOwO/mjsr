@@ -37,10 +37,7 @@ export class Object3d {
 		const primitives = ["points", "lines", "triangles"];
 		let primitive = -1;
 
-		if (
-			typeof this.primitive === "string" &&
-			primitives.includes(this.primitive) !== undefined
-		)
+		if (typeof this.primitive === "string" && primitives.includes(this.primitive) !== undefined)
 			primitive = primitives.indexOf(this.primitive);
 		else if (typeof this.primitive == "number") primitive = this.primitive;
 		else throw new Error("No primitive type supplied.");
@@ -107,7 +104,7 @@ export class Object3d {
 
 	/**
 	 * Creates a new instance of Object3d from a JavaScript Object
-	 * 
+	 *
 	 * @param {Object} object - The Object
 	 */
 	static from(object) {
