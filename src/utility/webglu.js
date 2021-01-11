@@ -5,6 +5,8 @@ export class Webglu {
 		this.shaders = [];
 		this.glprogram = null;
 
+		this.locations = {};
+
 		return this;
 	}
 
@@ -81,6 +83,25 @@ export class Webglu {
 				this.gl.vertexAttribPointer(attribute, sizes[b], this.gl.FLOAT, false, 0, 0);
 			else this.gl.vertexAttribPointer(attribute, 3, this.gl.FLOAT, false, 0, 0);
 		}
+	}
+
+	uniform3fv(name, v) {
+		return this.gl.uniform3fv(this._location(name), v);
+	}
+
+	uniformMatrix4fv(name, transpose, value) {
+		return this.gl.uniformMatrix4fv(this._location(name), transpose, value);
+	}
+
+	uniform1f(name, number) {
+		return this.gl.uniform1f(this._location(name), number);
+	}
+
+	_location(name) {
+		if (!this.locations[name])
+			this.locations[name] = this.gl.getUniformLocation(this.glprogram, name);
+
+		return this.locations[name];
 	}
 
 	buffer32f(data, type) {

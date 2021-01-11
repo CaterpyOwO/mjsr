@@ -2,7 +2,7 @@ import { Screen } from "./screen.js";
 import { Camera } from "./camera.js";
 import { Input } from "../input/input.js";
 
-import { Webglu } from "../utility/webgl.js";
+import { Webglu } from "../utility/webglu.js";
 
 import { default as vertex } from "./shaders/vert.js";
 import { default as fragment } from "./shaders/frag.js";
@@ -127,27 +127,11 @@ export class Renderer {
 
 			gl.useProgram(shader.glprogram);
 
-			gl.uniform3fv(gl.getUniformLocation(shader.glprogram, "u_pos"), this.camera.pos);
-			// gl.uniform2fv(gl.getUniformLocation(shader.glprogram, "u_resolution"), [
-			// 	gl.drawingBufferWidth,
-			// 	gl.drawingBufferHeight,
-			// ]);
+			shader.uniform3fv("u_pos", this.camera.pos);
 
-			gl.uniformMatrix4fv(
-				gl.getUniformLocation(shader.glprogram, "u_modelit"),
-				false,
-				this.camera.modelit()
-			);
-			gl.uniformMatrix4fv(
-				gl.getUniformLocation(shader.glprogram, "u_model"),
-				false,
-				this.camera.model
-			);
-			gl.uniformMatrix4fv(
-				gl.getUniformLocation(shader.glprogram, "u_vp"),
-				false,
-				this.camera.vp(this.screen.canvas)
-			);
+			shader.uniformMatrix4fv("u_modelit", false, this.camera.modelit());
+			shader.uniformMatrix4fv("u_model", false, this.camera.model);
+			shader.uniformMatrix4fv("u_vp", false, this.camera.vp(this.screen.canvas));
 
 			gl.useProgram(null);
 		}
@@ -158,14 +142,8 @@ export class Renderer {
 
 			gl.useProgram(shader.glprogram);
 
-			gl.uniform1f(
-				gl.getUniformLocation(shader.glprogram, "u_shinyness"),
-				mesh.material.shinyness
-			);
-			gl.uniform3fv(
-				gl.getUniformLocation(shader.glprogram, "u_colour"),
-				mesh.material.colour
-			);
+			shader.uniform1f("u_shinyness", mesh.material.shinyness);
+			shader.uniform3fv("u_colour", mesh.material.colour);
 
 			// gl.uniform1i(gl.getUniformLocation(shader.glprogram, "u_primitive"), primitive);
 
@@ -175,7 +153,6 @@ export class Renderer {
 			if (primitive == 2) buffers.normal = mesh.data.normal;
 
 			shader.buffers(buffers);
-
 			gl.drawArrays(primitives[primitive], 0, mesh.data.position.length / (primitive + 1));
 
 			gl.useProgram(null);
