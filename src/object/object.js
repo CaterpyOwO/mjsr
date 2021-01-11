@@ -54,8 +54,8 @@ export class Object3d {
 						position: [],
 						normal: [],
 						primitive,
-					}
-				}
+					},
+				};
 			}
 		} else {
 			for (let c in this.colours) {
@@ -65,11 +65,10 @@ export class Object3d {
 						position: [],
 						normal: [],
 						primitive,
-					}
-				}
+					},
+				};
 			}
 		}
-
 
 		switch (primitive) {
 			case 0:
@@ -79,7 +78,10 @@ export class Object3d {
 				break;
 			case 1:
 				for (let edge of this.edges) {
-					meshes[edge[2]].data.position.push(...this.verts[edge[1]], ...this.verts[edge[0]]);
+					meshes[edge[2]].data.position.push(
+						...this.verts[edge[1]],
+						...this.verts[edge[0]]
+					);
 				}
 				break;
 			case 2:
