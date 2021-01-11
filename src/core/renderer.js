@@ -133,7 +133,6 @@ export class Renderer {
 			// 	gl.drawingBufferHeight,
 			// ]);
 
-
 			gl.uniformMatrix4fv(
 				gl.getUniformLocation(shader.glprogram, "u_modelit"),
 				false,
@@ -159,8 +158,14 @@ export class Renderer {
 
 			gl.useProgram(shader.glprogram);
 
-			gl.uniform1f(gl.getUniformLocation(shader.glprogram, "u_shinyness"), mesh.material.shinyness);
-			gl.uniform3fv(gl.getUniformLocation(shader.glprogram, "u_colour"), mesh.material.colour);
+			gl.uniform1f(
+				gl.getUniformLocation(shader.glprogram, "u_shinyness"),
+				mesh.material.shinyness
+			);
+			gl.uniform3fv(
+				gl.getUniformLocation(shader.glprogram, "u_colour"),
+				mesh.material.colour
+			);
 
 			// gl.uniform1i(gl.getUniformLocation(shader.glprogram, "u_primitive"), primitive);
 
