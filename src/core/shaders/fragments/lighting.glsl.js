@@ -27,5 +27,5 @@ export const fragment = `
     vec3 ambient = 0.1 * lightColour;
 
 
-    gl_FragColor = vec4((ambient + diffuse + specular) * gl_FragColor.rgb, gl_FragColor.a);
+    gl_FragColor = vec4((ambient + diffuse + specular) * gl_FragColor.rgb, 1.0);
 `;

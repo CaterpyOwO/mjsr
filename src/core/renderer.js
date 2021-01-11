@@ -130,10 +130,11 @@ export class Renderer {
 			gl.useProgram(shader.glprogram);
 
 			gl.uniform3fv(gl.getUniformLocation(shader.glprogram, "u_pos"), this.camera.pos);
-			gl.uniform2fv(gl.getUniformLocation(shader.glprogram, "u_resolution"), [
-				gl.drawingBufferWidth,
-				gl.drawingBufferHeight,
-			]);
+			// gl.uniform2fv(gl.getUniformLocation(shader.glprogram, "u_resolution"), [
+			// 	gl.drawingBufferWidth,
+			// 	gl.drawingBufferHeight,
+			// ]);
+
 
 			gl.uniformMatrix4fv(
 				gl.getUniformLocation(shader.glprogram, "u_modelit"),
@@ -169,7 +170,7 @@ export class Renderer {
 			};
 			if (mesh.primitive == 2) buffers.normal = mesh.normal;
 
-			shader.buffers(buffers, { colour: 4, shinyness: 1 });
+			shader.buffers(buffers, { shinyness: 1 });
 
 			gl.drawArrays(primitives[primitive], 0, mesh.position.length / (primitive + 1));
 

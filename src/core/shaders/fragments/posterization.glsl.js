@@ -9,5 +9,5 @@ export const fragment = `
     c = c / numColors;
     c = pow(c, vec3(1.0/gamma));
 
-    gl_FragColor = vec4(c, gl_FragColor.a);
+    gl_FragColor = vec4(c, 1.0);
 `;
