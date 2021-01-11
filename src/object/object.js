@@ -1,7 +1,6 @@
 import * as constants from "../core/constants.js";
 
 import { crossProduct } from "../utility/math.js";
-import { parseColour } from "../utility/colour.js";
 
 import { Material } from "./material.js";
 
@@ -60,7 +59,7 @@ export class Object3d {
 		} else {
 			for (let c in this.colours) {
 				meshes[c] = {
-					material: Material.from(this.colours[c]),
+					material: new Material(this.colours[c]),
 					data: {
 						position: [],
 						normal: [],
