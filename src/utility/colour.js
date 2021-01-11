@@ -16,12 +16,12 @@ export function parseColour(colour, type) {
 				colour = colour.split("").reduce((r, e) => r.push(e + e) && r, []);
 			else colour = colour.match(/.{1,2}/g);
 
-			return [...colour.map((c) => clamp(parseInt(c, 16) / 255, 0.0, 1.0)), 1.0];
+			return [...colour.map((c) => clamp(parseInt(c, 16) / 255, 0.0, 1.0))];
 		case "rgb":
 			colour = colour.substr(4).slice(0, -1);
 			colour = colour.split(",");
 
-			return [...colour.map((c) => clamp(parseInt(c) / 255, 0.0, 1.0)), 1.0];
+			return [...colour.map((c) => clamp(parseInt(c) / 255, 0.0, 1.0))];
 
 		default:
 			throw new Error(`${type} is not a valid colour type.`);

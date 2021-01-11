@@ -2,27 +2,50 @@ import { Screen } from "./screen.js";
 import { Camera } from "./camera.js";
 import { Input } from "../input/input.js";
 
-import { crossProduct } from "../utility/math.js";
-import { parseColour } from "../utility/colour.js";
-
 import { Webglu } from "../utility/webgl.js";
 
 import { default as vertex } from "./shaders/vert.js";
 import { default as fragment } from "./shaders/frag.js";
 
+import { Object3d } from "../object/object.js";
+
 import * as constants from "../core/constants.js";
 
 export class Renderer {
+	/**
+	 * Creates a new Renderer
+	 *
+	 * @constructor
+	 *
+	 * @param {Screen} [screen=new Screen()] - The screen to render to
+	 * @param {Camera} [camera=new Camera()] - The camera
+	 * @param {Object} [inputHandler=new Input.None()] - Input handler
+	 *
+	 * @param {Object} [options={ mono: false, lighting: constants.BLINN_PHONG, culling: true, posterization: false }] - Additional rendering options
+	 * @param {Number} [options.lighting=mjsr.BLINN_PHONG] - Change lighting modes
+	 * @param {Boolean} [options.culling=true] - Enable face culling
+	 *
+	 * @param {Boolean} [options.mono=false] - Convert image to mono
+	 * @param {Boolean} [options.posterization=false] - Posterize rendered image
+	 *
+	 * @returns {Renderer}
+	 */
 	constructor(
 		screen = new Screen(),
 		camera = new Camera(),
 		inputHandler = new Input.None(),
-		options = { mono: false, lighting: constants.BLINN_PHONG, culling: true }
+		options = {
+			mono: false,
+			lighting: constants.BLINN_PHONG,
+			culling: true,
+			posterization: false,
+		}
 	) {
 		this.options = {};
 		this.options.mono = options.mono ?? false;
 		this.options.lighting = options.lighting ?? constants.BLINN_PHONG;
 		this.options.culling = options.culling ?? true;
+		this.options.posterization = options.posterization ?? false;
 
 		this.screen = screen;
 		this.camera = camera;
@@ -35,6 +58,11 @@ export class Renderer {
 		return this;
 	}
 
+	/**
+	 * Setup the renderer's scene
+	 *
+	 * @param {Object[]} scene - An array of Objects
+	 */
 	setup(scene) {
 		this.scene = scene;
 		this.meshes = [];
@@ -45,87 +73,13 @@ export class Renderer {
 		for (let object of this.scene) {
 			if (typeof object !== "object") throw new Error(`Invalid object in scene.`);
 
-			const props = {
-				0: ["coords", "verts", "colours", "primitive"],
-				1: ["coords", "verts", "edges", "colours", "primitive"],
-				2: ["coords", "verts", "faces", "colours", "primitive"],
-			};
+			if (!object.generateMesh) object = Object3d.from(object);
 
-			const primitives = ["points", "lines", "triangles"];
-			let primitive = -1;
-
-			if (
-				typeof object.primitive === "string" &&
-				primitives.includes(object.primitive) !== undefined
-			)
-				primitive = primitives.indexOf(object.primitive);
-			else if (typeof object.primitive == "number") primitive = object.primitive;
-			else throw new Error("No primitive type supplied.");
-
-			for (let prop of props[primitive])
-				if (object[prop] === undefined) {
-					if (prop == "colours" && object["materials"]) continue;
-					throw new Error(`Object doesn't have required property ${prop}.`);
-				}
-
-			let mesh = {
-				position: [],
-				colour: [],
-				normal: [],
-				shinyness: [],
-				primitive,
-			};
-
-			switch (primitive) {
-				case 0:
-					for (let vert of object.verts) {
-						let colour = parseColour(object.colours[vert[3]]);
-
-						mesh.position.push(vert[0], vert[1], vert[2]);
-						mesh.colour.push(...colour);
-					}
-					break;
-				case 1:
-					for (let edge of object.edges) {
-						let colour = parseColour(object.colours[edge[2]]);
-
-						mesh.position.push(...object.verts[edge[1]], ...object.verts[edge[0]]);
-
-						mesh.colour.push(...colour, ...colour);
-					}
-					break;
-				case 2:
-					for (let triangle of object.faces) {
-						let cross = crossProduct([
-							object.verts[triangle[0]],
-							object.verts[triangle[1]],
-							object.verts[triangle[2]],
-						]);
-
-						let colour = [],
-							shinyness = 32;
-						if (object.materials) {
-							colour = object.materials[triangle[3]].colour;
-							shinyness = object.materials[triangle[3]].shinyness;
-						} else colour = parseColour(object.colours[triangle[3]]);
-
-						mesh.position.push(
-							...object.verts[triangle[2]],
-							...object.verts[triangle[1]],
-							...object.verts[triangle[0]]
-						);
-
-						mesh.colour.push(...colour, ...colour, ...colour);
-						mesh.shinyness.push(shinyness, shinyness, shinyness);
-						mesh.normal.push(...cross, ...cross, ...cross);
-					}
-					break;
-				default:
-					throw new Error("Invalid primitive");
-			}
+			let meshes = object.generateMesh(),
+				primitive = meshes[0].data.primitive;
 
 			this.primitives.add(primitive);
-			this.meshes.push(mesh);
+			this.meshes.push(...meshes);
 		}
 
 		const { gl } = this.screen;
@@ -136,7 +90,14 @@ export class Renderer {
 			let mode = primitive == 2 ? this.options.lighting : 0;
 
 			shader.vert(vertex({ mode, primitive }));
-			shader.frag(fragment({ mode, primitive, mono: this.options.mono }));
+			shader.frag(
+				fragment({
+					mode,
+					primitive,
+					mono: this.options.mono,
+					posterization: this.options.posterization,
+				})
+			);
 
 			shader.program();
 
@@ -151,6 +112,9 @@ export class Renderer {
 		this.input.setupMovement();
 	}
 
+	/**
+	 * Draws the frame
+	 */
 	draw() {
 		const { gl } = this.screen;
 		let primitives = [gl.POINTS, gl.LINES, gl.TRIANGLES];
@@ -164,10 +128,10 @@ export class Renderer {
 			gl.useProgram(shader.glprogram);
 
 			gl.uniform3fv(gl.getUniformLocation(shader.glprogram, "u_pos"), this.camera.pos);
-			gl.uniform2fv(gl.getUniformLocation(shader.glprogram, "u_resolution"), [
-				gl.drawingBufferWidth,
-				gl.drawingBufferHeight,
-			]);
+			// gl.uniform2fv(gl.getUniformLocation(shader.glprogram, "u_resolution"), [
+			// 	gl.drawingBufferWidth,
+			// 	gl.drawingBufferHeight,
+			// ]);
 
 			gl.uniformMatrix4fv(
 				gl.getUniformLocation(shader.glprogram, "u_modelit"),
@@ -189,28 +153,41 @@ export class Renderer {
 		}
 
 		for (let mesh of this.meshes) {
-			const primitive = mesh.primitive;
+			const primitive = mesh.data.primitive;
 			const shader = this.shaders[primitive];
 
 			gl.useProgram(shader.glprogram);
 
+			gl.uniform1f(
+				gl.getUniformLocation(shader.glprogram, "u_shinyness"),
+				mesh.material.shinyness
+			);
+			gl.uniform3fv(
+				gl.getUniformLocation(shader.glprogram, "u_colour"),
+				mesh.material.colour
+			);
+
 			// gl.uniform1i(gl.getUniformLocation(shader.glprogram, "u_primitive"), primitive);
 
 			let buffers = {
-				position: mesh.position,
-				colour: mesh.colour,
-				shinyness: mesh.shinyness,
+				position: mesh.data.position,
 			};
-			if (mesh.primitive == 2) buffers.normal = mesh.normal;
+			if (primitive == 2) buffers.normal = mesh.data.normal;
 
-			shader.buffers(buffers, { colour: 4, shinyness: 1 });
+			shader.buffers(buffers);
 
-			gl.drawArrays(primitives[primitive], 0, mesh.position.length / (primitive + 1));
+			gl.drawArrays(primitives[primitive], 0, mesh.data.position.length / (primitive + 1));
 
 			gl.useProgram(null);
 		}
 	}
 
+	/**
+	 *
+	 * Update the renderer
+	 *
+	 * @param {DOMHighResTimeStamp} now - The timestamp
+	 */
 	update(now) {
 		this.dt = this.last - now;
 		this.last = now;

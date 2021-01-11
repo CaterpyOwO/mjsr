@@ -10,6 +10,16 @@ import {
 } from "../utility/gl-matrix/mat4.js";
 
 export class Camera {
+	/**
+	 * Creates a new Camera
+	 *
+	 * @constructor
+	 *
+	 * @param {Object[3]} [position=[0,0,0]] - The position of the camera in world space
+	 * @param {Object[3]} [rotation=[0,0,0]] - The rotation of the camera
+	 * @param {Number} [fov=45] - The field of view of the camera
+	 * @returns {Camera}
+	 */
 	constructor(position = [0, 0, 0], rotation = [0, 0, 0], fov = 45) {
 		this.pos = position;
 		this.rot = rotation;

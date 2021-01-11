@@ -66,7 +66,7 @@ export class Webglu {
 		throw err;
 	}
 
-	buffers(arrays, sizes) {
+	buffers(arrays, sizes = {}) {
 		if (arrays.length == 0) throw new Error("No buffers were supplied.");
 
 		for (let b in arrays) {
