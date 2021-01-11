@@ -11,8 +11,9 @@ export default function generate(
 	precision mediump float;
 
 	varying vec3 v_normal;
-	varying vec3 v_colour;
-	varying float v_shinyness;
+	
+	// uniform vec3 u_colour;
+    // uniform float u_shinyness;
 
 	#if (options.mode !== 0)
 		varying vec3 v_fragPos, v_viewPos;
@@ -20,7 +21,10 @@ export default function generate(
 	#endif
 
 	void main() {
-		gl_FragColor = vec4(v_colour, 1.0);
+		vec3 u_colour = vec3(1.0, .5333, .5333);
+		float u_shinyness = 64.0;
+
+		gl_FragColor = vec4(u_colour, 1.0);
 
 		#if (options.mode !== 0)
 			${lighting}

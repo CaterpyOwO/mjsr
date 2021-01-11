@@ -12,10 +12,10 @@ export const fragment = `
     #if (options.mode == 2)
         vec3 halfwayd = normalize(lightd + viewd);
 
-        float sp = pow(max(dot(normal, halfwayd), 0.0), v_shinyness);
+        float sp = pow(max(dot(normal, halfwayd), 0.0), u_shinyness);
         vec3 specular = lightColour * sp;
     #else
-        float sp = pow(max(dot(viewd, reflectd), 0.0), v_shinyness);
+        float sp = pow(max(dot(viewd, reflectd), 0.0), u_shinyness);
         vec3 specular = strength * sp * lightColour; 
     #endif
 
