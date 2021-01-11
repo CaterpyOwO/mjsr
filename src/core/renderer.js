@@ -71,17 +71,15 @@ export class Renderer {
 		this.shaders = {};
 
 		for (let object of this.scene) {
-			let mesh = {},
-				primitive = -1;
 			if (typeof object !== "object") throw new Error(`Invalid object in scene.`);
 
 			if (!object.generateMesh) object = Object3d.from(object);
 
-			mesh = object.generateMesh();
-			primitive = mesh.primitive;
+			let meshes = object.generateMesh(),
+				primitive = meshes[0].data.primitive;
 
 			this.primitives.add(primitive);
-			this.meshes.push(mesh);
+			this.meshes.push(...meshes);
 		}
 
 		const { gl } = this.screen;
@@ -156,23 +154,24 @@ export class Renderer {
 		}
 
 		for (let mesh of this.meshes) {
-			const primitive = mesh.primitive;
+			const primitive = mesh.data.primitive;
 			const shader = this.shaders[primitive];
 
 			gl.useProgram(shader.glprogram);
 
+			gl.uniform1f(gl.getUniformLocation(shader.glprogram, "u_shinyness"), mesh.material.shinyness);
+			gl.uniform3fv(gl.getUniformLocation(shader.glprogram, "u_colour"), mesh.material.colour);
+
 			// gl.uniform1i(gl.getUniformLocation(shader.glprogram, "u_primitive"), primitive);
 
 			let buffers = {
-				position: mesh.position,
-				colour: mesh.colour,
-				shinyness: mesh.shinyness,
+				position: mesh.data.position,
 			};
-			if (mesh.primitive == 2) buffers.normal = mesh.normal;
+			if (primitive == 2) buffers.normal = mesh.data.normal;
 
-			shader.buffers(buffers, { shinyness: 1 });
+			shader.buffers(buffers);
 
-			gl.drawArrays(primitives[primitive], 0, mesh.position.length / (primitive + 1));
+			gl.drawArrays(primitives[primitive], 0, mesh.data.position.length / (primitive + 1));
 
 			gl.useProgram(null);
 		}

@@ -17,4 +17,8 @@ export class Material {
 
 		this.shinyness = shinyness;
 	}
+
+	static from(colour, shinyness = 32) {
+		return new Material(colour, shinyness);
+	}
 }

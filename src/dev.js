@@ -48,7 +48,7 @@ let lol = mjsr.Object3d.from({
 console.log(lol);
 
 (async () => {
-	let scene = [await teapot.load(), lol];
+	let scene = [await teapot.load()];
 	r.setup(scene);
 
 	function frame(now) {
