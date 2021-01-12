@@ -5,12 +5,12 @@ const r = new Renderer(
 	new Screen().fullscreen(),
 	new Camera([0, -2, -8], [0, 0, 0]),
 	new Input.FirstPerson(),
-	{ mono: false, lighting: mjsr.BLINN_PHONG, culling: false }
+	{ mono: false, lighting: mjsr.BLINN_PHONG, culling: true }
 );
 
 let teapot = new mjsr.OBJLoader(
 	"./geometry/teapot.obj",
-	mjsr.COUNTER_CLOCKWISE,
+	mjsr.CLOCKWISE,
 	new mjsr.Object3d([0, 0, 0], mjsr.TRIANGLES, true),
 	new mjsr.Material("#f88", 64)
 );
