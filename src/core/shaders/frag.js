@@ -12,8 +12,8 @@ export default function generate(
 
 	varying vec3 v_normal;
 	
-	// uniform vec3 u_colour;
-    // uniform float u_shinyness;
+	uniform vec3 u_colour;
+    uniform float u_shinyness;
 
 	#if (options.mode !== 0)
 		varying vec3 v_fragPos, v_viewPos;
@@ -21,9 +21,6 @@ export default function generate(
 	#endif
 
 	void main() {
-		vec3 u_colour = vec3(1.0, .5333, .5333);
-		float u_shinyness = 64.0;
-
 		gl_FragColor = vec4(u_colour, 1.0);
 
 		#if (options.mode !== 0)
