@@ -48,7 +48,7 @@ let cube = mjsr.Object3d.from({
 (async () => {
 	let scene = [await teapot.load()];
 	let scene2 = [cube];
-	
+
 	r.setup(scene, scene2);
 
 	function frame(now) {
@@ -61,4 +61,4 @@ let cube = mjsr.Object3d.from({
 	requestAnimationFrame(frame);
 })();
 
-window.addEventListener("keydown", event => event.key == "l" && (r.scene = 1))
+window.addEventListener("keydown", (event) => event.key == "l" && (r.scene = 1));

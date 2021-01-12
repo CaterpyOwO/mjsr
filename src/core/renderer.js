@@ -75,14 +75,14 @@ export class Renderer {
 
 			for (let object of scene) {
 				if (typeof object !== "object") throw new Error(`Invalid object in scene.`);
-	
+
 				if (!object.generateMesh) object = Object3d.from(object);
-	
+
 				let meshes = object.generateMesh(),
 					primitive = meshes[0].data.primitive;
-	
+
 				this.primitives.add(primitive);
-				console.log()
+				console.log();
 				sceneMeshes.push(...meshes);
 			}
 
@@ -184,9 +184,7 @@ export class Renderer {
 	}
 
 	set scene(index) {
-		if (typeof index === "number" && this.scenes[index])
-			this._scene = index;
-		else 
-			throw new Error("Invalid scene index.")
+		if (typeof index === "number" && this.scenes[index]) this._scene = index;
+		else throw new Error("Invalid scene index.");
 	}
 }
