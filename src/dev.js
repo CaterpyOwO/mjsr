@@ -15,7 +15,7 @@ let teapot = new mjsr.OBJLoader(
 	new mjsr.Material("#f88", 64)
 );
 
-let lol = mjsr.Object3d.from({
+let cube = mjsr.Object3d.from({
 	coords: [0, 0, 0],
 	primitive: mjsr.LINES,
 	verts: [
@@ -45,11 +45,11 @@ let lol = mjsr.Object3d.from({
 	colours: ["#0ff", "#0f0", "#f0f", "#00f", "#ff0", "#f00"],
 });
 
-console.log(lol);
-
 (async () => {
 	let scene = [await teapot.load()];
-	r.setup(scene);
+	let scene2 = [cube];
+	
+	r.setup(scene, scene2);
 
 	function frame(now) {
 		r.draw();
@@ -60,3 +60,5 @@ console.log(lol);
 
 	requestAnimationFrame(frame);
 })();
+
+window.addEventListener("keydown", event => event.key == "l" && (r.scene = 1))

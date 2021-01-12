@@ -63,23 +63,30 @@ export class Renderer {
 	 *
 	 * @param {Object[]} scene - An array of Objects
 	 */
-	setup(scene) {
-		this.scene = scene;
-		this.meshes = [];
+	setup(...scenes) {
+		this.scenes = [];
+		this._scene = 0;
 
 		this.primitives = new Set();
 		this.shaders = {};
 
-		for (let object of this.scene) {
-			if (typeof object !== "object") throw new Error(`Invalid object in scene.`);
+		for (let scene of scenes) {
+			let sceneMeshes = [];
 
-			if (!object.generateMesh) object = Object3d.from(object);
+			for (let object of scene) {
+				if (typeof object !== "object") throw new Error(`Invalid object in scene.`);
+	
+				if (!object.generateMesh) object = Object3d.from(object);
+	
+				let meshes = object.generateMesh(),
+					primitive = meshes[0].data.primitive;
+	
+				this.primitives.add(primitive);
+				console.log()
+				sceneMeshes.push(...meshes);
+			}
 
-			let meshes = object.generateMesh(),
-				primitive = meshes[0].data.primitive;
-
-			this.primitives.add(primitive);
-			this.meshes.push(...meshes);
+			this.scenes.push(sceneMeshes);
 		}
 
 		const { gl } = this.screen;
@@ -136,7 +143,7 @@ export class Renderer {
 			gl.useProgram(null);
 		}
 
-		for (let mesh of this.meshes) {
+		for (let mesh of this.scenes[this._scene]) {
 			const primitive = mesh.data.primitive;
 			const shader = this.shaders[primitive];
 
@@ -170,5 +177,16 @@ export class Renderer {
 		this.last = now;
 
 		this.input.update(this.dt);
+	}
+
+	get scene() {
+		return this._scene;
+	}
+
+	set scene(index) {
+		if (typeof index === "number" && this.scenes[index])
+			this._scene = index;
+		else 
+			throw new Error("Invalid scene index.")
 	}
 }
