@@ -26,5 +26,6 @@ You can use it in your page by including this snippet
 ## Examples
 
 <img src="./examples/donut.png" width="300px" alt="A image of a donut">
+<img src="./examples/teapot.png" width="350px" alt="A image of a teapot">
 
 See the [`examples`](examples) folder for examples of usage
