@@ -5,14 +5,14 @@ const r = new Renderer(
 	new Screen().fullscreen(),
 	new Camera([0, -2, -8], [0, 0, 0]),
 	new Input.FirstPerson(),
-	{ mono: false, lighting: mjsr.BLINN_PHONG, culling: true }
+	{ mono: false, lighting: mjsr.BLINN_PHONG, culling: false }
 );
 
 let teapot = new mjsr.OBJLoader(
 	"./geometry/teapot.obj",
 	mjsr.CLOCKWISE,
 	new mjsr.Object3d([0, 0, 0], mjsr.TRIANGLES, true),
-	new mjsr.Material("#f88", 64)
+	new mjsr.Material("#faa", 64)
 );
 
 let cube = mjsr.Object3d.from({
@@ -50,6 +50,9 @@ let cube = mjsr.Object3d.from({
 	let scene2 = [cube];
 
 	r.setup(scene, scene2);
+
+	r.camera.pos = [-5.10333991356451, -4.250317499999999, -8.546766544622717]
+	r.camera.rot = [0.246666666666667, -0.513333333333333, 0]
 
 	function frame(now) {
 		r.draw();
