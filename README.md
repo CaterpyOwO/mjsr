@@ -18,7 +18,7 @@ Designed with simplicity in mind.
 You can use it in your page by including this snippet
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/caterpyowo/mjsr@v0.9.4-alpha/dist/mjsr.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/caterpyowo/mjsr@v0.9.5-alpha/dist/mjsr.min.js"></script>
 ```
 
 [Here](https://github.com/CaterpyOwO/mjsr/wiki) is a link to the wiki, where you can find the documentation
