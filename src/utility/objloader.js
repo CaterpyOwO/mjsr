@@ -15,11 +15,10 @@ export class OBJLoader {
 	constructor(
 		url,
 		normals = constants.CLOCKWISE,
-		object = new Object3d([0, 0, 0], constants.TRIANGLES, true),
-		material = new Material("#fff", 128)
+		material = new Material("#fff", 128),
 	) {
 		this.url = url;
-		this.object = object;
+		this.object = new Object3d([0, 0, 0], constants.TRIANGLES, true);
 		this.normals = normals;
 
 		this.object.materials.push(material);
@@ -53,6 +52,12 @@ export class OBJLoader {
 					break;
 			}
 		}
+		
+		if (!this.object.verts.length)
+			throw new Error("Object doesn't have any vertices.");
+
+		else if (!this.object.faces.length)
+			throw new Error("Object doesn't have any faces.");
 
 		return this.object;
 	}

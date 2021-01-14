@@ -11,7 +11,6 @@ const r = new Renderer(
 let teapot = new mjsr.OBJLoader(
 	"./geometry/teapot.obj",
 	mjsr.CLOCKWISE,
-	new mjsr.Object3d([0, 0, 0], mjsr.TRIANGLES, true),
 	new mjsr.Material("#faa", 64)
 );
 
@@ -51,17 +50,14 @@ let cube = mjsr.Object3d.from({
 
 	r.setup(scene, scene2);
 
-	r.camera.pos = [-5.10333991356451, -4.250317499999999, -8.546766544622717]
-	r.camera.rot = [0.246666666666667, -0.513333333333333, 0]
-
-	function frame(now) {
-		r.draw();
-		r.update(now);
-
-		requestAnimationFrame(frame);
-	}
-
 	requestAnimationFrame(frame);
 })();
+
+function frame(now) {
+	r.draw();
+	r.update(now);
+
+	requestAnimationFrame(frame);
+}
 
 window.addEventListener("keydown", (event) => event.key == "l" && (r.scene = 1));
