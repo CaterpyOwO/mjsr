@@ -13,11 +13,22 @@ export default function generate(
 	varying vec3 v_normal;
 	
 	uniform vec3 u_colour;
-    uniform float u_shinyness;
+	uniform float u_shinyness;
 
 	#if (options.mode !== 0)
 		varying vec3 v_fragPos, v_viewPos;
-		vec3 light = vec3(0.0, -2.0, -5.0);
+
+		struct Light {
+			vec3 position;
+			vec3 colour;
+		};
+	
+		uniform Light light;
+	#endif
+
+	#if options.posterization
+		uniform float p_gamma;
+		uniform float p_colours;
 	#endif
 
 	void main() {

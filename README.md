@@ -18,7 +18,7 @@ Designed with simplicity in mind.
 You can use it in your page by including this snippet
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/caterpyowo/mjsr@v0.9.4-alpha/dist/mjsr.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/caterpyowo/mjsr@v0.9.5-alpha/dist/mjsr.min.js"></script>
 ```
 
 [Here](https://github.com/CaterpyOwO/mjsr/wiki) is a link to the wiki, where you can find the documentation
@@ -26,5 +26,6 @@ You can use it in your page by including this snippet
 ## Examples
 
 <img src="./examples/donut.png" width="300px" alt="A image of a donut">
+<img src="./examples/teapot.png" width="350px" alt="A image of a teapot">
 
 See the [`examples`](examples) folder for examples of usage

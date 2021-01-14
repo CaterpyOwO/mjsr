@@ -1,8 +1,6 @@
 export const fragment = `
-    vec3 lightColour = vec3(1.0, 1.0, 1.0);
-
     vec3 normal = normalize(v_normal);
-    vec3 lightd = normalize(light - v_fragPos);
+    vec3 lightd = normalize(light.position - v_fragPos);
 
     // specular
     float strength = 0.3;
@@ -13,18 +11,18 @@ export const fragment = `
         vec3 halfwayd = normalize(lightd + viewd);
 
         float sp = pow(max(dot(normal, halfwayd), 0.0), u_shinyness);
-        vec3 specular = lightColour * sp;
+        vec3 specular = light.colour * sp;
     #else
         float sp = pow(max(dot(viewd, reflectd), 0.0), u_shinyness);
-        vec3 specular = strength * sp * lightColour; 
+        vec3 specular = strength * sp * light.colour; 
     #endif
 
     // diffuse
     float df = max(dot(normal, lightd), 0.0);
-    vec3 diffuse = df * lightColour;
+    vec3 diffuse = df * light.colour;
 
     // ambient
-    vec3 ambient = 0.1 * lightColour;
+    vec3 ambient = 0.1 * light.colour;
 
 
     gl_FragColor = vec4((ambient + diffuse + specular) * gl_FragColor.rgb, 1.0);

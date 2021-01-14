@@ -23,7 +23,7 @@ import * as constants from "./core/constants.js";
  * @description Mjsr is a 3D WebGL renderer that allows you to access many low level settings and makes it easy to make your own 3d objects.
  */
 export const mjsr = {
-	VERSION: "v0.9.4-alpha",
+	VERSION: "v0.9.5-alpha",
 	...constants,
 
 	Renderer,

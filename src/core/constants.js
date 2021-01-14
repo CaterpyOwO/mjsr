@@ -9,5 +9,5 @@ export const PHONG = 1;
 export const BLINN_PHONG = 2;
 
 //normals
-export const CLOCKWISE = 0;
-export const COUNTER_CLOCKWISE = 1;
+export const COUNTER_CLOCKWISE = 0;
+export const CLOCKWISE = 1;

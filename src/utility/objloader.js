@@ -12,14 +12,9 @@ export class OBJLoader {
 	 *
 	 * @returns {OBJLoader}
 	 */
-	constructor(
-		url,
-		normals = constants.CLOCKWISE,
-		object = new Object3d([0, 0, 0], constants.TRIANGLES, true),
-		material = new Material("#fff", 128)
-	) {
+	constructor(url, normals = constants.CLOCKWISE, material = new Material("#fff", 128)) {
 		this.url = url;
-		this.object = object;
+		this.object = new Object3d([0, 0, 0], constants.TRIANGLES, true);
 		this.normals = normals;
 
 		this.object.materials.push(material);
@@ -47,12 +42,15 @@ export class OBJLoader {
 					break;
 				case "f":
 					line = line.map((v) => parseInt(v.split(/\//)[0]) - 1);
-					if (this.normals == constants.CLOCKWISE)
+					if (this.normals == constants.COUNTER_CLOCKWISE)
 						this.object.faces.push([line[0], line[1], line[2], 0]);
 					else this.object.faces.push([line[2], line[1], line[0], 0]);
 					break;
 			}
 		}
+
+		if (!this.object.verts.length) throw new Error("Object doesn't have any vertices.");
+		else if (!this.object.faces.length) throw new Error("Object doesn't have any faces.");
 
 		return this.object;
 	}
