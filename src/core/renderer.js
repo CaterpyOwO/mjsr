@@ -49,19 +49,23 @@ export class Renderer {
 
 		this.lighting = {
 			colour: [1, 1, 1],
-			position: [0, -2, -5]
+			position: [0, -2, -5],
 		};
 
 		this.posterization = {
 			colours: 5,
-			gamma: 1
+			gamma: 1,
 		};
 
 		this.screen = screen;
 		this.camera = camera;
 
-
-		if (assert(inputHandler.setAttributes, "Input handler doesn't have a .setAttributes() method."))
+		if (
+			assert(
+				inputHandler.setAttributes,
+				"Input handler doesn't have a .setAttributes() method."
+			)
+		)
 			inputHandler.setAttributes(screen, camera);
 
 		assert(inputHandler.setupMovement, "Input handler doesn't have a .setupMovement() method.");
@@ -218,7 +222,8 @@ export class Renderer {
 	}
 
 	set scene(index) {
-		if (assert((typeof index == "number" && this.scenes[index]), "Invalid scene index.")) this._scene = index;
+		if (assert(typeof index == "number" && this.scenes[index], "Invalid scene index."))
+			this._scene = index;
 	}
 }
 
