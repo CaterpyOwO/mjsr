@@ -47,13 +47,30 @@ export class Renderer {
 		this.options.culling = options.culling ?? true;
 		this.options.posterization = options.posterization ?? false;
 
+		this.lighting = {
+			colour: [1, 1, 1],
+			position: [0, -2, -5]
+		};
+
+		this.posterization = {
+			colours: 5,
+			gamma: 1
+		};
+
 		this.screen = screen;
 		this.camera = camera;
 
-		inputHandler.setAttributes(screen, camera);
+
+		if (assert(inputHandler.setAttributes, "Input handler doesn't have a .setAttributes() method."))
+			inputHandler.setAttributes(screen, camera);
+
+		assert(inputHandler.setupMovement, "Input handler doesn't have a .setupMovement() method.");
+		assert(inputHandler.update, "Input handler doesn't have a .update() method.");
+
 		this.input = inputHandler;
 
-		(this.dt = 0), (this.last = 0);
+		this.dt = 0;
+		this.last = 0;
 
 		return this;
 	}
@@ -70,11 +87,14 @@ export class Renderer {
 		this.primitives = new Set();
 		this.shaders = {};
 
-		for (let scene of scenes) {
+		for (let s in scenes) {
+			let scene = scenes[s];
 			let sceneMeshes = [];
 
+			assert(scene.length, `Scene ${s} has no objects.`);
+
 			for (let object of scene) {
-				if (typeof object !== "object") throw new Error(`Invalid object in scene.`);
+				assert(typeof object == "object", "Invalid object in scene.");
 
 				if (!object.generateMesh) object = Object3d.from(object);
 
@@ -140,6 +160,18 @@ export class Renderer {
 			shader.uniformMatrix4fv("u_model", false, this.camera.model);
 			shader.uniformMatrix4fv("u_vp", false, this.camera.vp(this.screen.canvas));
 
+			if (this.options.lighting !== constants.NONE) {
+				shader.uniform3fv("light.position", this.lighting.position);
+				shader.uniform3fv("light.colour", this.lighting.colour);
+			}
+
+			if (this.options.posterization) {
+				shader.uniform1f("p_gamma", this.posterization.gamma);
+				shader.uniform1f("p_colours", this.posterization.colours);
+			}
+			// GLuint loc = glGetUniformLocation(shader_program_id, "Light[0].Type");
+			// glUniform1i(loc, value);
+
 			gl.useProgram(null);
 		}
 
@@ -173,6 +205,8 @@ export class Renderer {
 	 * @param {DOMHighResTimeStamp} now - The timestamp
 	 */
 	update(now) {
+		assert(typeof now == "number", "Invalid timestamp.");
+
 		this.dt = this.last - now;
 		this.last = now;
 
@@ -184,7 +218,11 @@ export class Renderer {
 	}
 
 	set scene(index) {
-		if (typeof index === "number" && this.scenes[index]) this._scene = index;
-		else throw new Error("Invalid scene index.");
+		if (assert((typeof index == "number" && this.scenes[index]), "Invalid scene index.")) this._scene = index;
 	}
+}
+
+function assert(condition, message) {
+	if (!condition) throw new Error("Assertion failed: " + message);
+	else return true;
 }
