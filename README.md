@@ -3,6 +3,7 @@
 [![Language grade: JavaScript][lgtm]](https://lgtm.com/projects/g/CaterpyOwO/mjsr/context:javascript)
 [![Github Release][release]](https://github.com/CaterpyOwO/mjsr/releases/latest)
 [![Github License][license]](https://github.com/CaterpyOwO/mjsr/blob/master/LICENSE)
+![CodeQL](https://github.com/CaterpyOwO/mjsr/workflows/CodeQL/badge.svg)
 
 [lgtm]: https://img.shields.io/lgtm/grade/javascript/g/CaterpyOwO/mjsr.svg?logo=lgtm&logoWidth=18
 [license]: https://img.shields.io/github/license/CaterpyOwO/mjsr
