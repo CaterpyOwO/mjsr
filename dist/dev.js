@@ -1,4 +1,3 @@
-import { mjsr } from "./mjsr.js";
 const { Renderer, Screen, Camera, Input } = mjsr;
 
 const r = new Renderer(

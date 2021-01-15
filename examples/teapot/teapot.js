@@ -7,7 +7,7 @@ const r = new Renderer(
 	{ mono: false, lighting: mjsr.BLINN_PHONG }
 );
 
-let teapot = new mjsr.OBJLoader("../../src/geometry/teapot.obj", mjsr.COUNTER_CLOCKWISE);
+let teapot = new mjsr.OBJLoader("./teapot.obj", mjsr.COUNTER_CLOCKWISE);
 teapot.load().then((tp) => {
 	let scene = [tp];
 	console.log(tp);

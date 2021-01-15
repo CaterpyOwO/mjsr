@@ -2,6 +2,10 @@ export function preprocess(source, options) {
 	let lines = source.split(/\n/),
 		lineCount = lines.length;
 
+	var options = options;
+
+	let opText = `let options = ${JSON.stringify(options)};`;
+
 	let depths = {};
 	let output = "";
 
@@ -18,7 +22,7 @@ export function preprocess(source, options) {
 						depths[depth] = condition;
 						currentLine = traverse(
 							currentLine + 1,
-							eval(line.trim().substr(3)) && depths[depth],
+							eval(opText + line.trim().substr(3)) && depths[depth],
 							depth + 1
 						);
 						break;
