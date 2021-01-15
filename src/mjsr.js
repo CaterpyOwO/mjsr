@@ -37,7 +37,6 @@ export const mjsr = {
 };
 
 if (typeof define === "function" && define.amd) define([], () => mjsr);
-else if (typeof exports === "object") module.exports = mjsr;
-else window.mjsr = mjsr;
+else globalThis.mjsr = mjsr;
 
 console.log(`Loaded mjsr version: %c${mjsr.VERSION}`, "text-decoration:underline");

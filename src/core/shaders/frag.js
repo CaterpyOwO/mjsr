@@ -1,7 +1,7 @@
 import { preprocess } from "../../utility/preprocess.js";
-import { fragment as mono } from "./fragments/mono.glsl.js";
-import { fragment as posteriz } from "./fragments/posterization.glsl.js";
-import { fragment as lighting } from "./fragments/lighting.glsl.js";
+import mono from "./fragments/mono.glsl";
+import posteriz from "./fragments/posterization.glsl";
+import lighting from "./fragments/lighting.glsl";
 
 export default function generate(
 	options = { primitive: 2, mono: false, mode: 0, posterization: false }
