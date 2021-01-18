@@ -1,6 +1,8 @@
 var _mjsr_exports = (function (exports) {
 	'use strict';
 
+	var version = "v0.9.5-alpha";
+
 	// Copyright (c) 2015-2020, Brandon Jones, Colin MacKenzie IV.
 	let ARRAY_TYPE = typeof Float32Array !== "undefined" ? Float32Array : Array;
 
@@ -1585,7 +1587,7 @@ var _mjsr_exports = (function (exports) {
 	 * @description Mjsr is a 3D WebGL renderer that allows you to access many low level settings and makes it easy to make your own 3d objects.
 	 */
 	const mjsr = {
-		VERSION: "v0.9.5-alpha",
+		VERSION: version,
 		...constants,
 
 		Renderer,

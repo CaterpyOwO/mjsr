@@ -1,11 +1,12 @@
 {
 	"name": "mjsr",
-	"version": "0.9.5",
+	"version": "v0.9.5-alpha",
 	"description": "",
 	"author": "",
 	"license": "MIT",
 	"private": false,
 	"devDependencies": {
+		"@rollup/plugin-json": "^4.1.0",
 		"express": "^4.17.1",
 		"prettier": "^2.1.2",
 		"rollup": "^2.36.1",

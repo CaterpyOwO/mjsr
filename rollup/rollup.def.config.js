@@ -1,5 +1,6 @@
 import { terser } from "rollup-plugin-terser";
 import glsl from "rollup-plugin-glsl";
+import json from "@rollup/plugin-json";
 
 export default {
 	input: "src/mjsr.js",
@@ -21,6 +22,7 @@ export default {
 			include: "src/**/*.glsl",
 			exclude: ["**/index.html"],
 			sourceMap: false,
-		}),
+        }),
+        json()
 	],
 };
