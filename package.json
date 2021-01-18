@@ -15,7 +15,7 @@
 	},
 	"scripts": {
 		"start": "npm run dev",
-		"dev": "rollup -c rollup_dev.config.js -w",
+		"dev": "rollup -c -w --configDev",
 		"build": "prettier --write . && rollup -c",
 		"format": "prettier --write .",
 		"test": "exit 0"
