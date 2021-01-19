@@ -1,26 +1,9 @@
-import { terser } from "rollup-plugin-terser";
-import glsl from "rollup-plugin-glsl";
+import def from "./rollup/rollup.def.config.js";
+import dev from "./rollup/rollup.dev.config.js";
 
-export default {
-	input: "src/mjsr.js",
-	output: [
-		{
-			file: "dist/mjsr.js",
-			format: "iife",
-			name: "_mjsr_exports",
-		},
-		{
-			file: "dist/mjsr.min.js",
-			format: "iife",
-			name: "_mjsr_exports",
-			plugins: [terser()],
-		},
-	],
-	plugins: [
-		glsl({
-			include: "src/**/*.glsl",
-			exclude: ["**/index.html"],
-			sourceMap: false,
-		}),
-	],
-};
+export default commandLineArgs => {
+	if (commandLineArgs.configDev === true)
+		return dev;
+	else
+		return def;
+  }

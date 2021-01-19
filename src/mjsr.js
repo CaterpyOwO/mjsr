@@ -1,5 +1,7 @@
 "use strict";
 
+import { version } from '../package.json';
+
 import { Camera } from "./core/camera.js";
 import { Renderer } from "./core/renderer.js";
 import { Screen } from "./core/screen.js";
@@ -23,7 +25,7 @@ import * as constants from "./core/constants.js";
  * @description Mjsr is a 3D WebGL renderer that allows you to access many low level settings and makes it easy to make your own 3d objects.
  */
 export const mjsr = {
-	VERSION: "v0.9.5-alpha",
+	VERSION: version,
 	...constants,
 
 	Renderer,
