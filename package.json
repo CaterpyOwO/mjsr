@@ -5,7 +5,7 @@
 	"author": "",
 	"license": "MIT",
 	"private": false,
-	"repository": "git://github.com/caterpyowo/mjsr",
+	"repository": "git://github.com/caterpyowo/mjsr,git",
 	"publishConfig": {
 		"registry":"https://npm.pkg.github.com"
 	},
