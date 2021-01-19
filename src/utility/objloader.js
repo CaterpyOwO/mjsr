@@ -7,14 +7,14 @@ export class OBJLoader {
 	 *
 	 * @param {String} url - The URL of the .obj file
 	 * @param {Number} [normals=mjsr.CLOCKWISE] - The order of the normals
-	 * @param {Object3d} [object=new Object3d([0, 0, 0], constants.TRIANGLES, true)] - The object to which the data should be appended
+	 * @param {Object3d} [object=new Object3d(constants.TRIANGLES, true)] - The object to which the data should be appended
 	 * @param {Material} [material=new Material("#fff", 128)] - The material that should be used to draw the object
 	 *
 	 * @returns {OBJLoader}
 	 */
 	constructor(url, normals = constants.CLOCKWISE, material = new Material("#fff", 128)) {
 		this.url = url;
-		this.object = new Object3d([0, 0, 0], constants.TRIANGLES, true);
+		this.object = new Object3d(constants.TRIANGLES, true);
 		this.normals = normals;
 
 		this.object.materials.push(material);
@@ -37,7 +37,7 @@ export class OBJLoader {
 					break;
 				case "v":
 					this.object.verts.push(
-						line.map((v, i) => parseFloat(v) + this.object.coords[i])
+						line.map((v, i) => parseFloat(v))
 					);
 					break;
 				case "f":

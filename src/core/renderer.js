@@ -11,6 +11,8 @@ import { Object3d } from "../object/object.js";
 
 import * as constants from "../core/constants.js";
 
+import { create, scale } from "../utility/gl-matrix/mat4.js";
+
 export class Renderer {
 	/**
 	 * Creates a new Renderer
@@ -187,6 +189,8 @@ export class Renderer {
 
 			shader.uniform1f("u_shinyness", mesh.material.shinyness);
 			shader.uniform3fv("u_colour", mesh.material.colour);
+
+			shader.uniformMatrix4fv("u_modelobj", false, scale(create(), create(), [3,2,1]));
 
 			// gl.uniform1i(gl.getUniformLocation(shader.glprogram, "u_primitive"), primitive);
 

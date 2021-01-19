@@ -7,14 +7,12 @@ import { Material } from "./material.js";
 export class Object3d {
 	/**
 	 *
-	 * @param {Object[3]} [coords=[0,0,0]] - The position of the object.
 	 * @param {Number} [primitive=mjsr.TRIANGLES] - The primitive the object should be rendered with
 	 * @param {Boolean} [materials=false] - Use materials instead of colours
 	 *
 	 * @returns {Object3d}
 	 */
-	constructor(coords = [0, 0, 0], primitive = constants.TRIANGLES, materials = false) {
-		this.coords = coords;
+	constructor(primitive = constants.TRIANGLES, materials = false) {
 		this.primitive = primitive;
 
 		this.verts = [];

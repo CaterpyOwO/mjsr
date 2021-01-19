@@ -1,7 +1,7 @@
 var _mjsr_exports = (function (exports) {
 	'use strict';
 
-	var version = "v0.9.5-alpha";
+	var version = "v0.9.7-alpha";
 
 	// Copyright (c) 2015-2020, Brandon Jones, Colin MacKenzie IV.
 	let ARRAY_TYPE = typeof Float32Array !== "undefined" ? Float32Array : Array;
@@ -285,6 +285,38 @@ var _mjsr_exports = (function (exports) {
 			out[15] = a03 * x + a13 * y + a23 * z + a[15];
 		}
 
+		return out;
+	}
+
+	/**
+	 * Scales the mat4 by the dimensions in the given vec3 not using vectorization
+	 *
+	 * @param {mat4} out the receiving matrix
+	 * @param {ReadonlyMat4} a the matrix to scale
+	 * @param {ReadonlyVec3} v the vec3 to scale the matrix by
+	 * @returns {mat4} out
+	 **/
+	function scale(out, a, v) {
+		let x = v[0],
+			y = v[1],
+			z = v[2];
+
+		out[0] = a[0] * x;
+		out[1] = a[1] * x;
+		out[2] = a[2] * x;
+		out[3] = a[3] * x;
+		out[4] = a[4] * y;
+		out[5] = a[5] * y;
+		out[6] = a[6] * y;
+		out[7] = a[7] * y;
+		out[8] = a[8] * z;
+		out[9] = a[9] * z;
+		out[10] = a[10] * z;
+		out[11] = a[11] * z;
+		out[12] = a[12];
+		out[13] = a[13];
+		out[14] = a[14];
+		out[15] = a[15];
 		return out;
 	}
 
@@ -886,6 +918,8 @@ var _mjsr_exports = (function (exports) {
     uniform mat4 u_vp, u_model, u_modelit;
     uniform vec3 u_pos;
 
+    uniform mat4 u_modelobj;
+
     void main() {
         #if (options.primitive == 2 && options.mode !== 0) 
             v_fragPos = vec3(u_model * position);
@@ -896,9 +930,9 @@ var _mjsr_exports = (function (exports) {
         #if (options.primitive == 0)
             gl_PointSize = 5.0;
         #endif
+        
 
-        mat4 mvp = u_vp * u_model;
-        gl_Position = mvp * position;
+        gl_Position = (u_vp * u_model) * (u_modelobj * position);
     }`,
 			options
 		);
@@ -1068,14 +1102,12 @@ var _mjsr_exports = (function (exports) {
 	class Object3d {
 		/**
 		 *
-		 * @param {Object[3]} [coords=[0,0,0]] - The position of the object.
 		 * @param {Number} [primitive=mjsr.TRIANGLES] - The primitive the object should be rendered with
 		 * @param {Boolean} [materials=false] - Use materials instead of colours
 		 *
 		 * @returns {Object3d}
 		 */
-		constructor(coords = [0, 0, 0], primitive = TRIANGLES, materials = false) {
-			this.coords = coords;
+		constructor(primitive = TRIANGLES, materials = false) {
 			this.primitive = primitive;
 
 			this.verts = [];
@@ -1385,6 +1417,8 @@ var _mjsr_exports = (function (exports) {
 				shader.uniform1f("u_shinyness", mesh.material.shinyness);
 				shader.uniform3fv("u_colour", mesh.material.colour);
 
+				shader.uniformMatrix4fv("u_modelobj", false, scale(create(), create(), [3,2,1]));
+
 				// gl.uniform1i(gl.getUniformLocation(shader.glprogram, "u_primitive"), primitive);
 
 				let buffers = {
@@ -1522,14 +1556,14 @@ var _mjsr_exports = (function (exports) {
 		 *
 		 * @param {String} url - The URL of the .obj file
 		 * @param {Number} [normals=mjsr.CLOCKWISE] - The order of the normals
-		 * @param {Object3d} [object=new Object3d([0, 0, 0], constants.TRIANGLES, true)] - The object to which the data should be appended
+		 * @param {Object3d} [object=new Object3d(constants.TRIANGLES, true)] - The object to which the data should be appended
 		 * @param {Material} [material=new Material("#fff", 128)] - The material that should be used to draw the object
 		 *
 		 * @returns {OBJLoader}
 		 */
 		constructor(url, normals = CLOCKWISE, material = new Material("#fff", 128)) {
 			this.url = url;
-			this.object = new Object3d([0, 0, 0], TRIANGLES, true);
+			this.object = new Object3d(TRIANGLES, true);
 			this.normals = normals;
 
 			this.object.materials.push(material);
@@ -1552,7 +1586,7 @@ var _mjsr_exports = (function (exports) {
 						break;
 					case "v":
 						this.object.verts.push(
-							line.map((v, i) => parseFloat(v) + this.object.coords[i])
+							line.map((v, i) => parseFloat(v))
 						);
 						break;
 					case "f":
