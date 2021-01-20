@@ -1,7 +1,7 @@
 import * as constants from "../core/constants.js";
 
 import { crossProduct } from "../utility/math.js";
-import { create, translate, rotate, scale } from "../utility/gl-matrix/mat4.js";
+import { create, translate, rotate, scale } from "gl-matrix/mat4";
 
 import { Material } from "./material.js";
 

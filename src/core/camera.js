@@ -7,7 +7,7 @@ import {
 	invert,
 	transpose,
 	multiply,
-} from "../utility/gl-matrix/mat4.js";
+} from "gl-matrix/mat4";
 
 export class Camera {
 	/**

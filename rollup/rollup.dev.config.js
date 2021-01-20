@@ -2,6 +2,7 @@ import { terser } from "rollup-plugin-terser";
 import glsl from "rollup-plugin-glsl";
 import serve from "rollup-plugin-serve";
 import json from "@rollup/plugin-json";
+import resolve from '@rollup/plugin-node-resolve';
 
 export default {
 	input: "src/mjsr.js",
@@ -26,5 +27,6 @@ export default {
 		}),
 		serve("dist"),
 		json(),
+		resolve()
 	],
 };

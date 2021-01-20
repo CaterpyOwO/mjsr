@@ -11,8 +11,6 @@ import { Object3d } from "../object/object.js";
 
 import * as constants from "../core/constants.js";
 
-import { create, scale } from "../utility/gl-matrix/mat4.js";
-
 export class Renderer {
 	/**
 	 * Creates a new Renderer

@@ -1,4 +1,4 @@
-import { rotateY } from "../utility/gl-matrix/mat4.js";
+import { rotateY } from "gl-matrix/mat4";
 
 class ModelRotate {
 	constructor() {
