@@ -16,21 +16,21 @@ mjsr is a simple, lightweight 3d library for JavaScript.
 Using a CDN:
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/caterpyowo/mjsr@v0.9.5-alpha/dist/mjsr.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/caterpyowo/mjsr@v0.9.7-alpha/dist/mjsr.min.js"></script>
 ```
 
 Using a local copy (See the [releases tab](https://github.com/CaterpyOwO/mjsr/releases/latest) to find the latest version).
+
 ```html
 <script src="./mjsr.min.js"></script>
 ```
-
 
 ## Usage
 
 ```js
 const r = new mjsr.Renderer(
-	new mjsr.Screen().fullscreen(), 
-	new mjsr.Camera([0, 0, -7]), 
+	new mjsr.Screen().fullscreen(),
+	new mjsr.Camera([0, 0, -7]),
 	new mjsr.Input.FirstPerson()
 );
 
@@ -51,9 +51,9 @@ requestAnimationFrame(frame);
 
 See the [`examples`](examples) folder for more examples.
 
-
 <img src="https://raw.githubusercontent.com/CaterpyOwO/mjsr/master/examples/donut.png" width="300px" alt="A image of a donut">
 <img src="https://raw.githubusercontent.com/CaterpyOwO/mjsr/master/examples/teapot.png" width="350px" alt="A image of a teapot">
 
 ## License
+
 [MIT](https://choosealicense.com/licenses/mit/)

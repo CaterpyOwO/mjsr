@@ -1,20 +1,25 @@
 var _mjsr_exports = (function (exports) {
 	'use strict';
 
-	var version = "v0.9.5-alpha";
+	var version = "v0.9.7-alpha";
 
-	// Copyright (c) 2015-2020, Brandon Jones, Colin MacKenzie IV.
-	let ARRAY_TYPE = typeof Float32Array !== "undefined" ? Float32Array : Array;
+	/**
+	 * Common utilities
+	 * @module glMatrix
+	 */
+	// Configuration Constants
+	var EPSILON = 0.000001;
+	var ARRAY_TYPE = typeof Float32Array !== 'undefined' ? Float32Array : Array;
+	if (!Math.hypot) Math.hypot = function () {
+	  var y = 0,
+	      i = arguments.length;
 
-	if (!Math.hypot)
-		Math.hypot = function () {
-			var y = 0,
-				i = arguments.length;
-			while (i--) y += arguments[i] * arguments[i];
-			return Math.sqrt(y);
-		};
+	  while (i--) {
+	    y += arguments[i] * arguments[i];
+	  }
 
-	// Copyright (c) 2015-2020, Brandon Jones, Colin MacKenzie IV.
+	  return Math.sqrt(y);
+	};
 
 	/**
 	 * 4x4 Matrix<br>Format: column-major, when typed out it looks like row-major<br>The matrices are being post multiplied.
@@ -26,29 +31,31 @@ var _mjsr_exports = (function (exports) {
 	 *
 	 * @returns {mat4} a new 4x4 matrix
 	 */
-	function create() {
-		let out = new ARRAY_TYPE(16);
-		if (ARRAY_TYPE != Float32Array) {
-			out[1] = 0;
-			out[2] = 0;
-			out[3] = 0;
-			out[4] = 0;
-			out[6] = 0;
-			out[7] = 0;
-			out[8] = 0;
-			out[9] = 0;
-			out[11] = 0;
-			out[12] = 0;
-			out[13] = 0;
-			out[14] = 0;
-		}
-		out[0] = 1;
-		out[5] = 1;
-		out[10] = 1;
-		out[15] = 1;
-		return out;
-	}
 
+	function create() {
+	  var out = new ARRAY_TYPE(16);
+
+	  if (ARRAY_TYPE != Float32Array) {
+	    out[1] = 0;
+	    out[2] = 0;
+	    out[3] = 0;
+	    out[4] = 0;
+	    out[6] = 0;
+	    out[7] = 0;
+	    out[8] = 0;
+	    out[9] = 0;
+	    out[11] = 0;
+	    out[12] = 0;
+	    out[13] = 0;
+	    out[14] = 0;
+	  }
+
+	  out[0] = 1;
+	  out[5] = 1;
+	  out[10] = 1;
+	  out[15] = 1;
+	  return out;
+	}
 	/**
 	 * Transpose the values of a mat4
 	 *
@@ -56,50 +63,49 @@ var _mjsr_exports = (function (exports) {
 	 * @param {ReadonlyMat4} a the source matrix
 	 * @returns {mat4} out
 	 */
+
 	function transpose(out, a) {
-		// If we are transposing ourselves we can skip a few steps but have to cache some values
-		if (out === a) {
-			let a01 = a[1],
-				a02 = a[2],
-				a03 = a[3];
-			let a12 = a[6],
-				a13 = a[7];
-			let a23 = a[11];
+	  // If we are transposing ourselves we can skip a few steps but have to cache some values
+	  if (out === a) {
+	    var a01 = a[1],
+	        a02 = a[2],
+	        a03 = a[3];
+	    var a12 = a[6],
+	        a13 = a[7];
+	    var a23 = a[11];
+	    out[1] = a[4];
+	    out[2] = a[8];
+	    out[3] = a[12];
+	    out[4] = a01;
+	    out[6] = a[9];
+	    out[7] = a[13];
+	    out[8] = a02;
+	    out[9] = a12;
+	    out[11] = a[14];
+	    out[12] = a03;
+	    out[13] = a13;
+	    out[14] = a23;
+	  } else {
+	    out[0] = a[0];
+	    out[1] = a[4];
+	    out[2] = a[8];
+	    out[3] = a[12];
+	    out[4] = a[1];
+	    out[5] = a[5];
+	    out[6] = a[9];
+	    out[7] = a[13];
+	    out[8] = a[2];
+	    out[9] = a[6];
+	    out[10] = a[10];
+	    out[11] = a[14];
+	    out[12] = a[3];
+	    out[13] = a[7];
+	    out[14] = a[11];
+	    out[15] = a[15];
+	  }
 
-			out[1] = a[4];
-			out[2] = a[8];
-			out[3] = a[12];
-			out[4] = a01;
-			out[6] = a[9];
-			out[7] = a[13];
-			out[8] = a02;
-			out[9] = a12;
-			out[11] = a[14];
-			out[12] = a03;
-			out[13] = a13;
-			out[14] = a23;
-		} else {
-			out[0] = a[0];
-			out[1] = a[4];
-			out[2] = a[8];
-			out[3] = a[12];
-			out[4] = a[1];
-			out[5] = a[5];
-			out[6] = a[9];
-			out[7] = a[13];
-			out[8] = a[2];
-			out[9] = a[6];
-			out[10] = a[10];
-			out[11] = a[14];
-			out[12] = a[3];
-			out[13] = a[7];
-			out[14] = a[11];
-			out[15] = a[15];
-		}
-
-		return out;
+	  return out;
 	}
-
 	/**
 	 * Inverts a mat4
 	 *
@@ -107,65 +113,62 @@ var _mjsr_exports = (function (exports) {
 	 * @param {ReadonlyMat4} a the source matrix
 	 * @returns {mat4} out
 	 */
+
 	function invert(out, a) {
-		let a00 = a[0],
-			a01 = a[1],
-			a02 = a[2],
-			a03 = a[3];
-		let a10 = a[4],
-			a11 = a[5],
-			a12 = a[6],
-			a13 = a[7];
-		let a20 = a[8],
-			a21 = a[9],
-			a22 = a[10],
-			a23 = a[11];
-		let a30 = a[12],
-			a31 = a[13],
-			a32 = a[14],
-			a33 = a[15];
+	  var a00 = a[0],
+	      a01 = a[1],
+	      a02 = a[2],
+	      a03 = a[3];
+	  var a10 = a[4],
+	      a11 = a[5],
+	      a12 = a[6],
+	      a13 = a[7];
+	  var a20 = a[8],
+	      a21 = a[9],
+	      a22 = a[10],
+	      a23 = a[11];
+	  var a30 = a[12],
+	      a31 = a[13],
+	      a32 = a[14],
+	      a33 = a[15];
+	  var b00 = a00 * a11 - a01 * a10;
+	  var b01 = a00 * a12 - a02 * a10;
+	  var b02 = a00 * a13 - a03 * a10;
+	  var b03 = a01 * a12 - a02 * a11;
+	  var b04 = a01 * a13 - a03 * a11;
+	  var b05 = a02 * a13 - a03 * a12;
+	  var b06 = a20 * a31 - a21 * a30;
+	  var b07 = a20 * a32 - a22 * a30;
+	  var b08 = a20 * a33 - a23 * a30;
+	  var b09 = a21 * a32 - a22 * a31;
+	  var b10 = a21 * a33 - a23 * a31;
+	  var b11 = a22 * a33 - a23 * a32; // Calculate the determinant
 
-		let b00 = a00 * a11 - a01 * a10;
-		let b01 = a00 * a12 - a02 * a10;
-		let b02 = a00 * a13 - a03 * a10;
-		let b03 = a01 * a12 - a02 * a11;
-		let b04 = a01 * a13 - a03 * a11;
-		let b05 = a02 * a13 - a03 * a12;
-		let b06 = a20 * a31 - a21 * a30;
-		let b07 = a20 * a32 - a22 * a30;
-		let b08 = a20 * a33 - a23 * a30;
-		let b09 = a21 * a32 - a22 * a31;
-		let b10 = a21 * a33 - a23 * a31;
-		let b11 = a22 * a33 - a23 * a32;
+	  var det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
 
-		// Calculate the determinant
-		let det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
+	  if (!det) {
+	    return null;
+	  }
 
-		if (!det) {
-			return null;
-		}
-		det = 1.0 / det;
-
-		out[0] = (a11 * b11 - a12 * b10 + a13 * b09) * det;
-		out[1] = (a02 * b10 - a01 * b11 - a03 * b09) * det;
-		out[2] = (a31 * b05 - a32 * b04 + a33 * b03) * det;
-		out[3] = (a22 * b04 - a21 * b05 - a23 * b03) * det;
-		out[4] = (a12 * b08 - a10 * b11 - a13 * b07) * det;
-		out[5] = (a00 * b11 - a02 * b08 + a03 * b07) * det;
-		out[6] = (a32 * b02 - a30 * b05 - a33 * b01) * det;
-		out[7] = (a20 * b05 - a22 * b02 + a23 * b01) * det;
-		out[8] = (a10 * b10 - a11 * b08 + a13 * b06) * det;
-		out[9] = (a01 * b08 - a00 * b10 - a03 * b06) * det;
-		out[10] = (a30 * b04 - a31 * b02 + a33 * b00) * det;
-		out[11] = (a21 * b02 - a20 * b04 - a23 * b00) * det;
-		out[12] = (a11 * b07 - a10 * b09 - a12 * b06) * det;
-		out[13] = (a00 * b09 - a01 * b07 + a02 * b06) * det;
-		out[14] = (a31 * b01 - a30 * b03 - a32 * b00) * det;
-		out[15] = (a20 * b03 - a21 * b01 + a22 * b00) * det;
-
-		return out;
+	  det = 1.0 / det;
+	  out[0] = (a11 * b11 - a12 * b10 + a13 * b09) * det;
+	  out[1] = (a02 * b10 - a01 * b11 - a03 * b09) * det;
+	  out[2] = (a31 * b05 - a32 * b04 + a33 * b03) * det;
+	  out[3] = (a22 * b04 - a21 * b05 - a23 * b03) * det;
+	  out[4] = (a12 * b08 - a10 * b11 - a13 * b07) * det;
+	  out[5] = (a00 * b11 - a02 * b08 + a03 * b07) * det;
+	  out[6] = (a32 * b02 - a30 * b05 - a33 * b01) * det;
+	  out[7] = (a20 * b05 - a22 * b02 + a23 * b01) * det;
+	  out[8] = (a10 * b10 - a11 * b08 + a13 * b06) * det;
+	  out[9] = (a01 * b08 - a00 * b10 - a03 * b06) * det;
+	  out[10] = (a30 * b04 - a31 * b02 + a33 * b00) * det;
+	  out[11] = (a21 * b02 - a20 * b04 - a23 * b00) * det;
+	  out[12] = (a11 * b07 - a10 * b09 - a12 * b06) * det;
+	  out[13] = (a00 * b09 - a01 * b07 + a02 * b06) * det;
+	  out[14] = (a31 * b01 - a30 * b03 - a32 * b00) * det;
+	  out[15] = (a20 * b03 - a21 * b01 + a22 * b00) * det;
+	  return out;
 	}
-
 	/**
 	 * Multiplies two mat4s
 	 *
@@ -174,63 +177,59 @@ var _mjsr_exports = (function (exports) {
 	 * @param {ReadonlyMat4} b the second operand
 	 * @returns {mat4} out
 	 */
+
 	function multiply(out, a, b) {
-		let a00 = a[0],
-			a01 = a[1],
-			a02 = a[2],
-			a03 = a[3];
-		let a10 = a[4],
-			a11 = a[5],
-			a12 = a[6],
-			a13 = a[7];
-		let a20 = a[8],
-			a21 = a[9],
-			a22 = a[10],
-			a23 = a[11];
-		let a30 = a[12],
-			a31 = a[13],
-			a32 = a[14],
-			a33 = a[15];
+	  var a00 = a[0],
+	      a01 = a[1],
+	      a02 = a[2],
+	      a03 = a[3];
+	  var a10 = a[4],
+	      a11 = a[5],
+	      a12 = a[6],
+	      a13 = a[7];
+	  var a20 = a[8],
+	      a21 = a[9],
+	      a22 = a[10],
+	      a23 = a[11];
+	  var a30 = a[12],
+	      a31 = a[13],
+	      a32 = a[14],
+	      a33 = a[15]; // Cache only the current line of the second matrix
 
-		// Cache only the current line of the second matrix
-		let b0 = b[0],
-			b1 = b[1],
-			b2 = b[2],
-			b3 = b[3];
-		out[0] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
-		out[1] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
-		out[2] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
-		out[3] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
-
-		b0 = b[4];
-		b1 = b[5];
-		b2 = b[6];
-		b3 = b[7];
-		out[4] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
-		out[5] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
-		out[6] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
-		out[7] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
-
-		b0 = b[8];
-		b1 = b[9];
-		b2 = b[10];
-		b3 = b[11];
-		out[8] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
-		out[9] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
-		out[10] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
-		out[11] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
-
-		b0 = b[12];
-		b1 = b[13];
-		b2 = b[14];
-		b3 = b[15];
-		out[12] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
-		out[13] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
-		out[14] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
-		out[15] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
-		return out;
+	  var b0 = b[0],
+	      b1 = b[1],
+	      b2 = b[2],
+	      b3 = b[3];
+	  out[0] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+	  out[1] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+	  out[2] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+	  out[3] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+	  b0 = b[4];
+	  b1 = b[5];
+	  b2 = b[6];
+	  b3 = b[7];
+	  out[4] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+	  out[5] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+	  out[6] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+	  out[7] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+	  b0 = b[8];
+	  b1 = b[9];
+	  b2 = b[10];
+	  b3 = b[11];
+	  out[8] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+	  out[9] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+	  out[10] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+	  out[11] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+	  b0 = b[12];
+	  b1 = b[13];
+	  b2 = b[14];
+	  b3 = b[15];
+	  out[12] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+	  out[13] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+	  out[14] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+	  out[15] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+	  return out;
 	}
-
 	/**
 	 * Translate a mat4 by the given vector
 	 *
@@ -239,55 +238,164 @@ var _mjsr_exports = (function (exports) {
 	 * @param {ReadonlyVec3} v vector to translate by
 	 * @returns {mat4} out
 	 */
+
 	function translate(out, a, v) {
-		let x = v[0],
-			y = v[1],
-			z = v[2];
-		let a00, a01, a02, a03;
-		let a10, a11, a12, a13;
-		let a20, a21, a22, a23;
+	  var x = v[0],
+	      y = v[1],
+	      z = v[2];
+	  var a00, a01, a02, a03;
+	  var a10, a11, a12, a13;
+	  var a20, a21, a22, a23;
 
-		if (a === out) {
-			out[12] = a[0] * x + a[4] * y + a[8] * z + a[12];
-			out[13] = a[1] * x + a[5] * y + a[9] * z + a[13];
-			out[14] = a[2] * x + a[6] * y + a[10] * z + a[14];
-			out[15] = a[3] * x + a[7] * y + a[11] * z + a[15];
-		} else {
-			a00 = a[0];
-			a01 = a[1];
-			a02 = a[2];
-			a03 = a[3];
-			a10 = a[4];
-			a11 = a[5];
-			a12 = a[6];
-			a13 = a[7];
-			a20 = a[8];
-			a21 = a[9];
-			a22 = a[10];
-			a23 = a[11];
+	  if (a === out) {
+	    out[12] = a[0] * x + a[4] * y + a[8] * z + a[12];
+	    out[13] = a[1] * x + a[5] * y + a[9] * z + a[13];
+	    out[14] = a[2] * x + a[6] * y + a[10] * z + a[14];
+	    out[15] = a[3] * x + a[7] * y + a[11] * z + a[15];
+	  } else {
+	    a00 = a[0];
+	    a01 = a[1];
+	    a02 = a[2];
+	    a03 = a[3];
+	    a10 = a[4];
+	    a11 = a[5];
+	    a12 = a[6];
+	    a13 = a[7];
+	    a20 = a[8];
+	    a21 = a[9];
+	    a22 = a[10];
+	    a23 = a[11];
+	    out[0] = a00;
+	    out[1] = a01;
+	    out[2] = a02;
+	    out[3] = a03;
+	    out[4] = a10;
+	    out[5] = a11;
+	    out[6] = a12;
+	    out[7] = a13;
+	    out[8] = a20;
+	    out[9] = a21;
+	    out[10] = a22;
+	    out[11] = a23;
+	    out[12] = a00 * x + a10 * y + a20 * z + a[12];
+	    out[13] = a01 * x + a11 * y + a21 * z + a[13];
+	    out[14] = a02 * x + a12 * y + a22 * z + a[14];
+	    out[15] = a03 * x + a13 * y + a23 * z + a[15];
+	  }
 
-			out[0] = a00;
-			out[1] = a01;
-			out[2] = a02;
-			out[3] = a03;
-			out[4] = a10;
-			out[5] = a11;
-			out[6] = a12;
-			out[7] = a13;
-			out[8] = a20;
-			out[9] = a21;
-			out[10] = a22;
-			out[11] = a23;
-
-			out[12] = a00 * x + a10 * y + a20 * z + a[12];
-			out[13] = a01 * x + a11 * y + a21 * z + a[13];
-			out[14] = a02 * x + a12 * y + a22 * z + a[14];
-			out[15] = a03 * x + a13 * y + a23 * z + a[15];
-		}
-
-		return out;
+	  return out;
 	}
+	/**
+	 * Scales the mat4 by the dimensions in the given vec3 not using vectorization
+	 *
+	 * @param {mat4} out the receiving matrix
+	 * @param {ReadonlyMat4} a the matrix to scale
+	 * @param {ReadonlyVec3} v the vec3 to scale the matrix by
+	 * @returns {mat4} out
+	 **/
 
+	function scale(out, a, v) {
+	  var x = v[0],
+	      y = v[1],
+	      z = v[2];
+	  out[0] = a[0] * x;
+	  out[1] = a[1] * x;
+	  out[2] = a[2] * x;
+	  out[3] = a[3] * x;
+	  out[4] = a[4] * y;
+	  out[5] = a[5] * y;
+	  out[6] = a[6] * y;
+	  out[7] = a[7] * y;
+	  out[8] = a[8] * z;
+	  out[9] = a[9] * z;
+	  out[10] = a[10] * z;
+	  out[11] = a[11] * z;
+	  out[12] = a[12];
+	  out[13] = a[13];
+	  out[14] = a[14];
+	  out[15] = a[15];
+	  return out;
+	}
+	/**
+	 * Rotates a mat4 by the given angle around the given axis
+	 *
+	 * @param {mat4} out the receiving matrix
+	 * @param {ReadonlyMat4} a the matrix to rotate
+	 * @param {Number} rad the angle to rotate the matrix by
+	 * @param {ReadonlyVec3} axis the axis to rotate around
+	 * @returns {mat4} out
+	 */
+
+	function rotate(out, a, rad, axis) {
+	  var x = axis[0],
+	      y = axis[1],
+	      z = axis[2];
+	  var len = Math.hypot(x, y, z);
+	  var s, c, t;
+	  var a00, a01, a02, a03;
+	  var a10, a11, a12, a13;
+	  var a20, a21, a22, a23;
+	  var b00, b01, b02;
+	  var b10, b11, b12;
+	  var b20, b21, b22;
+
+	  if (len < EPSILON) {
+	    return null;
+	  }
+
+	  len = 1 / len;
+	  x *= len;
+	  y *= len;
+	  z *= len;
+	  s = Math.sin(rad);
+	  c = Math.cos(rad);
+	  t = 1 - c;
+	  a00 = a[0];
+	  a01 = a[1];
+	  a02 = a[2];
+	  a03 = a[3];
+	  a10 = a[4];
+	  a11 = a[5];
+	  a12 = a[6];
+	  a13 = a[7];
+	  a20 = a[8];
+	  a21 = a[9];
+	  a22 = a[10];
+	  a23 = a[11]; // Construct the elements of the rotation matrix
+
+	  b00 = x * x * t + c;
+	  b01 = y * x * t + z * s;
+	  b02 = z * x * t - y * s;
+	  b10 = x * y * t - z * s;
+	  b11 = y * y * t + c;
+	  b12 = z * y * t + x * s;
+	  b20 = x * z * t + y * s;
+	  b21 = y * z * t - x * s;
+	  b22 = z * z * t + c; // Perform rotation-specific matrix multiplication
+
+	  out[0] = a00 * b00 + a10 * b01 + a20 * b02;
+	  out[1] = a01 * b00 + a11 * b01 + a21 * b02;
+	  out[2] = a02 * b00 + a12 * b01 + a22 * b02;
+	  out[3] = a03 * b00 + a13 * b01 + a23 * b02;
+	  out[4] = a00 * b10 + a10 * b11 + a20 * b12;
+	  out[5] = a01 * b10 + a11 * b11 + a21 * b12;
+	  out[6] = a02 * b10 + a12 * b11 + a22 * b12;
+	  out[7] = a03 * b10 + a13 * b11 + a23 * b12;
+	  out[8] = a00 * b20 + a10 * b21 + a20 * b22;
+	  out[9] = a01 * b20 + a11 * b21 + a21 * b22;
+	  out[10] = a02 * b20 + a12 * b21 + a22 * b22;
+	  out[11] = a03 * b20 + a13 * b21 + a23 * b22;
+
+	  if (a !== out) {
+	    // If the source and destination differ, copy the unchanged last row
+	    out[12] = a[12];
+	    out[13] = a[13];
+	    out[14] = a[14];
+	    out[15] = a[15];
+	  }
+
+	  return out;
+	}
 	/**
 	 * Rotates a matrix by the given angle around the X axis
 	 *
@@ -296,42 +404,42 @@ var _mjsr_exports = (function (exports) {
 	 * @param {Number} rad the angle to rotate the matrix by
 	 * @returns {mat4} out
 	 */
+
 	function rotateX(out, a, rad) {
-		let s = Math.sin(rad);
-		let c = Math.cos(rad);
-		let a10 = a[4];
-		let a11 = a[5];
-		let a12 = a[6];
-		let a13 = a[7];
-		let a20 = a[8];
-		let a21 = a[9];
-		let a22 = a[10];
-		let a23 = a[11];
+	  var s = Math.sin(rad);
+	  var c = Math.cos(rad);
+	  var a10 = a[4];
+	  var a11 = a[5];
+	  var a12 = a[6];
+	  var a13 = a[7];
+	  var a20 = a[8];
+	  var a21 = a[9];
+	  var a22 = a[10];
+	  var a23 = a[11];
 
-		if (a !== out) {
-			// If the source and destination differ, copy the unchanged rows
-			out[0] = a[0];
-			out[1] = a[1];
-			out[2] = a[2];
-			out[3] = a[3];
-			out[12] = a[12];
-			out[13] = a[13];
-			out[14] = a[14];
-			out[15] = a[15];
-		}
+	  if (a !== out) {
+	    // If the source and destination differ, copy the unchanged rows
+	    out[0] = a[0];
+	    out[1] = a[1];
+	    out[2] = a[2];
+	    out[3] = a[3];
+	    out[12] = a[12];
+	    out[13] = a[13];
+	    out[14] = a[14];
+	    out[15] = a[15];
+	  } // Perform axis-specific matrix multiplication
 
-		// Perform axis-specific matrix multiplication
-		out[4] = a10 * c + a20 * s;
-		out[5] = a11 * c + a21 * s;
-		out[6] = a12 * c + a22 * s;
-		out[7] = a13 * c + a23 * s;
-		out[8] = a20 * c - a10 * s;
-		out[9] = a21 * c - a11 * s;
-		out[10] = a22 * c - a12 * s;
-		out[11] = a23 * c - a13 * s;
-		return out;
+
+	  out[4] = a10 * c + a20 * s;
+	  out[5] = a11 * c + a21 * s;
+	  out[6] = a12 * c + a22 * s;
+	  out[7] = a13 * c + a23 * s;
+	  out[8] = a20 * c - a10 * s;
+	  out[9] = a21 * c - a11 * s;
+	  out[10] = a22 * c - a12 * s;
+	  out[11] = a23 * c - a13 * s;
+	  return out;
 	}
-
 	/**
 	 * Rotates a matrix by the given angle around the Y axis
 	 *
@@ -340,42 +448,42 @@ var _mjsr_exports = (function (exports) {
 	 * @param {Number} rad the angle to rotate the matrix by
 	 * @returns {mat4} out
 	 */
+
 	function rotateY(out, a, rad) {
-		let s = Math.sin(rad);
-		let c = Math.cos(rad);
-		let a00 = a[0];
-		let a01 = a[1];
-		let a02 = a[2];
-		let a03 = a[3];
-		let a20 = a[8];
-		let a21 = a[9];
-		let a22 = a[10];
-		let a23 = a[11];
+	  var s = Math.sin(rad);
+	  var c = Math.cos(rad);
+	  var a00 = a[0];
+	  var a01 = a[1];
+	  var a02 = a[2];
+	  var a03 = a[3];
+	  var a20 = a[8];
+	  var a21 = a[9];
+	  var a22 = a[10];
+	  var a23 = a[11];
 
-		if (a !== out) {
-			// If the source and destination differ, copy the unchanged rows
-			out[4] = a[4];
-			out[5] = a[5];
-			out[6] = a[6];
-			out[7] = a[7];
-			out[12] = a[12];
-			out[13] = a[13];
-			out[14] = a[14];
-			out[15] = a[15];
-		}
+	  if (a !== out) {
+	    // If the source and destination differ, copy the unchanged rows
+	    out[4] = a[4];
+	    out[5] = a[5];
+	    out[6] = a[6];
+	    out[7] = a[7];
+	    out[12] = a[12];
+	    out[13] = a[13];
+	    out[14] = a[14];
+	    out[15] = a[15];
+	  } // Perform axis-specific matrix multiplication
 
-		// Perform axis-specific matrix multiplication
-		out[0] = a00 * c - a20 * s;
-		out[1] = a01 * c - a21 * s;
-		out[2] = a02 * c - a22 * s;
-		out[3] = a03 * c - a23 * s;
-		out[8] = a00 * s + a20 * c;
-		out[9] = a01 * s + a21 * c;
-		out[10] = a02 * s + a22 * c;
-		out[11] = a03 * s + a23 * c;
-		return out;
+
+	  out[0] = a00 * c - a20 * s;
+	  out[1] = a01 * c - a21 * s;
+	  out[2] = a02 * c - a22 * s;
+	  out[3] = a03 * c - a23 * s;
+	  out[8] = a00 * s + a20 * c;
+	  out[9] = a01 * s + a21 * c;
+	  out[10] = a02 * s + a22 * c;
+	  out[11] = a03 * s + a23 * c;
+	  return out;
 	}
-
 	/**
 	 * Generates a perspective projection matrix with the given bounds.
 	 * Passing null/undefined/no value for far will generate infinite projection matrix.
@@ -387,32 +495,35 @@ var _mjsr_exports = (function (exports) {
 	 * @param {number} far Far bound of the frustum, can be null or Infinity
 	 * @returns {mat4} out
 	 */
+
 	function perspective(out, fovy, aspect, near, far) {
-		let f = 1.0 / Math.tan(fovy / 2),
-			nf;
-		out[0] = f / aspect;
-		out[1] = 0;
-		out[2] = 0;
-		out[3] = 0;
-		out[4] = 0;
-		out[5] = f;
-		out[6] = 0;
-		out[7] = 0;
-		out[8] = 0;
-		out[9] = 0;
-		out[11] = -1;
-		out[12] = 0;
-		out[13] = 0;
-		out[15] = 0;
-		if (far != null && far !== Infinity) {
-			nf = 1 / (near - far);
-			out[10] = (far + near) * nf;
-			out[14] = 2 * far * near * nf;
-		} else {
-			out[10] = -1;
-			out[14] = -2 * near;
-		}
-		return out;
+	  var f = 1.0 / Math.tan(fovy / 2),
+	      nf;
+	  out[0] = f / aspect;
+	  out[1] = 0;
+	  out[2] = 0;
+	  out[3] = 0;
+	  out[4] = 0;
+	  out[5] = f;
+	  out[6] = 0;
+	  out[7] = 0;
+	  out[8] = 0;
+	  out[9] = 0;
+	  out[11] = -1;
+	  out[12] = 0;
+	  out[13] = 0;
+	  out[15] = 0;
+
+	  if (far != null && far !== Infinity) {
+	    nf = 1 / (near - far);
+	    out[10] = (far + near) * nf;
+	    out[14] = 2 * far * near * nf;
+	  } else {
+	    out[10] = -1;
+	    out[14] = -2 * near;
+	  }
+
+	  return out;
 	}
 
 	class Camera {
@@ -578,10 +689,10 @@ var _mjsr_exports = (function (exports) {
 		setupMovement() {
 			let { canvas } = this.screen;
 
-			window.addEventListener("keydown", (event) => (this.keys[event.key.toLowerCase()] = true));
-			window.addEventListener("keyup", (event) => (this.keys[event.key.toLowerCase()] = false));
+			window.addEventListener("keydown", event => (this.keys[event.key.toLowerCase()] = true));
+			window.addEventListener("keyup", event => (this.keys[event.key.toLowerCase()] = false));
 
-			let movement = (event) => {
+			let movement = event => {
 				if (Math.abs(event.movementX) > 50 || Math.abs(event.movementY) > 50) return;
 				else return this.mouseRotation([event.movementX, event.movementY]);
 			};
@@ -649,8 +760,8 @@ var _mjsr_exports = (function (exports) {
 			let { canvas } = this.screen;
 			let lastMovement = [0, 0];
 
-			const mouse = (event) => this.mouseRotation([event.movementX, event.movementY]);
-			const touch = (event) => (
+			const mouse = event => this.mouseRotation([event.movementX, event.movementY]);
+			const touch = event => (
 				this.mouseRotation([
 					-(lastMovement[0] - event.touches[0].screenX),
 					lastMovement[1] - event.touches[0].screenY,
@@ -663,7 +774,7 @@ var _mjsr_exports = (function (exports) {
 
 			canvas.addEventListener(
 				"touchstart",
-				(event) => (lastMovement = [event.touches[0].screenX, event.touches[0].screenY]),
+				event => (lastMovement = [event.touches[0].screenX, event.touches[0].screenY]),
 				{ passive: true }
 			);
 			canvas.addEventListener("touchmove", touch, { passive: true });
@@ -886,6 +997,8 @@ var _mjsr_exports = (function (exports) {
     uniform mat4 u_vp, u_model, u_modelit;
     uniform vec3 u_pos;
 
+    uniform mat4 u_modelobj;
+
     void main() {
         #if (options.primitive == 2 && options.mode !== 0) 
             v_fragPos = vec3(u_model * position);
@@ -896,9 +1009,9 @@ var _mjsr_exports = (function (exports) {
         #if (options.primitive == 0)
             gl_PointSize = 5.0;
         #endif
+        
 
-        mat4 mvp = u_vp * u_model;
-        gl_Position = mvp * position;
+        gl_Position = (u_vp * u_model) * (u_modelobj * position);
     }`,
 			options
 		);
@@ -1034,12 +1147,12 @@ var _mjsr_exports = (function (exports) {
 					colour = colour.split("").reduce((r, e) => r.push(e + e) && r, []);
 				else colour = colour.match(/.{1,2}/g);
 
-				return [...colour.map((c) => clamp(parseInt(c, 16) / 255, 0.0, 1.0))];
+				return [...colour.map(c => clamp(parseInt(c, 16) / 255, 0.0, 1.0))];
 			case "rgb":
 				colour = colour.substr(4).slice(0, -1);
 				colour = colour.split(",");
 
-				return [...colour.map((c) => clamp(parseInt(c) / 255, 0.0, 1.0))];
+				return [...colour.map(c => clamp(parseInt(c) / 255, 0.0, 1.0))];
 
 			default:
 				throw new Error(`${type} is not a valid colour type.`);
@@ -1067,20 +1180,29 @@ var _mjsr_exports = (function (exports) {
 
 	class Object3d {
 		/**
+		 * Creates a new Object3d
 		 *
-		 * @param {Object[3]} [coords=[0,0,0]] - The position of the object.
 		 * @param {Number} [primitive=mjsr.TRIANGLES] - The primitive the object should be rendered with
 		 * @param {Boolean} [materials=false] - Use materials instead of colours
 		 *
 		 * @returns {Object3d}
 		 */
-		constructor(coords = [0, 0, 0], primitive = TRIANGLES, materials = false) {
-			this.coords = coords;
+		constructor(primitive = TRIANGLES, materials = false) {
 			this.primitive = primitive;
 
 			this.verts = [];
 			this.edges = [];
 			this.faces = [];
+
+			this.model = create();
+
+			this.transformations = {
+				scale: [1, 1, 1],
+				rotateX: 0,
+				rotateY: 0,
+				rotateZ: 0,
+				translate: [0, 0, 0],
+			};
 
 			switch (primitive) {
 				case TRIANGLES:
@@ -1166,6 +1288,70 @@ var _mjsr_exports = (function (exports) {
 			}
 
 			return meshes;
+		}
+		/**
+		 * Scales the object
+		 * 
+		 * @param {number[3]} vector - The vector by which the object should be scaled
+		 */
+		scale(vector) {
+			this.transformations.scale = vector;
+			this._updateModel();
+			return this;
+		}
+
+		/**
+		 * Rotates the object around the X axis
+		 * 
+		 * @param {number} rad - Degrees to rotate by
+		 */
+		rotateX(rad) {
+			this.transformations.rotateX = rad;
+			this._updateModel();
+			return this;
+		}
+
+		/**
+		 * Rotates the object around the Y axis
+		 * 
+		 * @param {number} rad - Degrees to rotate by
+		 */
+		rotateY(rad) {
+			this.transformations.rotateY = rad;
+			this._updateModel();
+			return this;
+		}
+
+		/**
+		 * Rotates the object around the Z axis
+		 * 
+		 * @param {number} rad - Degrees to rotate by
+		 */
+		rotateZ(rad) {
+			this.transformations.rotateZ = rad;
+			this._updateModel();
+			return this;
+		}
+
+		/**
+		 * Translates the object
+		 * 
+		 * @param {number[3]} vector - The vector by which the object should be translated
+		 */
+		translate(vector) {
+			this.transformations.translate = vector;
+			this._updateModel();
+			return this;
+		}
+
+		_updateModel() {
+			scale(this.model, create(), this.transformations.scale);
+
+			rotate(this.model, this.model, this.transformations.rotateX, [1, 0, 0]);
+			rotate(this.model, this.model, this.transformations.rotateY, [0, 1, 0]);
+			rotate(this.model, this.model, this.transformations.rotateZ, [0, 0, 1]);
+
+			translate(this.model, this.model, this.transformations.translate);
 		}
 
 		/**
@@ -1294,7 +1480,8 @@ var _mjsr_exports = (function (exports) {
 
 				assert(scene.length, `Scene ${s} has no objects.`);
 
-				for (let object of scene) {
+				for (let o in scene) {
+					let object = scene[o];
 					assert(typeof object == "object", "Invalid object in scene.");
 
 					if (!object.generateMesh) object = Object3d.from(object);
@@ -1303,11 +1490,17 @@ var _mjsr_exports = (function (exports) {
 						primitive = meshes[0].data.primitive;
 
 					this.primitives.add(primitive);
-					console.log();
-					sceneMeshes.push(...meshes);
+					sceneMeshes.push(
+						...meshes.map(v => {
+							v.object = o;
+							return v;
+						})
+					);
+					// object.scene = s;
+					// object.object = o;
 				}
 
-				this.scenes.push(sceneMeshes);
+				this.scenes.push({ meshes: sceneMeshes, objects: scene });
 			}
 
 			const { gl } = this.screen;
@@ -1370,20 +1563,26 @@ var _mjsr_exports = (function (exports) {
 					shader.uniform1f("p_gamma", this.posterization.gamma);
 					shader.uniform1f("p_colours", this.posterization.colours);
 				}
-				// GLuint loc = glGetUniformLocation(shader_program_id, "Light[0].Type");
-				// glUniform1i(loc, value);
 
 				gl.useProgram(null);
 			}
 
-			for (let mesh of this.scenes[this._scene]) {
+			for (let mesh of this.scenes[this._scene].meshes) {
 				const primitive = mesh.data.primitive;
 				const shader = this.shaders[primitive];
+
+				// console.log(this.scenes[this._scene].objects)
 
 				gl.useProgram(shader.glprogram);
 
 				shader.uniform1f("u_shinyness", mesh.material.shinyness);
 				shader.uniform3fv("u_colour", mesh.material.colour);
+
+				shader.uniformMatrix4fv(
+					"u_modelobj",
+					false,
+					this.scenes[this._scene].objects[mesh.object].model
+				);
 
 				// gl.uniform1i(gl.getUniformLocation(shader.glprogram, "u_primitive"), primitive);
 
@@ -1522,14 +1721,14 @@ var _mjsr_exports = (function (exports) {
 		 *
 		 * @param {String} url - The URL of the .obj file
 		 * @param {Number} [normals=mjsr.CLOCKWISE] - The order of the normals
-		 * @param {Object3d} [object=new Object3d([0, 0, 0], constants.TRIANGLES, true)] - The object to which the data should be appended
+		 * @param {Object3d} [object=new Object3d(constants.TRIANGLES, true)] - The object to which the data should be appended
 		 * @param {Material} [material=new Material("#fff", 128)] - The material that should be used to draw the object
 		 *
 		 * @returns {OBJLoader}
 		 */
 		constructor(url, normals = CLOCKWISE, material = new Material("#fff", 128)) {
 			this.url = url;
-			this.object = new Object3d([0, 0, 0], TRIANGLES, true);
+			this.object = new Object3d(TRIANGLES, true);
 			this.normals = normals;
 
 			this.object.materials.push(material);
@@ -1551,12 +1750,10 @@ var _mjsr_exports = (function (exports) {
 					case "#":
 						break;
 					case "v":
-						this.object.verts.push(
-							line.map((v, i) => parseFloat(v) + this.object.coords[i])
-						);
+						this.object.verts.push(line.map((v, i) => parseFloat(v)));
 						break;
 					case "f":
-						line = line.map((v) => parseInt(v.split(/\//)[0]) - 1);
+						line = line.map(v => parseInt(v.split(/\//)[0]) - 1);
 						if (this.normals == COUNTER_CLOCKWISE)
 							this.object.faces.push([line[0], line[1], line[2], 0]);
 						else this.object.faces.push([line[2], line[1], line[0], 0]);

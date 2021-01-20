@@ -17,6 +17,8 @@ export default function generate(options = { primitive: 2, lighting: true }) {
     uniform mat4 u_vp, u_model, u_modelit;
     uniform vec3 u_pos;
 
+    uniform mat4 u_modelobj;
+
     void main() {
         #if (options.primitive == 2 && options.mode !== 0) 
             v_fragPos = vec3(u_model * position);
@@ -27,9 +29,9 @@ export default function generate(options = { primitive: 2, lighting: true }) {
         #if (options.primitive == 0)
             gl_PointSize = 5.0;
         #endif
+        
 
-        mat4 mvp = u_vp * u_model;
-        gl_Position = mvp * position;
+        gl_Position = (u_vp * u_model) * (u_modelobj * position);
     }`,
 		options
 	);

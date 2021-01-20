@@ -10,7 +10,7 @@ const r = new Renderer(
 let teapot = new mjsr.OBJLoader(
 	"./geometry/teapot.obj",
 	mjsr.CLOCKWISE,
-	new mjsr.Material("#faa", 64)
+	new mjsr.Material("#faa", 123)
 );
 
 let cube = mjsr.Object3d.from({
@@ -43,14 +43,15 @@ let cube = mjsr.Object3d.from({
 	colours: ["#0ff", "#0f0", "#f0f", "#00f", "#ff0", "#f00"],
 });
 
-(async () => {
-	let scene = [await teapot.load()];
-	let scene2 = [cube];
+teapot.load().then(obj => {
+	teapot = obj;
+	let scene = [teapot];
+	r.setup(scene);
 
-	r.setup(scene, scene2);
+	teapot.rotateX(90 * (Math.PI / 180)).rotateY(2.5).rotateZ(1.2);
 
 	requestAnimationFrame(frame);
-})();
+});
 
 function frame(now) {
 	r.draw();
@@ -58,5 +59,3 @@ function frame(now) {
 
 	requestAnimationFrame(frame);
 }
-
-window.addEventListener("keydown", (event) => event.key == "l" && (r.scene = 1));
