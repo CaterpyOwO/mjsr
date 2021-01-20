@@ -1,7 +1,7 @@
 import { terser } from "rollup-plugin-terser";
 import glsl from "rollup-plugin-glsl";
 import json from "@rollup/plugin-json";
-import resolve from '@rollup/plugin-node-resolve';
+import resolve from "@rollup/plugin-node-resolve";
 
 export default {
 	input: "src/mjsr.js",
@@ -25,6 +25,6 @@ export default {
 			sourceMap: false,
 		}),
 		json(),
-		resolve()
+		resolve(),
 	],
 };

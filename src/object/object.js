@@ -118,7 +118,7 @@ export class Object3d {
 	}
 	/**
 	 * Scales the object
-	 * 
+	 *
 	 * @param {number[3]} vector - The vector by which the object should be scaled
 	 */
 	scale(vector) {
@@ -129,7 +129,7 @@ export class Object3d {
 
 	/**
 	 * Rotates the object around the X axis
-	 * 
+	 *
 	 * @param {number} rad - Degrees to rotate by
 	 */
 	rotateX(rad) {
@@ -140,7 +140,7 @@ export class Object3d {
 
 	/**
 	 * Rotates the object around the Y axis
-	 * 
+	 *
 	 * @param {number} rad - Degrees to rotate by
 	 */
 	rotateY(rad) {
@@ -151,7 +151,7 @@ export class Object3d {
 
 	/**
 	 * Rotates the object around the Z axis
-	 * 
+	 *
 	 * @param {number} rad - Degrees to rotate by
 	 */
 	rotateZ(rad) {
@@ -162,7 +162,7 @@ export class Object3d {
 
 	/**
 	 * Translates the object
-	 * 
+	 *
 	 * @param {number[3]} vector - The vector by which the object should be translated
 	 */
 	translate(vector) {

@@ -1291,7 +1291,7 @@ var _mjsr_exports = (function (exports) {
 		}
 		/**
 		 * Scales the object
-		 * 
+		 *
 		 * @param {number[3]} vector - The vector by which the object should be scaled
 		 */
 		scale(vector) {
@@ -1302,7 +1302,7 @@ var _mjsr_exports = (function (exports) {
 
 		/**
 		 * Rotates the object around the X axis
-		 * 
+		 *
 		 * @param {number} rad - Degrees to rotate by
 		 */
 		rotateX(rad) {
@@ -1313,7 +1313,7 @@ var _mjsr_exports = (function (exports) {
 
 		/**
 		 * Rotates the object around the Y axis
-		 * 
+		 *
 		 * @param {number} rad - Degrees to rotate by
 		 */
 		rotateY(rad) {
@@ -1324,7 +1324,7 @@ var _mjsr_exports = (function (exports) {
 
 		/**
 		 * Rotates the object around the Z axis
-		 * 
+		 *
 		 * @param {number} rad - Degrees to rotate by
 		 */
 		rotateZ(rad) {
@@ -1335,7 +1335,7 @@ var _mjsr_exports = (function (exports) {
 
 		/**
 		 * Translates the object
-		 * 
+		 *
 		 * @param {number[3]} vector - The vector by which the object should be translated
 		 */
 		translate(vector) {
