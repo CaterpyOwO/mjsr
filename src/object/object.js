@@ -190,9 +190,9 @@ export class Object3d {
 		const out = new Object3d();
 
 		const props = {
-			0: ["coords", "verts", "colours", "primitive"],
-			1: ["coords", "verts", "edges", "colours", "primitive"],
-			2: ["coords", "verts", "faces", "colours", "primitive"],
+			0: ["verts", "colours", "primitive"],
+			1: ["verts", "edges", "colours", "primitive"],
+			2: ["verts", "faces", "colours", "primitive"],
 		};
 
 		const primitives = ["points", "lines", "triangles"];
