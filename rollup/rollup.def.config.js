@@ -22,7 +22,7 @@ export default {
 			include: "src/**/*.glsl",
 			exclude: ["**/index.html"],
 			sourceMap: false,
-        }),
-        json()
+		}),
+		json(),
 	],
 };

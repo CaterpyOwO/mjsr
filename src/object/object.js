@@ -1,11 +1,13 @@
 import * as constants from "../core/constants.js";
 
 import { crossProduct } from "../utility/math.js";
+import { create, translate, rotate, scale } from "../utility/gl-matrix/mat4.js";
 
 import { Material } from "./material.js";
 
 export class Object3d {
 	/**
+	 * Creates a new Object3d
 	 *
 	 * @param {Number} [primitive=mjsr.TRIANGLES] - The primitive the object should be rendered with
 	 * @param {Boolean} [materials=false] - Use materials instead of colours
@@ -18,6 +20,16 @@ export class Object3d {
 		this.verts = [];
 		this.edges = [];
 		this.faces = [];
+
+		this.model = create();
+
+		this.transformations = {
+			scale: [1, 1, 1],
+			rotateX: 0,
+			rotateY: 0,
+			rotateZ: 0,
+			translate: [0, 0, 0],
+		};
 
 		switch (primitive) {
 			case constants.TRIANGLES:
@@ -103,6 +115,70 @@ export class Object3d {
 		}
 
 		return meshes;
+	}
+	/**
+	 * Scales the object
+	 * 
+	 * @param {number[3]} vector - The vector by which the object should be scaled
+	 */
+	scale(vector) {
+		this.transformations.scale = vector;
+		this._updateModel();
+		return this;
+	}
+
+	/**
+	 * Rotates the object around the X axis
+	 * 
+	 * @param {number} rad - Degrees to rotate by
+	 */
+	rotateX(rad) {
+		this.transformations.rotateX = rad;
+		this._updateModel();
+		return this;
+	}
+
+	/**
+	 * Rotates the object around the Y axis
+	 * 
+	 * @param {number} rad - Degrees to rotate by
+	 */
+	rotateY(rad) {
+		this.transformations.rotateY = rad;
+		this._updateModel();
+		return this;
+	}
+
+	/**
+	 * Rotates the object around the Z axis
+	 * 
+	 * @param {number} rad - Degrees to rotate by
+	 */
+	rotateZ(rad) {
+		this.transformations.rotateZ = rad;
+		this._updateModel();
+		return this;
+	}
+
+	/**
+	 * Translates the object
+	 * 
+	 * @param {number[3]} vector - The vector by which the object should be translated
+	 */
+	translate(vector) {
+		this.transformations.translate = vector;
+		this._updateModel();
+		return this;
+	}
+
+	_updateModel() {
+		scale(this.model, create(), this.transformations.scale);
+
+		rotate(this.model, this.model, this.transformations.rotateX, [1, 0, 0]);
+		rotate(this.model, this.model, this.transformations.rotateY, [0, 1, 0]);
+		rotate(this.model, this.model, this.transformations.rotateZ, [0, 0, 1]);
+
+		translate(this.model, this.model, this.transformations.translate);
 	}
 
 	/**

@@ -4,6 +4,15 @@ var _mjsr_exports = (function (exports) {
 	var version = "v0.9.7-alpha";
 
 	// Copyright (c) 2015-2020, Brandon Jones, Colin MacKenzie IV.
+	// Distributed under an MIT license: https://github.com/toji/gl-matrix/blob/master/LICENSE.md
+
+	/**
+	 * Common utilities
+	 * @module glMatrix
+	 */
+
+	// Configuration Constants
+	const EPSILON = 0.000001;
 	let ARRAY_TYPE = typeof Float32Array !== "undefined" ? Float32Array : Array;
 
 	if (!Math.hypot)
@@ -321,6 +330,89 @@ var _mjsr_exports = (function (exports) {
 	}
 
 	/**
+	 * Rotates a mat4 by the given angle around the given axis
+	 *
+	 * @param {mat4} out the receiving matrix
+	 * @param {ReadonlyMat4} a the matrix to rotate
+	 * @param {Number} rad the angle to rotate the matrix by
+	 * @param {ReadonlyVec3} axis the axis to rotate around
+	 * @returns {mat4} out
+	 */
+	function rotate(out, a, rad, axis) {
+		let x = axis[0],
+			y = axis[1],
+			z = axis[2];
+		let len = Math.hypot(x, y, z);
+		let s, c, t;
+		let a00, a01, a02, a03;
+		let a10, a11, a12, a13;
+		let a20, a21, a22, a23;
+		let b00, b01, b02;
+		let b10, b11, b12;
+		let b20, b21, b22;
+
+		if (len < EPSILON) {
+			return null;
+		}
+
+		len = 1 / len;
+		x *= len;
+		y *= len;
+		z *= len;
+
+		s = Math.sin(rad);
+		c = Math.cos(rad);
+		t = 1 - c;
+
+		a00 = a[0];
+		a01 = a[1];
+		a02 = a[2];
+		a03 = a[3];
+		a10 = a[4];
+		a11 = a[5];
+		a12 = a[6];
+		a13 = a[7];
+		a20 = a[8];
+		a21 = a[9];
+		a22 = a[10];
+		a23 = a[11];
+
+		// Construct the elements of the rotation matrix
+		b00 = x * x * t + c;
+		b01 = y * x * t + z * s;
+		b02 = z * x * t - y * s;
+		b10 = x * y * t - z * s;
+		b11 = y * y * t + c;
+		b12 = z * y * t + x * s;
+		b20 = x * z * t + y * s;
+		b21 = y * z * t - x * s;
+		b22 = z * z * t + c;
+
+		// Perform rotation-specific matrix multiplication
+		out[0] = a00 * b00 + a10 * b01 + a20 * b02;
+		out[1] = a01 * b00 + a11 * b01 + a21 * b02;
+		out[2] = a02 * b00 + a12 * b01 + a22 * b02;
+		out[3] = a03 * b00 + a13 * b01 + a23 * b02;
+		out[4] = a00 * b10 + a10 * b11 + a20 * b12;
+		out[5] = a01 * b10 + a11 * b11 + a21 * b12;
+		out[6] = a02 * b10 + a12 * b11 + a22 * b12;
+		out[7] = a03 * b10 + a13 * b11 + a23 * b12;
+		out[8] = a00 * b20 + a10 * b21 + a20 * b22;
+		out[9] = a01 * b20 + a11 * b21 + a21 * b22;
+		out[10] = a02 * b20 + a12 * b21 + a22 * b22;
+		out[11] = a03 * b20 + a13 * b21 + a23 * b22;
+
+		if (a !== out) {
+			// If the source and destination differ, copy the unchanged last row
+			out[12] = a[12];
+			out[13] = a[13];
+			out[14] = a[14];
+			out[15] = a[15];
+		}
+		return out;
+	}
+
+	/**
 	 * Rotates a matrix by the given angle around the X axis
 	 *
 	 * @param {mat4} out the receiving matrix
@@ -610,10 +702,10 @@ var _mjsr_exports = (function (exports) {
 		setupMovement() {
 			let { canvas } = this.screen;
 
-			window.addEventListener("keydown", (event) => (this.keys[event.key.toLowerCase()] = true));
-			window.addEventListener("keyup", (event) => (this.keys[event.key.toLowerCase()] = false));
+			window.addEventListener("keydown", event => (this.keys[event.key.toLowerCase()] = true));
+			window.addEventListener("keyup", event => (this.keys[event.key.toLowerCase()] = false));
 
-			let movement = (event) => {
+			let movement = event => {
 				if (Math.abs(event.movementX) > 50 || Math.abs(event.movementY) > 50) return;
 				else return this.mouseRotation([event.movementX, event.movementY]);
 			};
@@ -681,8 +773,8 @@ var _mjsr_exports = (function (exports) {
 			let { canvas } = this.screen;
 			let lastMovement = [0, 0];
 
-			const mouse = (event) => this.mouseRotation([event.movementX, event.movementY]);
-			const touch = (event) => (
+			const mouse = event => this.mouseRotation([event.movementX, event.movementY]);
+			const touch = event => (
 				this.mouseRotation([
 					-(lastMovement[0] - event.touches[0].screenX),
 					lastMovement[1] - event.touches[0].screenY,
@@ -695,7 +787,7 @@ var _mjsr_exports = (function (exports) {
 
 			canvas.addEventListener(
 				"touchstart",
-				(event) => (lastMovement = [event.touches[0].screenX, event.touches[0].screenY]),
+				event => (lastMovement = [event.touches[0].screenX, event.touches[0].screenY]),
 				{ passive: true }
 			);
 			canvas.addEventListener("touchmove", touch, { passive: true });
@@ -1068,12 +1160,12 @@ var _mjsr_exports = (function (exports) {
 					colour = colour.split("").reduce((r, e) => r.push(e + e) && r, []);
 				else colour = colour.match(/.{1,2}/g);
 
-				return [...colour.map((c) => clamp(parseInt(c, 16) / 255, 0.0, 1.0))];
+				return [...colour.map(c => clamp(parseInt(c, 16) / 255, 0.0, 1.0))];
 			case "rgb":
 				colour = colour.substr(4).slice(0, -1);
 				colour = colour.split(",");
 
-				return [...colour.map((c) => clamp(parseInt(c) / 255, 0.0, 1.0))];
+				return [...colour.map(c => clamp(parseInt(c) / 255, 0.0, 1.0))];
 
 			default:
 				throw new Error(`${type} is not a valid colour type.`);
@@ -1101,6 +1193,7 @@ var _mjsr_exports = (function (exports) {
 
 	class Object3d {
 		/**
+		 * Creates a new Object3d
 		 *
 		 * @param {Number} [primitive=mjsr.TRIANGLES] - The primitive the object should be rendered with
 		 * @param {Boolean} [materials=false] - Use materials instead of colours
@@ -1113,6 +1206,16 @@ var _mjsr_exports = (function (exports) {
 			this.verts = [];
 			this.edges = [];
 			this.faces = [];
+
+			this.model = create();
+
+			this.transformations = {
+				scale: [1, 1, 1],
+				rotateX: 0,
+				rotateY: 0,
+				rotateZ: 0,
+				translate: [0, 0, 0],
+			};
 
 			switch (primitive) {
 				case TRIANGLES:
@@ -1198,6 +1301,70 @@ var _mjsr_exports = (function (exports) {
 			}
 
 			return meshes;
+		}
+		/**
+		 * Scales the object
+		 * 
+		 * @param {number[3]} vector - The vector by which the object should be scaled
+		 */
+		scale(vector) {
+			this.transformations.scale = vector;
+			this._updateModel();
+			return this;
+		}
+
+		/**
+		 * Rotates the object around the X axis
+		 * 
+		 * @param {number} rad - Degrees to rotate by
+		 */
+		rotateX(rad) {
+			this.transformations.rotateX = rad;
+			this._updateModel();
+			return this;
+		}
+
+		/**
+		 * Rotates the object around the Y axis
+		 * 
+		 * @param {number} rad - Degrees to rotate by
+		 */
+		rotateY(rad) {
+			this.transformations.rotateY = rad;
+			this._updateModel();
+			return this;
+		}
+
+		/**
+		 * Rotates the object around the Z axis
+		 * 
+		 * @param {number} rad - Degrees to rotate by
+		 */
+		rotateZ(rad) {
+			this.transformations.rotateZ = rad;
+			this._updateModel();
+			return this;
+		}
+
+		/**
+		 * Translates the object
+		 * 
+		 * @param {number[3]} vector - The vector by which the object should be translated
+		 */
+		translate(vector) {
+			this.transformations.translate = vector;
+			this._updateModel();
+			return this;
+		}
+
+		_updateModel() {
+			scale(this.model, create(), this.transformations.scale);
+
+			rotate(this.model, this.model, this.transformations.rotateX, [1, 0, 0]);
+			rotate(this.model, this.model, this.transformations.rotateY, [0, 1, 0]);
+			rotate(this.model, this.model, this.transformations.rotateZ, [0, 0, 1]);
+
+			translate(this.model, this.model, this.transformations.translate);
 		}
 
 		/**
@@ -1326,7 +1493,8 @@ var _mjsr_exports = (function (exports) {
 
 				assert(scene.length, `Scene ${s} has no objects.`);
 
-				for (let object of scene) {
+				for (let o in scene) {
+					let object = scene[o];
 					assert(typeof object == "object", "Invalid object in scene.");
 
 					if (!object.generateMesh) object = Object3d.from(object);
@@ -1335,11 +1503,17 @@ var _mjsr_exports = (function (exports) {
 						primitive = meshes[0].data.primitive;
 
 					this.primitives.add(primitive);
-					console.log();
-					sceneMeshes.push(...meshes);
+					sceneMeshes.push(
+						...meshes.map(v => {
+							v.object = o;
+							return v;
+						})
+					);
+					// object.scene = s;
+					// object.object = o;
 				}
 
-				this.scenes.push(sceneMeshes);
+				this.scenes.push({ meshes: sceneMeshes, objects: scene });
 			}
 
 			const { gl } = this.screen;
@@ -1402,22 +1576,26 @@ var _mjsr_exports = (function (exports) {
 					shader.uniform1f("p_gamma", this.posterization.gamma);
 					shader.uniform1f("p_colours", this.posterization.colours);
 				}
-				// GLuint loc = glGetUniformLocation(shader_program_id, "Light[0].Type");
-				// glUniform1i(loc, value);
 
 				gl.useProgram(null);
 			}
 
-			for (let mesh of this.scenes[this._scene]) {
+			for (let mesh of this.scenes[this._scene].meshes) {
 				const primitive = mesh.data.primitive;
 				const shader = this.shaders[primitive];
+
+				// console.log(this.scenes[this._scene].objects)
 
 				gl.useProgram(shader.glprogram);
 
 				shader.uniform1f("u_shinyness", mesh.material.shinyness);
 				shader.uniform3fv("u_colour", mesh.material.colour);
 
-				shader.uniformMatrix4fv("u_modelobj", false, scale(create(), create(), [3,2,1]));
+				shader.uniformMatrix4fv(
+					"u_modelobj",
+					false,
+					this.scenes[this._scene].objects[mesh.object].model
+				);
 
 				// gl.uniform1i(gl.getUniformLocation(shader.glprogram, "u_primitive"), primitive);
 
@@ -1585,12 +1763,10 @@ var _mjsr_exports = (function (exports) {
 					case "#":
 						break;
 					case "v":
-						this.object.verts.push(
-							line.map((v, i) => parseFloat(v))
-						);
+						this.object.verts.push(line.map((v, i) => parseFloat(v)));
 						break;
 					case "f":
-						line = line.map((v) => parseInt(v.split(/\//)[0]) - 1);
+						line = line.map(v => parseInt(v.split(/\//)[0]) - 1);
 						if (this.normals == COUNTER_CLOCKWISE)
 							this.object.faces.push([line[0], line[1], line[2], 0]);
 						else this.object.faces.push([line[2], line[1], line[0], 0]);

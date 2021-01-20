@@ -3,7 +3,6 @@ import glsl from "rollup-plugin-glsl";
 import serve from "rollup-plugin-serve";
 import json from "@rollup/plugin-json";
 
-
 export default {
 	input: "src/mjsr.js",
 	output: [
@@ -26,6 +25,6 @@ export default {
 			sourceMap: false,
 		}),
 		serve("dist"),
-		json()
+		json(),
 	],
 };

@@ -14,8 +14,8 @@ class ModelRotate {
 		let { canvas } = this.screen;
 		let lastMovement = [0, 0];
 
-		const mouse = (event) => this.mouseRotation([event.movementX, event.movementY]);
-		const touch = (event) => (
+		const mouse = event => this.mouseRotation([event.movementX, event.movementY]);
+		const touch = event => (
 			this.mouseRotation([
 				-(lastMovement[0] - event.touches[0].screenX),
 				lastMovement[1] - event.touches[0].screenY,
@@ -28,7 +28,7 @@ class ModelRotate {
 
 		canvas.addEventListener(
 			"touchstart",
-			(event) => (lastMovement = [event.touches[0].screenX, event.touches[0].screenY]),
+			event => (lastMovement = [event.touches[0].screenX, event.touches[0].screenY]),
 			{ passive: true }
 		);
 		canvas.addEventListener("touchmove", touch, { passive: true });

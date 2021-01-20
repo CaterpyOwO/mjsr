@@ -8,7 +8,7 @@ const r = new Renderer(
 );
 
 let teapot = new mjsr.OBJLoader("./teapot.obj", mjsr.COUNTER_CLOCKWISE);
-teapot.load().then((tp) => {
+teapot.load().then(tp => {
 	let scene = [tp];
 	console.log(tp);
 	r.setup(scene);

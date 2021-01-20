@@ -20,17 +20,17 @@ Using a CDN:
 ```
 
 Using a local copy (See the [releases tab](https://github.com/CaterpyOwO/mjsr/releases/latest) to find the latest version).
+
 ```html
 <script src="./mjsr.min.js"></script>
 ```
-
 
 ## Usage
 
 ```js
 const r = new mjsr.Renderer(
-	new mjsr.Screen().fullscreen(), 
-	new mjsr.Camera([0, 0, -7]), 
+	new mjsr.Screen().fullscreen(),
+	new mjsr.Camera([0, 0, -7]),
 	new mjsr.Input.FirstPerson()
 );
 
@@ -51,9 +51,9 @@ requestAnimationFrame(frame);
 
 See the [`examples`](examples) folder for more examples.
 
-
 <img src="https://raw.githubusercontent.com/CaterpyOwO/mjsr/master/examples/donut.png" width="300px" alt="A image of a donut">
 <img src="https://raw.githubusercontent.com/CaterpyOwO/mjsr/master/examples/teapot.png" width="350px" alt="A image of a teapot">
 
 ## License
+
 [MIT](https://choosealicense.com/licenses/mit/)

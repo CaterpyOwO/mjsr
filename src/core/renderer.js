@@ -99,7 +99,8 @@ export class Renderer {
 
 			assert(scene.length, `Scene ${s} has no objects.`);
 
-			for (let object of scene) {
+			for (let o in scene) {
+				let object = scene[o];
 				assert(typeof object == "object", "Invalid object in scene.");
 
 				if (!object.generateMesh) object = Object3d.from(object);
@@ -108,11 +109,17 @@ export class Renderer {
 					primitive = meshes[0].data.primitive;
 
 				this.primitives.add(primitive);
-				console.log();
-				sceneMeshes.push(...meshes);
+				sceneMeshes.push(
+					...meshes.map(v => {
+						v.object = o;
+						return v;
+					})
+				);
+				// object.scene = s;
+				// object.object = o;
 			}
 
-			this.scenes.push(sceneMeshes);
+			this.scenes.push({ meshes: sceneMeshes, objects: scene });
 		}
 
 		const { gl } = this.screen;
@@ -175,22 +182,26 @@ export class Renderer {
 				shader.uniform1f("p_gamma", this.posterization.gamma);
 				shader.uniform1f("p_colours", this.posterization.colours);
 			}
-			// GLuint loc = glGetUniformLocation(shader_program_id, "Light[0].Type");
-			// glUniform1i(loc, value);
 
 			gl.useProgram(null);
 		}
 
-		for (let mesh of this.scenes[this._scene]) {
+		for (let mesh of this.scenes[this._scene].meshes) {
 			const primitive = mesh.data.primitive;
 			const shader = this.shaders[primitive];
+
+			// console.log(this.scenes[this._scene].objects)
 
 			gl.useProgram(shader.glprogram);
 
 			shader.uniform1f("u_shinyness", mesh.material.shinyness);
 			shader.uniform3fv("u_colour", mesh.material.colour);
 
-			shader.uniformMatrix4fv("u_modelobj", false, scale(create(), create(), [3,2,1]));
+			shader.uniformMatrix4fv(
+				"u_modelobj",
+				false,
+				this.scenes[this._scene].objects[mesh.object].model
+			);
 
 			// gl.uniform1i(gl.getUniformLocation(shader.glprogram, "u_primitive"), primitive);
 
