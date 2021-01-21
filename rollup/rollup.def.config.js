@@ -4,17 +4,17 @@ import json from "@rollup/plugin-json";
 import resolve from "@rollup/plugin-node-resolve";
 
 export default {
-	input: "src/mjsr.js",
+	input: "src/index.js",
 	output: [
 		{
 			file: "dist/mjsr.js",
 			format: "iife",
-			name: "_mjsr_exports",
+			name: "mjsr",
 		},
 		{
 			file: "dist/mjsr.min.js",
 			format: "iife",
-			name: "_mjsr_exports",
+			name: "mjsr",
 			plugins: [terser()],
 		},
 	],

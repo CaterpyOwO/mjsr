@@ -1,3 +1,5 @@
+import * as fragments from "../core/shaders/fragments/fragments.js";
+
 export function preprocess(source, options) {
 	let lines = source.split(/\n/),
 		lineCount = lines.length;
@@ -10,6 +12,7 @@ export function preprocess(source, options) {
 	let output = "";
 
 	traverse();
+	console.log(output)
 	return output.trim();
 
 	function traverse(currentLine = 0, condition = true, depth = 0) {
@@ -35,6 +38,9 @@ export function preprocess(source, options) {
 						break;
 					case "endif":
 						currentLine = traverse(currentLine + 1, depths[depth - 1], depth - 1);
+						break;
+					case "import":
+						if (condition) output += preprocess(fragments[line.trim().substr(8)], options)
 						break;
 				}
 			} else if (condition) output += `${line}\n`;

@@ -1,4 +1,4 @@
-var _mjsr_exports = (function (exports) {
+var mjsr = (function () {
 	'use strict';
 
 	var version = "v0.9.7-alpha";
@@ -932,6 +932,19 @@ var _mjsr_exports = (function (exports) {
 		}
 	}
 
+	var mono = "float lum=(gl_FragColor.r+gl_FragColor.g+gl_FragColor.b)/3.0;vec2 monoColour=vec2(lum,1.0);gl_FragColor=monoColour.xxxy;";
+
+	var posterization = "vec3 c=gl_FragColor.rgb;c=pow(c,vec3(p_gamma,p_gamma,p_gamma));c=c*p_colours;c=floor(c);c=c/p_colours;c=pow(c,vec3(1.0/p_gamma));gl_FragColor=vec4(c,1.0);";
+
+	var lighting = "vec3 normal=normalize(v_normal);vec3 lightd=normalize(light.position-v_fragPos);float strength=0.3;vec3 viewd=normalize(v_viewPos-v_fragPos);vec3 reflectd=reflect(-lightd,normal);\n#if (options.mode == 2)\nvec3 halfwayd=normalize(lightd+viewd);float sp=pow(max(dot(normal,halfwayd),0.0),u_shinyness);vec3 specular=light.colour*sp;\n#else\nfloat sp=pow(max(dot(viewd,reflectd),0.0),u_shinyness);vec3 specular=strength*sp*light.colour;\n#endif\nfloat df=max(dot(normal,lightd),0.0);vec3 diffuse=df*light.colour;vec3 ambient=0.1*light.colour;gl_FragColor=vec4((ambient+diffuse+specular)*gl_FragColor.rgb,1.0);";
+
+	var fragments = /*#__PURE__*/Object.freeze({
+		__proto__: null,
+		mono: mono,
+		posteriz: posterization,
+		lighting: lighting
+	});
+
 	function preprocess(source, options) {
 		let lines = source.split(/\n/),
 			lineCount = lines.length;
@@ -944,6 +957,7 @@ var _mjsr_exports = (function (exports) {
 		let output = "";
 
 		traverse();
+		console.log(output);
 		return output.trim();
 
 		function traverse(currentLine = 0, condition = true, depth = 0) {
@@ -970,6 +984,9 @@ var _mjsr_exports = (function (exports) {
 						case "endif":
 							currentLine = traverse(currentLine + 1, depths[depth - 1], depth - 1);
 							break;
+						case "import":
+							if (condition) output += preprocess(fragments[line.trim().substr(8)], options);
+							break;
 					}
 				} else if (condition) output += `${line}\n`;
 
@@ -980,94 +997,16 @@ var _mjsr_exports = (function (exports) {
 		}
 	}
 
-	function generate(options = { primitive: 2, lighting: true }) {
-		return preprocess(
-			`
-    precision mediump float;
+	var vert = "precision mediump float;attribute vec4 position;attribute vec3 normal;varying vec3 v_colour;varying vec3 v_normal;varying float v_shinyness;varying vec3 v_fragPos,v_viewPos;uniform mat4 u_vp,u_model,u_modelit;uniform vec3 u_pos;uniform mat4 u_modelobj;void main(){\n#if (options.primitive == 2 && options.mode !== 0)\nv_fragPos=vec3(u_model*position);v_viewPos=u_pos;v_normal=mat3(u_modelit)*normal;\n#endif\n#if (options.primitive == 0)\ngl_PointSize=5.0;\n#endif\ngl_Position=(u_vp*u_model)*(u_modelobj*position);}";
 
-    attribute vec4 position;
-    attribute vec3 normal;
-
-    varying vec3 v_colour;
-    varying vec3 v_normal;
-    varying float v_shinyness;
-
-	varying vec3 v_fragPos, v_viewPos;
-
-    uniform mat4 u_vp, u_model, u_modelit;
-    uniform vec3 u_pos;
-
-    uniform mat4 u_modelobj;
-
-    void main() {
-        #if (options.primitive == 2 && options.mode !== 0) 
-            v_fragPos = vec3(u_model * position);
-            v_viewPos = u_pos;
-            v_normal = mat3(u_modelit) * normal;
-        #endif
-
-        #if (options.primitive == 0)
-            gl_PointSize = 5.0;
-        #endif
-        
-
-        gl_Position = (u_vp * u_model) * (u_modelobj * position);
-    }`,
-			options
-		);
+	function vertex (options) {
+		return preprocess(vert, options);
 	}
 
-	var mono = "float lum=(gl_FragColor.r+gl_FragColor.g+gl_FragColor.b)/3.0;vec2 monoColour=vec2(lum,1.0);gl_FragColor=monoColour.xxxy;";
+	var frag = "precision mediump float;varying vec3 v_normal;uniform vec3 u_colour;uniform float u_shinyness;\n#if (options.mode !== 0)\nvarying vec3 v_fragPos,v_viewPos;struct Light{vec3 position;vec3 colour;};uniform Light light;\n#endif\n#if options.posterization\nuniform float p_gamma;uniform float p_colours;\n#endif\nvoid main(){gl_FragColor=vec4(u_colour,1.0);\n#if (options.mode !== 0)\n#import lighting\n#endif\n#if options.mono\n#import mono\n#endif\n#if options.posterization\n#import posteriz\n#endif\n}";
 
-	var posteriz = "vec3 c=gl_FragColor.rgb;c=pow(c,vec3(p_gamma,p_gamma,p_gamma));c=c*p_colours;c=floor(c);c=c/p_colours;c=pow(c,vec3(1.0/p_gamma));gl_FragColor=vec4(c,1.0);";
-
-	var lighting = "vec3 normal=normalize(v_normal);vec3 lightd=normalize(light.position-v_fragPos);float strength=0.3;vec3 viewd=normalize(v_viewPos-v_fragPos);vec3 reflectd=reflect(-lightd,normal);\n#if (options.mode == 2)\nvec3 halfwayd=normalize(lightd+viewd);float sp=pow(max(dot(normal,halfwayd),0.0),u_shinyness);vec3 specular=light.colour*sp;\n#else\nfloat sp=pow(max(dot(viewd,reflectd),0.0),u_shinyness);vec3 specular=strength*sp*light.colour;\n#endif\nfloat df=max(dot(normal,lightd),0.0);vec3 diffuse=df*light.colour;vec3 ambient=0.1*light.colour;gl_FragColor=vec4((ambient+diffuse+specular)*gl_FragColor.rgb,1.0);";
-
-	function generate$1(
-		options = { primitive: 2, mono: false, mode: 0, posterization: false }
-	) {
-		return preprocess(
-			`
-	precision mediump float;
-
-	varying vec3 v_normal;
-	
-	uniform vec3 u_colour;
-	uniform float u_shinyness;
-
-	#if (options.mode !== 0)
-		varying vec3 v_fragPos, v_viewPos;
-
-		struct Light {
-			vec3 position;
-			vec3 colour;
-		};
-	
-		uniform Light light;
-	#endif
-
-	#if options.posterization
-		uniform float p_gamma;
-		uniform float p_colours;
-	#endif
-
-	void main() {
-		gl_FragColor = vec4(u_colour, 1.0);
-
-		#if (options.mode !== 0)
-			${lighting}
-		#endif
-
-		#if options.mono
-			${mono}
-		#endif
-
-		#if options.posterization
-			${posteriz}
-		#endif
-	}`,
-			options
-		);
+	function fragment (options) {
+		return preprocess(frag, options);
 	}
 
 	// primitives
@@ -1510,9 +1449,9 @@ var _mjsr_exports = (function (exports) {
 
 				let mode = primitive == 2 ? this.options.lighting : 0;
 
-				shader.vert(generate({ mode, primitive }));
+				shader.vert(vertex({ mode, primitive }));
 				shader.frag(
-					generate$1({
+					fragment({
 						mode,
 						primitive,
 						mono: this.options.mono,
@@ -1783,7 +1722,7 @@ var _mjsr_exports = (function (exports) {
 	 *
 	 * @description Mjsr is a 3D WebGL renderer that allows you to access many low level settings and makes it easy to make your own 3d objects.
 	 */
-	const mjsr = {
+	var index = {
 		VERSION: version,
 		...constants,
 
@@ -1797,15 +1736,10 @@ var _mjsr_exports = (function (exports) {
 		OBJLoader,
 	};
 
-	if (typeof define === "function" && define.amd) define([], () => mjsr);
-	else globalThis.mjsr = mjsr;
 
-	console.log(`Loaded mjsr version: %c${mjsr.VERSION}`, "text-decoration:underline");
 
-	exports.mjsr = mjsr;
+	console.log(`Loaded mjsr version: %c${version}`, "text-decoration:underline");
 
-	Object.defineProperty(exports, '__esModule', { value: true });
+	return index;
 
-	return exports;
-
-}({}));
+}());
