@@ -1420,8 +1420,10 @@ var mjsr = (function () {
 		 * @param {Object[]} scene - An array of Objects
 		 */
 		setup(...scenes) {
+			const { gl } = this.screen;
+			
 			this.scenes = [];
-			this._scene = 0;
+			this.__scene = 0;
 
 			this.primitives = {
 				0: false,
@@ -1455,8 +1457,6 @@ var mjsr = (function () {
 
 				this.scenes.push({ meshes: sceneMeshes, objects: scene });
 			}
-
-			const { gl } = this.screen;
 
 			for (let primitive in this.primitives) {
 				if (this.primitives[primitive]) {
@@ -1522,7 +1522,7 @@ var mjsr = (function () {
 				gl.useProgram(null);
 			}
 
-			for (let mesh of this.scenes[this._scene].meshes) {
+			for (let mesh of this.scenes[this.__scene].meshes) {
 				const primitive = mesh.data.primitive;
 				const shader = this.shaders[primitive];
 
@@ -1534,7 +1534,7 @@ var mjsr = (function () {
 				shader.uniformMatrix4fv(
 					"u_modelobj",
 					false,
-					this.scenes[this._scene].objects[mesh.object].model
+					this.scenes[this.__scene].objects[mesh.object].model
 				);
 
 				let buffers = {
@@ -1565,12 +1565,12 @@ var mjsr = (function () {
 		}
 
 		get scene() {
-			return this._scene;
+			return this.__scene;
 		}
 
 		set scene(index) {
 			if (assert(typeof index == "number" && this.scenes[index], "Invalid scene index."))
-				this._scene = index;
+				this.__scene = index;
 		}
 	}
 

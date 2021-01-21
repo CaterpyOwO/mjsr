@@ -2,7 +2,7 @@ const { Renderer, Screen, Camera, Input } = mjsr;
 
 const r = new Renderer(
 	new Screen().fullscreen(),
-	new Camera([0, -2, -8], [0, 0, 0]),
+	new Camera([0, -2, -8], [0.2, 0, 0]),
 	new Input.FirstPerson(),
 	{ mono: false, lighting: mjsr.BLINN_PHONG, culling: false }
 );
@@ -48,14 +48,14 @@ teapot.load().then(obj => {
 	let scene = [teapot];
 	r.setup(scene);
 
-	teapot.rotateY(90 * (Math.PI / 180))
-
 	requestAnimationFrame(frame);
 });
 
 function frame(now) {
 	r.draw();
 	r.update(now);
+
+	teapot.rotateX(5e-4*Date.now()).rotateY(7e-4*Date.now());
 
 	requestAnimationFrame(frame);
 }
