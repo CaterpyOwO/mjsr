@@ -9,6 +9,8 @@ import { default as fragment } from "./shaders/frag.js";
 
 import { Object3d } from "../object/object.js";
 
+import { generateMesh } from "../utility/mesh.js";
+
 import * as constants from "../core/constants.js";
 
 export class Renderer {
@@ -62,13 +64,13 @@ export class Renderer {
 
 		if (
 			assert(
-				inputHandler.setAttributes,
-				"Input handler doesn't have a .setAttributes() method."
+				inputHandler.attributes,
+				"Input handler doesn't have a .attributes() method."
 			)
 		)
-			inputHandler.setAttributes(screen, camera);
+			inputHandler.attributes(screen, camera);
 
-		assert(inputHandler.setupMovement, "Input handler doesn't have a .setupMovement() method.");
+		assert(inputHandler.setup, "Input handler doesn't have a .setup() method.");
 		assert(inputHandler.update, "Input handler doesn't have a .update() method.");
 
 		this.input = inputHandler;
@@ -88,7 +90,11 @@ export class Renderer {
 		this.scenes = [];
 		this._scene = 0;
 
-		this.primitives = new Set();
+		this.primitives = {
+			0: false,
+			1: false,
+			2: false,
+		};
 		this.shaders = {};
 
 		for (let s in scenes) {
@@ -101,20 +107,17 @@ export class Renderer {
 				let object = scene[o];
 				assert(typeof object == "object", "Invalid object in scene.");
 
-				if (!object.generateMesh) object = Object3d.from(object);
+				if (!object instanceof Object3d) object = Object3d.from(object);
 
-				let meshes = object.generateMesh(),
-					primitive = meshes[0].data.primitive;
+				let meshes = generateMesh(object);
 
-				this.primitives.add(primitive);
+				this.primitives[meshes[0].data.primitive] = true;
 				sceneMeshes.push(
 					...meshes.map(v => {
 						v.object = o;
 						return v;
 					})
 				);
-				// object.scene = s;
-				// object.object = o;
 			}
 
 			this.scenes.push({ meshes: sceneMeshes, objects: scene });
@@ -122,24 +125,26 @@ export class Renderer {
 
 		const { gl } = this.screen;
 
-		for (let primitive of this.primitives) {
-			let shader = new Webglu(gl);
+		for (let primitive in this.primitives) {
+			if (this.primitives[primitive]) {
+				let shader = new Webglu(gl);
 
-			let mode = primitive == 2 ? this.options.lighting : 0;
-
-			shader.vert(vertex({ mode, primitive }));
-			shader.frag(
-				fragment({
-					mode,
-					primitive,
-					mono: this.options.mono,
-					posterization: this.options.posterization,
-				})
-			);
-
-			shader.program();
-
-			this.shaders[primitive] = shader;
+				let mode = primitive == 2 ? this.options.lighting : 0;
+	
+				shader.vert(vertex({ mode, primitive }));
+				shader.frag(
+					fragment({
+						mode,
+						primitive,
+						mono: this.options.mono,
+						posterization: this.options.posterization,
+					})
+				);
+	
+				shader.program();
+	
+				this.shaders[primitive] = shader;
+			}
 		}
 
 		gl.clearColor(1.0, 1.0, 1.0, 1.0);
@@ -147,7 +152,7 @@ export class Renderer {
 
 		if (this.options.culling) gl.enable(gl.CULL_FACE);
 
-		this.input.setupMovement();
+		this.input.setup();
 	}
 
 	/**
@@ -188,8 +193,6 @@ export class Renderer {
 			const primitive = mesh.data.primitive;
 			const shader = this.shaders[primitive];
 
-			// console.log(this.scenes[this._scene].objects)
-
 			gl.useProgram(shader.glprogram);
 
 			shader.uniform1f("u_shinyness", mesh.material.shinyness);
@@ -200,8 +203,6 @@ export class Renderer {
 				false,
 				this.scenes[this._scene].objects[mesh.object].model
 			);
-
-			// gl.uniform1i(gl.getUniformLocation(shader.glprogram, "u_primitive"), primitive);
 
 			let buffers = {
 				position: mesh.data.position,

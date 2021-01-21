@@ -12,7 +12,6 @@ export function preprocess(source, options) {
 	let output = "";
 
 	traverse();
-	console.log(output)
 	return output.trim();
 
 	function traverse(currentLine = 0, condition = true, depth = 0) {

@@ -5,12 +5,12 @@ class ModelRotate {
 		this.keys = [];
 	}
 
-	setAttributes(screen, camera) {
+	attributes(screen, camera) {
 		this.screen = screen;
 		this.camera = camera;
 	}
 
-	setupMovement() {
+	setup() {
 		let { canvas } = this.screen;
 		let lastMovement = [0, 0];
 

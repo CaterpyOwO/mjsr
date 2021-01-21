@@ -48,7 +48,7 @@ teapot.load().then(obj => {
 	let scene = [teapot];
 	r.setup(scene);
 
-	teapot.rotateX(90 * (Math.PI / 180)).rotateY(2.5).rotateZ(1.2);
+	teapot.rotateY(90 * (Math.PI / 180))
 
 	requestAnimationFrame(frame);
 });

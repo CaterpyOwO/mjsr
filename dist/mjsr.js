@@ -672,8 +672,8 @@ var mjsr = (function () {
 
 	class None {
 		update() {}
-		setAttributes() {}
-		setupMovement() {}
+		attributes() {}
+		setup() {}
 	}
 
 	class FirstPerson {
@@ -681,12 +681,12 @@ var mjsr = (function () {
 			this.keys = [];
 		}
 
-		setAttributes(screen, camera) {
+		attributes(screen, camera) {
 			this.screen = screen;
 			this.camera = camera;
 		}
 
-		setupMovement() {
+		setup() {
 			let { canvas } = this.screen;
 
 			window.addEventListener("keydown", event => (this.keys[event.key.toLowerCase()] = true));
@@ -751,12 +751,12 @@ var mjsr = (function () {
 			this.keys = [];
 		}
 
-		setAttributes(screen, camera) {
+		attributes(screen, camera) {
 			this.screen = screen;
 			this.camera = camera;
 		}
 
-		setupMovement() {
+		setup() {
 			let { canvas } = this.screen;
 			let lastMovement = [0, 0];
 
@@ -957,7 +957,6 @@ var mjsr = (function () {
 		let output = "";
 
 		traverse();
-		console.log(output);
 		return output.trim();
 
 		function traverse(currentLine = 0, condition = true, depth = 0) {
@@ -997,7 +996,7 @@ var mjsr = (function () {
 		}
 	}
 
-	var vert = "precision mediump float;attribute vec4 position;attribute vec3 normal;varying vec3 v_colour;varying vec3 v_normal;varying float v_shinyness;varying vec3 v_fragPos,v_viewPos;uniform mat4 u_vp,u_model,u_modelit;uniform vec3 u_pos;uniform mat4 u_modelobj;void main(){\n#if (options.primitive == 2 && options.mode !== 0)\nv_fragPos=vec3(u_model*position);v_viewPos=u_pos;v_normal=mat3(u_modelit)*normal;\n#endif\n#if (options.primitive == 0)\ngl_PointSize=5.0;\n#endif\ngl_Position=(u_vp*u_model)*(u_modelobj*position);}";
+	var vert = "precision mediump float;attribute vec4 position;attribute vec3 normal;varying vec3 v_colour;varying vec3 v_normal;varying float v_shinyness;varying vec3 v_fragPos,v_viewPos;uniform mat4 u_vp,u_model,u_modelit;uniform vec3 u_pos;uniform mat4 u_modelobj;void main(){\n#if (options.primitive == 2 && options.mode !== 0)\nv_fragPos=vec3(u_model*u_modelobj*position);v_viewPos=u_pos;v_normal=mat3(u_modelit)*mat3(u_modelobj)*normal;\n#endif\n#if (options.primitive == 0)\ngl_PointSize=5.0;\n#endif\ngl_Position=(u_vp*u_model)*(u_modelobj*position);}";
 
 	function vertex (options) {
 		return preprocess(vert, options);
@@ -1034,88 +1033,6 @@ var mjsr = (function () {
 		COUNTER_CLOCKWISE: COUNTER_CLOCKWISE,
 		CLOCKWISE: CLOCKWISE
 	});
-
-	function crossProduct(triangle) {
-		try {
-			let line1 = [
-					triangle[1][0] - triangle[0][0],
-					triangle[1][1] - triangle[0][1],
-					triangle[1][2] - triangle[0][2],
-				],
-				line2 = [
-					triangle[2][0] - triangle[0][0],
-					triangle[2][1] - triangle[0][1],
-					triangle[2][2] - triangle[0][2],
-				];
-			let normal = [
-				line1[1] * line2[2] - line1[2] * line2[1],
-				line1[2] * line2[0] - line1[0] * line2[2],
-				line1[0] * line2[1] - line1[1] * line2[0],
-			];
-
-			return normalize(normal);
-		} catch (error) {
-			throw error;
-		}
-	}
-
-	function normalize(vec) {
-		let v = Math.sqrt(vec[0] ** 2 + vec[1] ** 2 + vec[2] ** 2);
-		return [(vec[0] /= v), (vec[1] /= v), (vec[2] /= v)];
-	}
-
-	function clamp(number, min, max) {
-		return Math.max(Math.min(number, max), min);
-	}
-
-	// export { crossProduct, normalize, clamp, parseColour, shuffle, distance, shadeColour, dotProduct };
-
-	function parseColour(colour, type) {
-		colour = colour.trim();
-
-		if (!type) {
-			if (/rgb\([^\)]*\)/.test(colour)) type = "rgb";
-			else if (/(?:#|0x)(?:[a-f0-9]{3}|[a-f0-9]{6})\b/i.test(colour)) type = "hex";
-			else throw new Error(`${colour} is not a valid colour.`);
-		}
-
-		switch (type) {
-			case "hex":
-				colour = colour.substr(1);
-				if (colour.length == 3)
-					colour = colour.split("").reduce((r, e) => r.push(e + e) && r, []);
-				else colour = colour.match(/.{1,2}/g);
-
-				return [...colour.map(c => clamp(parseInt(c, 16) / 255, 0.0, 1.0))];
-			case "rgb":
-				colour = colour.substr(4).slice(0, -1);
-				colour = colour.split(",");
-
-				return [...colour.map(c => clamp(parseInt(c) / 255, 0.0, 1.0))];
-
-			default:
-				throw new Error(`${type} is not a valid colour type.`);
-		}
-	}
-
-	class Material {
-		/**
-		 *
-		 * @constructor
-		 *
-		 * @param {String} colour - The colour of the material
-		 * @param {Number} [shinyness=32.0] - The shinyness of the material
-		 *
-		 * @returns {Material}
-		 */
-		constructor(colour, shinyness = 32.0) {
-			if (typeof colour == "string") this.colour = parseColour(colour);
-			else if (Array.isArray(colour)) this.colour = colour;
-			else throw new Error(`${colour} is not a valid colour.`);
-
-			this.shinyness = shinyness;
-		}
-	}
 
 	class Object3d {
 		/**
@@ -1156,78 +1073,6 @@ var mjsr = (function () {
 			}
 		}
 
-		generateMesh() {
-			const primitives = ["points", "lines", "triangles"];
-			let primitive = -1;
-
-			if (typeof this.primitive === "string" && primitives.includes(this.primitive) !== undefined)
-				primitive = primitives.indexOf(this.primitive);
-			else if (typeof this.primitive == "number") primitive = this.primitive;
-			else throw new Error("No primitive type supplied.");
-
-			let meshes = [];
-
-			if (this.materials) {
-				for (let m in this.materials) {
-					meshes[m] = {
-						material: this.materials[m],
-						data: {
-							position: [],
-							normal: [],
-							primitive,
-						},
-					};
-				}
-			} else {
-				for (let c in this.colours) {
-					meshes[c] = {
-						material: new Material(this.colours[c]),
-						data: {
-							position: [],
-							normal: [],
-							primitive,
-						},
-					};
-				}
-			}
-
-			switch (primitive) {
-				case 0:
-					for (let vert of this.verts) {
-						meshes[vert[3]].data.position.push(vert[0], vert[1], vert[2]);
-					}
-					break;
-				case 1:
-					for (let edge of this.edges) {
-						meshes[edge[2]].data.position.push(
-							...this.verts[edge[1]],
-							...this.verts[edge[0]]
-						);
-					}
-					break;
-				case 2:
-					for (let triangle of this.faces) {
-						let cross = crossProduct([
-							this.verts[triangle[0]],
-							this.verts[triangle[1]],
-							this.verts[triangle[2]],
-						]);
-
-						meshes[triangle[3]].data.position.push(
-							...this.verts[triangle[2]],
-							...this.verts[triangle[1]],
-							...this.verts[triangle[0]]
-						);
-
-						meshes[triangle[3]].data.normal.push(...cross, ...cross, ...cross);
-					}
-					break;
-				default:
-					throw new Error("Invalid primitive");
-			}
-
-			return meshes;
-		}
 		/**
 		 * Scales the object
 		 *
@@ -1333,6 +1178,174 @@ var mjsr = (function () {
 		}
 	}
 
+	function crossProduct(triangle) {
+		try {
+			let line1 = [
+					triangle[1][0] - triangle[0][0],
+					triangle[1][1] - triangle[0][1],
+					triangle[1][2] - triangle[0][2],
+				],
+				line2 = [
+					triangle[2][0] - triangle[0][0],
+					triangle[2][1] - triangle[0][1],
+					triangle[2][2] - triangle[0][2],
+				];
+			let normal = [
+				line1[1] * line2[2] - line1[2] * line2[1],
+				line1[2] * line2[0] - line1[0] * line2[2],
+				line1[0] * line2[1] - line1[1] * line2[0],
+			];
+
+			return normalize(normal);
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	function normalize(vec) {
+		let v = Math.sqrt(vec[0] ** 2 + vec[1] ** 2 + vec[2] ** 2);
+		return [(vec[0] /= v), (vec[1] /= v), (vec[2] /= v)];
+	}
+
+	function clamp(number, min, max) {
+		return Math.max(Math.min(number, max), min);
+	}
+
+	// export { crossProduct, normalize, clamp, parseColour, shuffle, distance, shadeColour, dotProduct };
+
+	function parseColour(colour, type) {
+		colour = colour.trim();
+
+		if (!type) {
+			if (/rgb\([^\)]*\)/.test(colour)) type = "rgb";
+			else if (/(?:#|0x)(?:[a-f0-9]{3}|[a-f0-9]{6})\b/i.test(colour)) type = "hex";
+			else throw new Error(`${colour} is not a valid colour.`);
+		}
+
+		switch (type) {
+			case "hex":
+				colour = colour.substr(1);
+				if (colour.length == 3)
+					colour = colour.split("").reduce((r, e) => r.push(e + e) && r, []);
+				else colour = colour.match(/.{1,2}/g);
+
+				return [...colour.map(c => clamp(parseInt(c, 16) / 255, 0.0, 1.0))];
+			case "rgb":
+				colour = colour.substr(4).slice(0, -1);
+				colour = colour.split(",");
+
+				return [...colour.map(c => clamp(parseInt(c) / 255, 0.0, 1.0))];
+
+			default:
+				throw new Error(`${type} is not a valid colour type.`);
+		}
+	}
+
+	class Material {
+		/**
+		 *
+		 * @constructor
+		 *
+		 * @param {String} colour - The colour of the material
+		 * @param {Number} [shinyness=32.0] - The shinyness of the material
+		 *
+		 * @returns {Material}
+		 */
+		constructor(colour, shinyness = 32.0) {
+			if (typeof colour == "string") this.colour = parseColour(colour);
+			else if (Array.isArray(colour)) this.colour = colour;
+			else throw new Error(`${colour} is not a valid colour.`);
+
+			this.shinyness = shinyness;
+		}
+	}
+
+	function generateMesh(object) {
+	    const primitives = ["points", "lines", "triangles"];
+	    let primitive = -1;
+
+	    const props = {
+	        0: ["verts", "colours", "primitive"],
+	        1: ["verts", "edges", "colours", "primitive"],
+	        2: ["verts", "faces", "colours", "primitive"],
+	    };
+
+	    if (typeof object.primitive === "string" && primitives.includes(object.primitive) !== undefined)
+	        primitive = primitives.indexOf(object.primitive);
+	    else if (typeof object.primitive == "number") primitive = object.primitive;
+	    else throw new Error("No primitive type supplied.");
+
+	    for (let prop of props[primitive]) {
+	        if (object[prop] === undefined) {
+	            if (prop == "colours" && object["materials"]) continue;
+	            throw new Error(`Object doesn't have required property ${prop}.`);
+	        }
+	    }
+
+	    let meshes = [];
+
+	    if (object.materials) {
+	        for (let m in object.materials) {
+	            meshes[m] = {
+	                material: object.materials[m],
+	                data: {
+	                    position: [],
+	                    normal: [],
+	                    primitive,
+	                },
+	            };
+	        }
+	    } else {
+	        for (let c in object.colours) {
+	            meshes[c] = {
+	                material: new Material(object.colours[c]),
+	                data: {
+	                    position: [],
+	                    normal: [],
+	                    primitive,
+	                },
+	            };
+	        }
+	    }
+
+	    switch (primitive) {
+	        case 0:
+	            for (let vert of object.verts) {
+	                meshes[vert[3]].data.position.push(vert[0], vert[1], vert[2]);
+	            }
+	            break;
+	        case 1:
+	            for (let edge of object.edges) {
+	                meshes[edge[2]].data.position.push(
+	                    ...object.verts[edge[1]],
+	                    ...object.verts[edge[0]]
+	                );
+	            }
+	            break;
+	        case 2:
+	            for (let triangle of object.faces) {
+	                let cross = crossProduct([
+	                    object.verts[triangle[0]],
+	                    object.verts[triangle[1]],
+	                    object.verts[triangle[2]],
+	                ]);
+
+	                meshes[triangle[3]].data.position.push(
+	                    ...object.verts[triangle[2]],
+	                    ...object.verts[triangle[1]],
+	                    ...object.verts[triangle[0]]
+	                );
+
+	                meshes[triangle[3]].data.normal.push(...cross, ...cross, ...cross);
+	            }
+	            break;
+	        default:
+	            throw new Error("Invalid primitive");
+	    }
+
+	    return meshes;
+	}
+
 	class Renderer {
 		/**
 		 * Creates a new Renderer
@@ -1384,13 +1397,13 @@ var mjsr = (function () {
 
 			if (
 				assert(
-					inputHandler.setAttributes,
-					"Input handler doesn't have a .setAttributes() method."
+					inputHandler.attributes,
+					"Input handler doesn't have a .attributes() method."
 				)
 			)
-				inputHandler.setAttributes(screen, camera);
+				inputHandler.attributes(screen, camera);
 
-			assert(inputHandler.setupMovement, "Input handler doesn't have a .setupMovement() method.");
+			assert(inputHandler.setup, "Input handler doesn't have a .setup() method.");
 			assert(inputHandler.update, "Input handler doesn't have a .update() method.");
 
 			this.input = inputHandler;
@@ -1410,7 +1423,11 @@ var mjsr = (function () {
 			this.scenes = [];
 			this._scene = 0;
 
-			this.primitives = new Set();
+			this.primitives = {
+				0: false,
+				1: false,
+				2: false,
+			};
 			this.shaders = {};
 
 			for (let s in scenes) {
@@ -1423,20 +1440,17 @@ var mjsr = (function () {
 					let object = scene[o];
 					assert(typeof object == "object", "Invalid object in scene.");
 
-					if (!object.generateMesh) object = Object3d.from(object);
+					if (!object instanceof Object3d) object = Object3d.from(object);
 
-					let meshes = object.generateMesh(),
-						primitive = meshes[0].data.primitive;
+					let meshes = generateMesh(object);
 
-					this.primitives.add(primitive);
+					this.primitives[meshes[0].data.primitive] = true;
 					sceneMeshes.push(
 						...meshes.map(v => {
 							v.object = o;
 							return v;
 						})
 					);
-					// object.scene = s;
-					// object.object = o;
 				}
 
 				this.scenes.push({ meshes: sceneMeshes, objects: scene });
@@ -1444,24 +1458,26 @@ var mjsr = (function () {
 
 			const { gl } = this.screen;
 
-			for (let primitive of this.primitives) {
-				let shader = new Webglu(gl);
+			for (let primitive in this.primitives) {
+				if (this.primitives[primitive]) {
+					let shader = new Webglu(gl);
 
-				let mode = primitive == 2 ? this.options.lighting : 0;
-
-				shader.vert(vertex({ mode, primitive }));
-				shader.frag(
-					fragment({
-						mode,
-						primitive,
-						mono: this.options.mono,
-						posterization: this.options.posterization,
-					})
-				);
-
-				shader.program();
-
-				this.shaders[primitive] = shader;
+					let mode = primitive == 2 ? this.options.lighting : 0;
+		
+					shader.vert(vertex({ mode, primitive }));
+					shader.frag(
+						fragment({
+							mode,
+							primitive,
+							mono: this.options.mono,
+							posterization: this.options.posterization,
+						})
+					);
+		
+					shader.program();
+		
+					this.shaders[primitive] = shader;
+				}
 			}
 
 			gl.clearColor(1.0, 1.0, 1.0, 1.0);
@@ -1469,7 +1485,7 @@ var mjsr = (function () {
 
 			if (this.options.culling) gl.enable(gl.CULL_FACE);
 
-			this.input.setupMovement();
+			this.input.setup();
 		}
 
 		/**
@@ -1510,8 +1526,6 @@ var mjsr = (function () {
 				const primitive = mesh.data.primitive;
 				const shader = this.shaders[primitive];
 
-				// console.log(this.scenes[this._scene].objects)
-
 				gl.useProgram(shader.glprogram);
 
 				shader.uniform1f("u_shinyness", mesh.material.shinyness);
@@ -1522,8 +1536,6 @@ var mjsr = (function () {
 					false,
 					this.scenes[this._scene].objects[mesh.object].model
 				);
-
-				// gl.uniform1i(gl.getUniformLocation(shader.glprogram, "u_primitive"), primitive);
 
 				let buffers = {
 					position: mesh.data.position,

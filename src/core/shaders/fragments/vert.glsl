@@ -16,9 +16,9 @@ uniform mat4 u_modelobj;
 
 void main() {
     #if (options.primitive == 2 && options.mode !== 0) 
-        v_fragPos = vec3(u_model * position);
+        v_fragPos = vec3(u_model * u_modelobj * position);
         v_viewPos = u_pos;
-        v_normal = mat3(u_modelit) * normal;
+        v_normal = mat3(u_modelit) * mat3(u_modelobj) * normal;
     #endif
 
     #if (options.primitive == 0)

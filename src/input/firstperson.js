@@ -3,12 +3,12 @@ class FirstPerson {
 		this.keys = [];
 	}
 
-	setAttributes(screen, camera) {
+	attributes(screen, camera) {
 		this.screen = screen;
 		this.camera = camera;
 	}
 
-	setupMovement() {
+	setup() {
 		let { canvas } = this.screen;
 
 		window.addEventListener("keydown", event => (this.keys[event.key.toLowerCase()] = true));
