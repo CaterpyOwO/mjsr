@@ -39,7 +39,8 @@ export function preprocess(source, options) {
 						currentLine = traverse(currentLine + 1, depths[depth - 1], depth - 1);
 						break;
 					case "import":
-						if (condition) output += preprocess(fragments[line.trim().substr(8)], options)
+						if (condition)
+							output += preprocess(fragments[line.trim().substr(8)], options);
 						break;
 				}
 			} else if (condition) output += `${line}\n`;

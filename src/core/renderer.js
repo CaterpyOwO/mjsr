@@ -62,12 +62,7 @@ export class Renderer {
 		this.screen = screen;
 		this.camera = camera;
 
-		if (
-			assert(
-				inputHandler.attributes,
-				"Input handler doesn't have a .attributes() method."
-			)
-		)
+		if (assert(inputHandler.attributes, "Input handler doesn't have a .attributes() method."))
 			inputHandler.attributes(screen, camera);
 
 		assert(inputHandler.setup, "Input handler doesn't have a .setup() method.");
@@ -130,7 +125,7 @@ export class Renderer {
 				let shader = new Webglu(gl);
 
 				let mode = primitive == 2 ? this.options.lighting : 0;
-	
+
 				shader.vert(vertex({ mode, primitive }));
 				shader.frag(
 					fragment({
@@ -140,9 +135,9 @@ export class Renderer {
 						posterization: this.options.posterization,
 					})
 				);
-	
+
 				shader.program();
-	
+
 				this.shaders[primitive] = shader;
 			}
 		}

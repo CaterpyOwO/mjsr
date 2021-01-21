@@ -984,7 +984,8 @@ var mjsr = (function () {
 							currentLine = traverse(currentLine + 1, depths[depth - 1], depth - 1);
 							break;
 						case "import":
-							if (condition) output += preprocess(fragments[line.trim().substr(8)], options);
+							if (condition)
+								output += preprocess(fragments[line.trim().substr(8)], options);
 							break;
 					}
 				} else if (condition) output += `${line}\n`;
@@ -1261,89 +1262,93 @@ var mjsr = (function () {
 	}
 
 	function generateMesh(object) {
-	    const primitives = ["points", "lines", "triangles"];
-	    let primitive = -1;
+		const primitives = ["points", "lines", "triangles"];
+		let primitive = -1;
 
-	    const props = {
-	        0: ["verts", "colours", "primitive"],
-	        1: ["verts", "edges", "colours", "primitive"],
-	        2: ["verts", "faces", "colours", "primitive"],
-	    };
+		const props = {
+			0: ["verts", "colours", "primitive"],
+			1: ["verts", "edges", "colours", "primitive"],
+			2: ["verts", "faces", "colours", "primitive"],
+		};
 
-	    if (typeof object.primitive === "string" && primitives.includes(object.primitive) !== undefined)
-	        primitive = primitives.indexOf(object.primitive);
-	    else if (typeof object.primitive == "number") primitive = object.primitive;
-	    else throw new Error("No primitive type supplied.");
+		if (typeof object.primitive === "string" && primitives.includes(object.primitive) !== undefined)
+			primitive = primitives.indexOf(object.primitive);
+		else if (typeof object.primitive == "number") primitive = object.primitive;
+		else throw new Error("No primitive type supplied.");
 
-	    for (let prop of props[primitive]) {
-	        if (object[prop] === undefined) {
-	            if (prop == "colours" && object["materials"]) continue;
-	            throw new Error(`Object doesn't have required property ${prop}.`);
-	        }
-	    }
+		for (let prop of props[primitive]) {
+			if (object[prop] === undefined) {
+				if (prop == "colours" && object["materials"]) continue;
+				throw new Error(`Object doesn't have required property ${prop}.`);
+			}
+		}
 
-	    let meshes = [];
+		let meshes = [];
 
-	    if (object.materials) {
-	        for (let m in object.materials) {
-	            meshes[m] = {
-	                material: object.materials[m],
-	                data: {
-	                    position: [],
-	                    normal: [],
-	                    primitive,
-	                },
-	            };
-	        }
-	    } else {
-	        for (let c in object.colours) {
-	            meshes[c] = {
-	                material: new Material(object.colours[c]),
-	                data: {
-	                    position: [],
-	                    normal: [],
-	                    primitive,
-	                },
-	            };
-	        }
-	    }
+		if (object.materials) {
+			for (let m in object.materials) {
+				meshes[m] = {
+					material: object.materials[m],
+					data: {
+						position: [],
+						normal: [],
+						primitive,
+					},
+				};
+			}
+		} else {
+			for (let c in object.colours) {
+				meshes[c] = {
+					material: new Material(object.colours[c]),
+					data: {
+						position: [],
+						normal: [],
+						primitive,
+					},
+				};
+			}
+		}
+		try {
+			switch (primitive) {
+				case 0:
+					for (let vert of object.verts)
+						meshes[vert[3]].data.position.push(vert[0], vert[1], vert[2]);
 
-	    switch (primitive) {
-	        case 0:
-	            for (let vert of object.verts) {
-	                meshes[vert[3]].data.position.push(vert[0], vert[1], vert[2]);
-	            }
-	            break;
-	        case 1:
-	            for (let edge of object.edges) {
-	                meshes[edge[2]].data.position.push(
-	                    ...object.verts[edge[1]],
-	                    ...object.verts[edge[0]]
-	                );
-	            }
-	            break;
-	        case 2:
-	            for (let triangle of object.faces) {
-	                let cross = crossProduct([
-	                    object.verts[triangle[0]],
-	                    object.verts[triangle[1]],
-	                    object.verts[triangle[2]],
-	                ]);
+					break;
+				case 1:
+					for (let edge of object.edges) {
+						meshes[edge[2]].data.position.push(
+							...object.verts[edge[1]],
+							...object.verts[edge[0]]
+						);
+					}
+					break;
+				case 2:
+					for (let triangle of object.faces) {
+						let cross = crossProduct([
+							object.verts[triangle[0]],
+							object.verts[triangle[1]],
+							object.verts[triangle[2]],
+						]);
 
-	                meshes[triangle[3]].data.position.push(
-	                    ...object.verts[triangle[2]],
-	                    ...object.verts[triangle[1]],
-	                    ...object.verts[triangle[0]]
-	                );
+						meshes[triangle[3]].data.position.push(
+							...object.verts[triangle[2]],
+							...object.verts[triangle[1]],
+							...object.verts[triangle[0]]
+						);
 
-	                meshes[triangle[3]].data.normal.push(...cross, ...cross, ...cross);
-	            }
-	            break;
-	        default:
-	            throw new Error("Invalid primitive");
-	    }
-
-	    return meshes;
+						meshes[triangle[3]].data.normal.push(...cross, ...cross, ...cross);
+					}
+					break;
+				default:
+					throw new Error("Invalid primitive");
+			}
+		} catch (error) {
+			if (error instanceof TypeError)
+				throw new Error("There was an unexpected error while parsing the mesh.");
+			else throw error;
+		}
+		return meshes;
 	}
 
 	class Renderer {
@@ -1395,12 +1400,7 @@ var mjsr = (function () {
 			this.screen = screen;
 			this.camera = camera;
 
-			if (
-				assert(
-					inputHandler.attributes,
-					"Input handler doesn't have a .attributes() method."
-				)
-			)
+			if (assert(inputHandler.attributes, "Input handler doesn't have a .attributes() method."))
 				inputHandler.attributes(screen, camera);
 
 			assert(inputHandler.setup, "Input handler doesn't have a .setup() method.");
@@ -1463,7 +1463,7 @@ var mjsr = (function () {
 					let shader = new Webglu(gl);
 
 					let mode = primitive == 2 ? this.options.lighting : 0;
-		
+
 					shader.vert(vertex({ mode, primitive }));
 					shader.frag(
 						fragment({
@@ -1473,9 +1473,9 @@ var mjsr = (function () {
 							posterization: this.options.posterization,
 						})
 					);
-		
+
 					shader.program();
-		
+
 					this.shaders[primitive] = shader;
 				}
 			}
@@ -1705,6 +1705,7 @@ var mjsr = (function () {
 						break;
 					case "f":
 						line = line.map(v => parseInt(v.split(/\//)[0]) - 1);
+
 						if (this.normals == COUNTER_CLOCKWISE)
 							this.object.faces.push([line[0], line[1], line[2], 0]);
 						else this.object.faces.push([line[2], line[1], line[0], 0]);
@@ -1747,8 +1748,6 @@ var mjsr = (function () {
 		Object3d,
 		OBJLoader,
 	};
-
-
 
 	console.log(`Loaded mjsr version: %c${version}`, "text-decoration:underline");
 

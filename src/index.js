@@ -38,6 +38,4 @@ export default {
 	OBJLoader,
 };
 
-
-
 console.log(`Loaded mjsr version: %c${version}`, "text-decoration:underline");

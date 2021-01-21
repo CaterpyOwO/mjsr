@@ -2,7 +2,6 @@ import * as constants from "../core/constants.js";
 
 import { create, translate, rotate, scale } from "gl-matrix/mat4";
 
-
 export class Object3d {
 	/**
 	 * Creates a new Object3d
