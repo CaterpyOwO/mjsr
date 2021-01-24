@@ -15,8 +15,8 @@ export class Camera {
 	 *
 	 * @constructor
 	 *
-	 * @param {Object[3]} [position=[0,0,0]] - The position of the camera in world space
-	 * @param {Object[3]} [rotation=[0,0,0]] - The rotation of the camera
+	 * @param {Number[]} [position=[0,0,0]] - The position of the camera in world space
+	 * @param {Number[]} [rotation=[0,0,0]] - The rotation of the camera
 	 * @param {Number} [fov=45] - The field of view of the camera
 	 * @returns {Camera}
 	 */

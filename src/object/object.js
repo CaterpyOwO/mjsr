@@ -44,7 +44,7 @@ export class Object3d {
 	/**
 	 * Scales the object
 	 *
-	 * @param {number[3]} vector - The vector by which the object should be scaled
+	 * @param {Number[]} vector - The vector by which the object should be scaled
 	 */
 	scale(vector) {
 		this.transformations.scale = vector;
@@ -88,7 +88,7 @@ export class Object3d {
 	/**
 	 * Translates the object
 	 *
-	 * @param {number[3]} vector - The vector by which the object should be translated
+	 * @param {Number[]} vector - The vector by which the object should be translated
 	 */
 	translate(vector) {
 		this.transformations.translate = vector;

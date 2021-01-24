@@ -20,9 +20,7 @@ import * as constants from "./core/constants.js";
 /**
  * Mjsr - Minimalistic JavaScript renderer
  *
- * @module
- *
- * @description Mjsr is a 3D WebGL renderer that allows you to access many low level settings and makes it easy to make your own 3d objects.
+ * @description mjsr is a simple, lightweight 3d library for JavaScript.
  */
 export default {
 	VERSION: version,

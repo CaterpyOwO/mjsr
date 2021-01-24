@@ -532,8 +532,8 @@ var mjsr = (function () {
 		 *
 		 * @constructor
 		 *
-		 * @param {Object[3]} [position=[0,0,0]] - The position of the camera in world space
-		 * @param {Object[3]} [rotation=[0,0,0]] - The rotation of the camera
+		 * @param {Number[]} [position=[0,0,0]] - The position of the camera in world space
+		 * @param {Number[]} [rotation=[0,0,0]] - The rotation of the camera
 		 * @param {Number} [fov=45] - The field of view of the camera
 		 * @returns {Camera}
 		 */
@@ -1061,7 +1061,7 @@ var mjsr = (function () {
 		/**
 		 * Scales the object
 		 *
-		 * @param {number[3]} vector - The vector by which the object should be scaled
+		 * @param {Number[]} vector - The vector by which the object should be scaled
 		 */
 		scale(vector) {
 			this.transformations.scale = vector;
@@ -1105,7 +1105,7 @@ var mjsr = (function () {
 		/**
 		 * Translates the object
 		 *
-		 * @param {number[3]} vector - The vector by which the object should be translated
+		 * @param {Number[]} vector - The vector by which the object should be translated
 		 */
 		translate(vector) {
 			this.transformations.translate = vector;
@@ -1715,9 +1715,7 @@ var mjsr = (function () {
 	/**
 	 * Mjsr - Minimalistic JavaScript renderer
 	 *
-	 * @module
-	 *
-	 * @description Mjsr is a 3D WebGL renderer that allows you to access many low level settings and makes it easy to make your own 3d objects.
+	 * @description mjsr is a simple, lightweight 3d library for JavaScript.
 	 */
 	var index = {
 		VERSION: version,
