@@ -196,7 +196,7 @@ export class Renderer {
 			let model = this.scenes[this.__scene].objects[mesh.object].model;
 			if (model) shader.uniformMatrix4fv("u_modelobj", false, model);
 			//prettier-ignore
-			else shader.uniformMatrix4fv("u_modelobj", false, [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,]);
+			else shader.uniformMatrix4fv("u_modelobj", false, [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]);
 
 			let buffers = {
 				position: mesh.data.position,
