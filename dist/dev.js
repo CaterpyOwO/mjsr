@@ -2,9 +2,9 @@ const { Renderer, Screen, Camera, Input } = mjsr;
 
 const r = new Renderer(
 	new Screen().fullscreen(),
-	new Camera([0, -2, -8], [0, 0, 0]),
-	new Input.FirstPerson(),
-	{ mono: false, lighting: mjsr.BLINN_PHONG, culling: false }
+	new Camera([0, -3, -9], [0.3, 0, 0]),
+	new Input.None(),
+	{ lighting: mjsr.BLINN_PHONG, culling: false }
 );
 
 let teapot = new mjsr.OBJLoader(
@@ -14,7 +14,6 @@ let teapot = new mjsr.OBJLoader(
 );
 
 let cube = mjsr.Object3d.from({
-	coords: [0, 0, 0],
 	primitive: mjsr.LINES,
 	verts: [
 		[-1, -1, -1],
@@ -43,19 +42,23 @@ let cube = mjsr.Object3d.from({
 	colours: ["#0ff", "#0f0", "#f0f", "#00f", "#ff0", "#f00"],
 });
 
+let dt = document.querySelector("#dt");
+
 teapot.load().then(obj => {
 	teapot = obj;
 	let scene = [teapot];
 	r.setup(scene);
 
-	teapot.rotateX(90 * (Math.PI / 180)).rotateY(2.5).rotateZ(1.2);
-
 	requestAnimationFrame(frame);
 });
+
+
 
 function frame(now) {
 	r.draw();
 	r.update(now);
+
+	teapot.rotateX(5e-4*Date.now()).rotateY(7e-4*Date.now());
 
 	requestAnimationFrame(frame);
 }

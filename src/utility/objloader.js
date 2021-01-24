@@ -26,7 +26,7 @@ export class OBJLoader {
 	 *  @returns {Object3d}
 	 */
 	async load() {
-		let obj = (await this.loadFile()).split(/\n/);
+		const obj = (await loadFile(this.url)).split(/\n/);
 
 		for (let line of obj) {
 			line = line.trim().split(/\s/);
@@ -40,6 +40,7 @@ export class OBJLoader {
 					break;
 				case "f":
 					line = line.map(v => parseInt(v.split(/\//)[0]) - 1);
+
 					if (this.normals == constants.COUNTER_CLOCKWISE)
 						this.object.faces.push([line[0], line[1], line[2], 0]);
 					else this.object.faces.push([line[2], line[1], line[0], 0]);
@@ -52,12 +53,12 @@ export class OBJLoader {
 
 		return this.object;
 	}
+}
 
-	async loadFile() {
-		try {
-			return await (await fetch(this.url)).text();
-		} catch (error) {
-			throw error;
-		}
+async function loadFile(url) {
+	try {
+		return (await fetch(url)).text();
+	} catch (error) {
+		throw error;
 	}
 }

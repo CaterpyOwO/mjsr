@@ -1,4 +1,4 @@
-var _mjsr_exports = (function (exports) {
+var mjsr = (function () {
 	'use strict';
 
 	var version = "v0.9.7-alpha";
@@ -532,8 +532,8 @@ var _mjsr_exports = (function (exports) {
 		 *
 		 * @constructor
 		 *
-		 * @param {Object[3]} [position=[0,0,0]] - The position of the camera in world space
-		 * @param {Object[3]} [rotation=[0,0,0]] - The rotation of the camera
+		 * @param {Number[]} [position=[0,0,0]] - The position of the camera in world space
+		 * @param {Number[]} [rotation=[0,0,0]] - The rotation of the camera
 		 * @param {Number} [fov=45] - The field of view of the camera
 		 * @returns {Camera}
 		 */
@@ -574,22 +574,6 @@ var _mjsr_exports = (function (exports) {
 
 			return model;
 		}
-		// projectVertex(coords, canvas) {
-		//     let [x, y, z] = coords;
-
-		// 	x -= this.pos[0];
-		// 	y -= this.pos[1];
-		// 	z -= this.pos[2];
-		// 	[x, z] = this.rotateVertex2d([x, z], this.rot[1]);
-		// 	[y, z] = this.rotateVertex2d([y, z], this.rot[0]);
-
-		// 	let f = this.fov / Math.max(0.0, z);
-		// 	x *= f;
-		//     y *= f;
-
-		//     let rect = canvas.getBoundingClientRect();
-		// 	return [(x - rect.left) / canvas.width * 2, 0 - (y - rect.top) / canvas.height * 2, z / 100];
-		// }
 	}
 
 	class Screen {
@@ -672,8 +656,8 @@ var _mjsr_exports = (function (exports) {
 
 	class None {
 		update() {}
-		setAttributes() {}
-		setupMovement() {}
+		attributes() {}
+		setup() {}
 	}
 
 	class FirstPerson {
@@ -681,12 +665,12 @@ var _mjsr_exports = (function (exports) {
 			this.keys = [];
 		}
 
-		setAttributes(screen, camera) {
+		attributes(screen, camera) {
 			this.screen = screen;
 			this.camera = camera;
 		}
 
-		setupMovement() {
+		setup() {
 			let { canvas } = this.screen;
 
 			window.addEventListener("keydown", event => (this.keys[event.key.toLowerCase()] = true));
@@ -731,17 +715,17 @@ var _mjsr_exports = (function (exports) {
 			if (document.pointerLockElement == canvas || document.mozPointerLockElement == canvas) {
 				let s = dt / 160;
 
-				if (this.keys["q"]) this.camera.pos[1] += s; // q, shift
-				if (this.keys["e"]) this.camera.pos[1] -= s; // e, space
+				if (this.keys["q"]) this.camera.pos[1] -= s; // q, shift
+				if (this.keys["e"]) this.camera.pos[1] += s; // e, space
 
 				let x = s * Math.sin(this.camera.rot[1]),
 					y = s * Math.cos(this.camera.rot[1]);
 
-				if (this.keys["w"]) (this.camera.pos[0] += x), (this.camera.pos[2] -= y); // w
-				if (this.keys["s"]) (this.camera.pos[0] -= x), (this.camera.pos[2] += y); // s
+				if (this.keys["w"]) (this.camera.pos[0] -= x), (this.camera.pos[2] += y); // w
+				if (this.keys["s"]) (this.camera.pos[0] += x), (this.camera.pos[2] -= y); // s
 
-				if (this.keys["a"]) (this.camera.pos[0] -= y), (this.camera.pos[2] -= x); // a
-				if (this.keys["d"]) (this.camera.pos[0] += y), (this.camera.pos[2] += x); // w
+				if (this.keys["a"]) (this.camera.pos[0] += y), (this.camera.pos[2] += x); // a
+				if (this.keys["d"]) (this.camera.pos[0] -= y), (this.camera.pos[2] -= x); // w
 			}
 		}
 	}
@@ -751,12 +735,12 @@ var _mjsr_exports = (function (exports) {
 			this.keys = [];
 		}
 
-		setAttributes(screen, camera) {
+		attributes(screen, camera) {
 			this.screen = screen;
 			this.camera = camera;
 		}
 
-		setupMovement() {
+		setup() {
 			let { canvas } = this.screen;
 			let lastMovement = [0, 0];
 
@@ -932,6 +916,19 @@ var _mjsr_exports = (function (exports) {
 		}
 	}
 
+	var mono = "float lum=(gl_FragColor.r+gl_FragColor.g+gl_FragColor.b)/3.0;vec2 monoColour=vec2(lum,1.0);gl_FragColor=monoColour.xxxy;";
+
+	var posterization = "vec3 c=gl_FragColor.rgb;c=pow(c,vec3(p_gamma,p_gamma,p_gamma));c=c*p_colours;c=floor(c);c=c/p_colours;c=pow(c,vec3(1.0/p_gamma));gl_FragColor=vec4(c,1.0);";
+
+	var lighting = "vec3 normal=normalize(v_normal);vec3 lightd=normalize(light.position-v_fragPos);float strength=0.3;vec3 viewd=normalize(v_viewPos-v_fragPos);vec3 reflectd=reflect(-lightd,normal);\n#if (options.mode == 2)\nvec3 halfwayd=normalize(lightd+viewd);float sp=pow(max(dot(normal,halfwayd),0.0),u_shinyness);vec3 specular=light.colour*sp;\n#else\nfloat sp=pow(max(dot(viewd,reflectd),0.0),u_shinyness);vec3 specular=strength*sp*light.colour;\n#endif\nfloat df=max(dot(normal,lightd),0.0);vec3 diffuse=df*light.colour;vec3 ambient=0.1*light.colour;gl_FragColor=vec4((ambient+diffuse+specular)*gl_FragColor.rgb,1.0);";
+
+	var fragments = /*#__PURE__*/Object.freeze({
+		__proto__: null,
+		mono: mono,
+		posteriz: posterization,
+		lighting: lighting
+	});
+
 	function preprocess(source, options) {
 		let lines = source.split(/\n/),
 			lineCount = lines.length;
@@ -970,6 +967,10 @@ var _mjsr_exports = (function (exports) {
 						case "endif":
 							currentLine = traverse(currentLine + 1, depths[depth - 1], depth - 1);
 							break;
+						case "import":
+							if (condition)
+								output += preprocess(fragments[line.trim().substr(8)], options);
+							break;
 					}
 				} else if (condition) output += `${line}\n`;
 
@@ -980,94 +981,16 @@ var _mjsr_exports = (function (exports) {
 		}
 	}
 
-	function generate(options = { primitive: 2, lighting: true }) {
-		return preprocess(
-			`
-    precision mediump float;
+	var vert = "precision mediump float;attribute vec4 position;attribute vec3 normal;varying vec3 v_colour;varying vec3 v_normal;varying float v_shinyness;varying vec3 v_fragPos,v_viewPos;uniform mat4 u_vp,u_model,u_modelit;uniform vec3 u_pos;uniform mat4 u_modelobj;void main(){\n#if (options.primitive == 2 && options.mode !== 0)\nv_fragPos=vec3(u_model*u_modelobj*position);v_viewPos=u_pos;v_normal=mat3(u_modelit)*mat3(u_modelobj)*normal;\n#endif\n#if (options.primitive == 0)\ngl_PointSize=5.0;\n#endif\ngl_Position=(u_vp*u_model)*(u_modelobj*position);}";
 
-    attribute vec4 position;
-    attribute vec3 normal;
-
-    varying vec3 v_colour;
-    varying vec3 v_normal;
-    varying float v_shinyness;
-
-	varying vec3 v_fragPos, v_viewPos;
-
-    uniform mat4 u_vp, u_model, u_modelit;
-    uniform vec3 u_pos;
-
-    uniform mat4 u_modelobj;
-
-    void main() {
-        #if (options.primitive == 2 && options.mode !== 0) 
-            v_fragPos = vec3(u_model * position);
-            v_viewPos = u_pos;
-            v_normal = mat3(u_modelit) * normal;
-        #endif
-
-        #if (options.primitive == 0)
-            gl_PointSize = 5.0;
-        #endif
-        
-
-        gl_Position = (u_vp * u_model) * (u_modelobj * position);
-    }`,
-			options
-		);
+	function vertex (options) {
+		return preprocess(vert, options);
 	}
 
-	var mono = "float lum=(gl_FragColor.r+gl_FragColor.g+gl_FragColor.b)/3.0;vec2 monoColour=vec2(lum,1.0);gl_FragColor=monoColour.xxxy;";
+	var frag = "precision mediump float;varying vec3 v_normal;uniform vec3 u_colour;uniform float u_shinyness;\n#if (options.mode !== 0)\nvarying vec3 v_fragPos,v_viewPos;struct Light{vec3 position;vec3 colour;};uniform Light light;\n#endif\n#if options.posterization\nuniform float p_gamma;uniform float p_colours;\n#endif\nvoid main(){gl_FragColor=vec4(u_colour,1.0);\n#if (options.mode !== 0)\n#import lighting\n#endif\n#if options.mono\n#import mono\n#endif\n#if options.posterization\n#import posteriz\n#endif\n}";
 
-	var posteriz = "vec3 c=gl_FragColor.rgb;c=pow(c,vec3(p_gamma,p_gamma,p_gamma));c=c*p_colours;c=floor(c);c=c/p_colours;c=pow(c,vec3(1.0/p_gamma));gl_FragColor=vec4(c,1.0);";
-
-	var lighting = "vec3 normal=normalize(v_normal);vec3 lightd=normalize(light.position-v_fragPos);float strength=0.3;vec3 viewd=normalize(v_viewPos-v_fragPos);vec3 reflectd=reflect(-lightd,normal);\n#if (options.mode == 2)\nvec3 halfwayd=normalize(lightd+viewd);float sp=pow(max(dot(normal,halfwayd),0.0),u_shinyness);vec3 specular=light.colour*sp;\n#else\nfloat sp=pow(max(dot(viewd,reflectd),0.0),u_shinyness);vec3 specular=strength*sp*light.colour;\n#endif\nfloat df=max(dot(normal,lightd),0.0);vec3 diffuse=df*light.colour;vec3 ambient=0.1*light.colour;gl_FragColor=vec4((ambient+diffuse+specular)*gl_FragColor.rgb,1.0);";
-
-	function generate$1(
-		options = { primitive: 2, mono: false, mode: 0, posterization: false }
-	) {
-		return preprocess(
-			`
-	precision mediump float;
-
-	varying vec3 v_normal;
-	
-	uniform vec3 u_colour;
-	uniform float u_shinyness;
-
-	#if (options.mode !== 0)
-		varying vec3 v_fragPos, v_viewPos;
-
-		struct Light {
-			vec3 position;
-			vec3 colour;
-		};
-	
-		uniform Light light;
-	#endif
-
-	#if options.posterization
-		uniform float p_gamma;
-		uniform float p_colours;
-	#endif
-
-	void main() {
-		gl_FragColor = vec4(u_colour, 1.0);
-
-		#if (options.mode !== 0)
-			${lighting}
-		#endif
-
-		#if options.mono
-			${mono}
-		#endif
-
-		#if options.posterization
-			${posteriz}
-		#endif
-	}`,
-			options
-		);
+	function fragment (options) {
+		return preprocess(frag, options);
 	}
 
 	// primitives
@@ -1095,6 +1018,150 @@ var _mjsr_exports = (function (exports) {
 		COUNTER_CLOCKWISE: COUNTER_CLOCKWISE,
 		CLOCKWISE: CLOCKWISE
 	});
+
+	class Object3d {
+		/**
+		 * Creates a new Object3d
+		 *
+		 * @param {Number} [primitive=mjsr.TRIANGLES] - The primitive the object should be rendered with
+		 * @param {Boolean} [materials=false] - Use materials instead of colours
+		 *
+		 * @returns {Object3d}
+		 */
+		constructor(primitive = TRIANGLES, materials = false) {
+			this.primitive = primitive;
+
+			this.verts = [];
+			this.edges = [];
+			this.faces = [];
+
+			this.model = create();
+
+			this.transformations = {
+				scale: [1, 1, 1],
+				rotateX: 0,
+				rotateY: 0,
+				rotateZ: 0,
+				translate: [0, 0, 0],
+			};
+
+			switch (primitive) {
+				case TRIANGLES:
+					materials ? (this.materials = []) : (this.colours = []);
+					break;
+				case LINES:
+				case POINTS:
+					this.colours = [];
+					break;
+				default:
+					throw new Error(`The primitive ${primitive} is not a valid primitive`);
+			}
+		}
+
+		/**
+		 * Scales the object
+		 *
+		 * @param {Number[]} vector - The vector by which the object should be scaled
+		 */
+		scale(vector) {
+			this.transformations.scale = vector;
+			this._updateModel();
+			return this;
+		}
+
+		/**
+		 * Rotates the object around the X axis
+		 *
+		 * @param {number} rad - Degrees to rotate by
+		 */
+		rotateX(rad) {
+			this.transformations.rotateX = rad;
+			this._updateModel();
+			return this;
+		}
+
+		/**
+		 * Rotates the object around the Y axis
+		 *
+		 * @param {number} rad - Degrees to rotate by
+		 */
+		rotateY(rad) {
+			this.transformations.rotateY = rad;
+			this._updateModel();
+			return this;
+		}
+
+		/**
+		 * Rotates the object around the Z axis
+		 *
+		 * @param {number} rad - Degrees to rotate by
+		 */
+		rotateZ(rad) {
+			this.transformations.rotateZ = rad;
+			this._updateModel();
+			return this;
+		}
+
+		/**
+		 * Translates the object
+		 *
+		 * @param {Number[]} vector - The vector by which the object should be translated
+		 */
+		translate(vector) {
+			this.transformations.translate = vector;
+			this._updateModel();
+			return this;
+		}
+
+		_updateModel() {
+			scale(this.model, create(), this.transformations.scale);
+
+			rotate(this.model, this.model, this.transformations.rotateX, [1, 0, 0]);
+			rotate(this.model, this.model, this.transformations.rotateY, [0, 1, 0]);
+			rotate(this.model, this.model, this.transformations.rotateZ, [0, 0, 1]);
+
+			translate(this.model, this.model, this.transformations.translate);
+		}
+
+		/**
+		 * Creates a new instance of Object3d from a JavaScript Object
+		 *
+		 * @param {Object} object - The Object
+		 */
+		static from(object) {
+			const out = new Object3d();
+
+			const props = {
+				0: ["verts", "colours", "primitive"],
+				1: ["verts", "edges", "colours", "primitive"],
+				2: ["verts", "faces", "colours", "primitive"],
+			};
+
+			const primitives = ["points", "lines", "triangles"];
+			let primitive = -1;
+
+			if (
+				typeof object.primitive === "string" &&
+				primitives.includes(object.primitive) !== undefined
+			)
+				primitive = primitives.indexOf(object.primitive);
+			else if (typeof object.primitive == "number") primitive = object.primitive;
+			else throw new Error("No primitive type supplied.");
+
+			for (let prop of props[primitive]) {
+				if (object[prop] === undefined) {
+					if (prop == "colours" && object["materials"]) continue;
+					throw new Error(`Object doesn't have required property ${prop}.`);
+				}
+
+				out[prop] = object[prop];
+			}
+
+			out.primitive = primitive;
+
+			return out;
+		}
+	}
 
 	function crossProduct(triangle) {
 		try {
@@ -1178,106 +1245,80 @@ var _mjsr_exports = (function (exports) {
 		}
 	}
 
-	class Object3d {
-		/**
-		 * Creates a new Object3d
-		 *
-		 * @param {Number} [primitive=mjsr.TRIANGLES] - The primitive the object should be rendered with
-		 * @param {Boolean} [materials=false] - Use materials instead of colours
-		 *
-		 * @returns {Object3d}
-		 */
-		constructor(primitive = TRIANGLES, materials = false) {
-			this.primitive = primitive;
+	function generateMesh(object) {
+		const primitives = ["points", "lines", "triangles"];
+		let primitive = -1;
 
-			this.verts = [];
-			this.edges = [];
-			this.faces = [];
+		const props = {
+			0: ["verts", "colours", "primitive"],
+			1: ["verts", "edges", "colours", "primitive"],
+			2: ["verts", "faces", "colours", "primitive"],
+		};
 
-			this.model = create();
+		if (typeof object.primitive === "string" && primitives.includes(object.primitive) !== undefined)
+			primitive = primitives.indexOf(object.primitive);
+		else if (typeof object.primitive == "number") primitive = object.primitive;
+		else throw new Error("No primitive type supplied.");
 
-			this.transformations = {
-				scale: [1, 1, 1],
-				rotateX: 0,
-				rotateY: 0,
-				rotateZ: 0,
-				translate: [0, 0, 0],
-			};
-
-			switch (primitive) {
-				case TRIANGLES:
-					materials ? (this.materials = []) : (this.colours = []);
-					break;
-				case LINES:
-				case POINTS:
-					this.colours = [];
-					break;
-				default:
-					throw new Error(`The primitive ${primitive} is not a valid primitive`);
+		for (let prop of props[primitive]) {
+			if (object[prop] === undefined) {
+				if (prop == "colours" && object["materials"]) continue;
+				throw new Error(`Object doesn't have required property ${prop}.`);
 			}
 		}
 
-		generateMesh() {
-			const primitives = ["points", "lines", "triangles"];
-			let primitive = -1;
+		let meshes = [];
 
-			if (typeof this.primitive === "string" && primitives.includes(this.primitive) !== undefined)
-				primitive = primitives.indexOf(this.primitive);
-			else if (typeof this.primitive == "number") primitive = this.primitive;
-			else throw new Error("No primitive type supplied.");
-
-			let meshes = [];
-
-			if (this.materials) {
-				for (let m in this.materials) {
-					meshes[m] = {
-						material: this.materials[m],
-						data: {
-							position: [],
-							normal: [],
-							primitive,
-						},
-					};
-				}
-			} else {
-				for (let c in this.colours) {
-					meshes[c] = {
-						material: new Material(this.colours[c]),
-						data: {
-							position: [],
-							normal: [],
-							primitive,
-						},
-					};
-				}
+		if (object.materials) {
+			for (let m in object.materials) {
+				meshes[m] = {
+					material: object.materials[m],
+					data: {
+						position: [],
+						normal: [],
+						primitive,
+					},
+				};
 			}
-
+		} else {
+			for (let c in object.colours) {
+				meshes[c] = {
+					material: new Material(object.colours[c]),
+					data: {
+						position: [],
+						normal: [],
+						primitive,
+					},
+				};
+			}
+		}
+		try {
 			switch (primitive) {
 				case 0:
-					for (let vert of this.verts) {
+					for (let vert of object.verts)
 						meshes[vert[3]].data.position.push(vert[0], vert[1], vert[2]);
-					}
+
 					break;
 				case 1:
-					for (let edge of this.edges) {
+					for (let edge of object.edges) {
 						meshes[edge[2]].data.position.push(
-							...this.verts[edge[1]],
-							...this.verts[edge[0]]
+							...object.verts[edge[1]],
+							...object.verts[edge[0]]
 						);
 					}
 					break;
 				case 2:
-					for (let triangle of this.faces) {
+					for (let triangle of object.faces) {
 						let cross = crossProduct([
-							this.verts[triangle[0]],
-							this.verts[triangle[1]],
-							this.verts[triangle[2]],
+							object.verts[triangle[0]],
+							object.verts[triangle[1]],
+							object.verts[triangle[2]],
 						]);
 
 						meshes[triangle[3]].data.position.push(
-							...this.verts[triangle[2]],
-							...this.verts[triangle[1]],
-							...this.verts[triangle[0]]
+							...object.verts[triangle[2]],
+							...object.verts[triangle[1]],
+							...object.verts[triangle[0]]
 						);
 
 						meshes[triangle[3]].data.normal.push(...cross, ...cross, ...cross);
@@ -1286,112 +1327,12 @@ var _mjsr_exports = (function (exports) {
 				default:
 					throw new Error("Invalid primitive");
 			}
-
-			return meshes;
+		} catch (error) {
+			if (error instanceof TypeError)
+				throw new Error("There was an unexpected error while parsing the mesh.");
+			else throw error;
 		}
-		/**
-		 * Scales the object
-		 *
-		 * @param {number[3]} vector - The vector by which the object should be scaled
-		 */
-		scale(vector) {
-			this.transformations.scale = vector;
-			this._updateModel();
-			return this;
-		}
-
-		/**
-		 * Rotates the object around the X axis
-		 *
-		 * @param {number} rad - Degrees to rotate by
-		 */
-		rotateX(rad) {
-			this.transformations.rotateX = rad;
-			this._updateModel();
-			return this;
-		}
-
-		/**
-		 * Rotates the object around the Y axis
-		 *
-		 * @param {number} rad - Degrees to rotate by
-		 */
-		rotateY(rad) {
-			this.transformations.rotateY = rad;
-			this._updateModel();
-			return this;
-		}
-
-		/**
-		 * Rotates the object around the Z axis
-		 *
-		 * @param {number} rad - Degrees to rotate by
-		 */
-		rotateZ(rad) {
-			this.transformations.rotateZ = rad;
-			this._updateModel();
-			return this;
-		}
-
-		/**
-		 * Translates the object
-		 *
-		 * @param {number[3]} vector - The vector by which the object should be translated
-		 */
-		translate(vector) {
-			this.transformations.translate = vector;
-			this._updateModel();
-			return this;
-		}
-
-		_updateModel() {
-			scale(this.model, create(), this.transformations.scale);
-
-			rotate(this.model, this.model, this.transformations.rotateX, [1, 0, 0]);
-			rotate(this.model, this.model, this.transformations.rotateY, [0, 1, 0]);
-			rotate(this.model, this.model, this.transformations.rotateZ, [0, 0, 1]);
-
-			translate(this.model, this.model, this.transformations.translate);
-		}
-
-		/**
-		 * Creates a new instance of Object3d from a JavaScript Object
-		 *
-		 * @param {Object} object - The Object
-		 */
-		static from(object) {
-			const out = new Object3d();
-
-			const props = {
-				0: ["verts", "colours", "primitive"],
-				1: ["verts", "edges", "colours", "primitive"],
-				2: ["verts", "faces", "colours", "primitive"],
-			};
-
-			const primitives = ["points", "lines", "triangles"];
-			let primitive = -1;
-
-			if (
-				typeof object.primitive === "string" &&
-				primitives.includes(object.primitive) !== undefined
-			)
-				primitive = primitives.indexOf(object.primitive);
-			else if (typeof object.primitive == "number") primitive = object.primitive;
-			else throw new Error("No primitive type supplied.");
-
-			for (let prop of props[primitive]) {
-				if (object[prop] === undefined) {
-					if (prop == "colours" && object["materials"]) continue;
-					throw new Error(`Object doesn't have required property ${prop}.`);
-				}
-
-				out[prop] = object[prop];
-			}
-
-			out.primitive = primitive;
-
-			return out;
-		}
+		return meshes;
 	}
 
 	class Renderer {
@@ -1443,15 +1384,10 @@ var _mjsr_exports = (function (exports) {
 			this.screen = screen;
 			this.camera = camera;
 
-			if (
-				assert(
-					inputHandler.setAttributes,
-					"Input handler doesn't have a .setAttributes() method."
-				)
-			)
-				inputHandler.setAttributes(screen, camera);
+			if (assert(inputHandler.attributes, "Input handler doesn't have a .attributes() method."))
+				inputHandler.attributes(screen, camera);
 
-			assert(inputHandler.setupMovement, "Input handler doesn't have a .setupMovement() method.");
+			assert(inputHandler.setup, "Input handler doesn't have a .setup() method.");
 			assert(inputHandler.update, "Input handler doesn't have a .update() method.");
 
 			this.input = inputHandler;
@@ -1468,10 +1404,16 @@ var _mjsr_exports = (function (exports) {
 		 * @param {Object[]} scene - An array of Objects
 		 */
 		setup(...scenes) {
-			this.scenes = [];
-			this._scene = 0;
+			const { gl } = this.screen;
 
-			this.primitives = new Set();
+			this.scenes = [];
+			this.__scene = 0;
+
+			this.primitives = {
+				0: false,
+				1: false,
+				2: false,
+			};
 			this.shaders = {};
 
 			for (let s in scenes) {
@@ -1484,45 +1426,42 @@ var _mjsr_exports = (function (exports) {
 					let object = scene[o];
 					assert(typeof object == "object", "Invalid object in scene.");
 
-					if (!object.generateMesh) object = Object3d.from(object);
+					if (!object instanceof Object3d) object = Object3d.from(object);
 
-					let meshes = object.generateMesh(),
-						primitive = meshes[0].data.primitive;
+					let meshes = generateMesh(object);
 
-					this.primitives.add(primitive);
+					this.primitives[meshes[0].data.primitive] = true;
 					sceneMeshes.push(
 						...meshes.map(v => {
 							v.object = o;
 							return v;
 						})
 					);
-					// object.scene = s;
-					// object.object = o;
 				}
 
 				this.scenes.push({ meshes: sceneMeshes, objects: scene });
 			}
 
-			const { gl } = this.screen;
+			for (let primitive in this.primitives) {
+				if (this.primitives[primitive]) {
+					let shader = new Webglu(gl);
 
-			for (let primitive of this.primitives) {
-				let shader = new Webglu(gl);
+					let mode = primitive == 2 ? this.options.lighting : 0;
 
-				let mode = primitive == 2 ? this.options.lighting : 0;
+					shader.vert(vertex({ mode, primitive }));
+					shader.frag(
+						fragment({
+							mode,
+							primitive,
+							mono: this.options.mono,
+							posterization: this.options.posterization,
+						})
+					);
 
-				shader.vert(generate({ mode, primitive }));
-				shader.frag(
-					generate$1({
-						mode,
-						primitive,
-						mono: this.options.mono,
-						posterization: this.options.posterization,
-					})
-				);
+					shader.program();
 
-				shader.program();
-
-				this.shaders[primitive] = shader;
+					this.shaders[primitive] = shader;
+				}
 			}
 
 			gl.clearColor(1.0, 1.0, 1.0, 1.0);
@@ -1530,7 +1469,7 @@ var _mjsr_exports = (function (exports) {
 
 			if (this.options.culling) gl.enable(gl.CULL_FACE);
 
-			this.input.setupMovement();
+			this.input.setup();
 		}
 
 		/**
@@ -1543,8 +1482,8 @@ var _mjsr_exports = (function (exports) {
 			gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-			for (let sh in this.shaders) {
-				let shader = this.shaders[sh];
+			for (let s in this.shaders) {
+				let shader = this.shaders[s];
 
 				gl.useProgram(shader.glprogram);
 
@@ -1567,11 +1506,9 @@ var _mjsr_exports = (function (exports) {
 				gl.useProgram(null);
 			}
 
-			for (let mesh of this.scenes[this._scene].meshes) {
+			for (let mesh of this.scenes[this.__scene].meshes) {
 				const primitive = mesh.data.primitive;
 				const shader = this.shaders[primitive];
-
-				// console.log(this.scenes[this._scene].objects)
 
 				gl.useProgram(shader.glprogram);
 
@@ -1581,10 +1518,8 @@ var _mjsr_exports = (function (exports) {
 				shader.uniformMatrix4fv(
 					"u_modelobj",
 					false,
-					this.scenes[this._scene].objects[mesh.object].model
+					this.scenes[this.__scene].objects[mesh.object].model
 				);
-
-				// gl.uniform1i(gl.getUniformLocation(shader.glprogram, "u_primitive"), primitive);
 
 				let buffers = {
 					position: mesh.data.position,
@@ -1607,19 +1542,19 @@ var _mjsr_exports = (function (exports) {
 		update(now) {
 			assert(typeof now == "number", "Invalid timestamp.");
 
-			this.dt = this.last - now;
+			this.dt = now - this.last;
 			this.last = now;
 
 			this.input.update(this.dt);
 		}
 
 		get scene() {
-			return this._scene;
+			return this.__scene;
 		}
 
 		set scene(index) {
 			if (assert(typeof index == "number" && this.scenes[index], "Invalid scene index."))
-				this._scene = index;
+				this.__scene = index;
 		}
 	}
 
@@ -1740,7 +1675,7 @@ var _mjsr_exports = (function (exports) {
 		 *  @returns {Object3d}
 		 */
 		async load() {
-			let obj = (await this.loadFile()).split(/\n/);
+			const obj = (await loadFile(this.url)).split(/\n/);
 
 			for (let line of obj) {
 				line = line.trim().split(/\s/);
@@ -1754,6 +1689,7 @@ var _mjsr_exports = (function (exports) {
 						break;
 					case "f":
 						line = line.map(v => parseInt(v.split(/\//)[0]) - 1);
+
 						if (this.normals == COUNTER_CLOCKWISE)
 							this.object.faces.push([line[0], line[1], line[2], 0]);
 						else this.object.faces.push([line[2], line[1], line[0], 0]);
@@ -1766,24 +1702,22 @@ var _mjsr_exports = (function (exports) {
 
 			return this.object;
 		}
+	}
 
-		async loadFile() {
-			try {
-				return await (await fetch(this.url)).text();
-			} catch (error) {
-				throw error;
-			}
+	async function loadFile(url) {
+		try {
+			return (await fetch(url)).text();
+		} catch (error) {
+			throw error;
 		}
 	}
 
 	/**
 	 * Mjsr - Minimalistic JavaScript renderer
 	 *
-	 * @module
-	 *
-	 * @description Mjsr is a 3D WebGL renderer that allows you to access many low level settings and makes it easy to make your own 3d objects.
+	 * @description mjsr is a simple, lightweight 3d library for JavaScript.
 	 */
-	const mjsr = {
+	var index = {
 		VERSION: version,
 		...constants,
 
@@ -1797,15 +1731,8 @@ var _mjsr_exports = (function (exports) {
 		OBJLoader,
 	};
 
-	if (typeof define === "function" && define.amd) define([], () => mjsr);
-	else globalThis.mjsr = mjsr;
+	console.log(`Loaded mjsr version: %c${version}`, "text-decoration:underline");
 
-	console.log(`Loaded mjsr version: %c${mjsr.VERSION}`, "text-decoration:underline");
+	return index;
 
-	exports.mjsr = mjsr;
-
-	Object.defineProperty(exports, '__esModule', { value: true });
-
-	return exports;
-
-}({}));
+}());
