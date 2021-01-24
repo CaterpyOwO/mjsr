@@ -16,7 +16,7 @@
 Using a CDN:
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/caterpyowo/mjsr@v0.9.8-beta/dist/mjsr.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/caterpyowo/mjsr@v0.9.9-beta/dist/mjsr.min.js"></script>
 ```
 
 Using a local copy (See the [releases tab](https://github.com/CaterpyOwO/mjsr/releases/latest) to find the latest version).
