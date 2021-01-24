@@ -6,7 +6,7 @@ export class OBJLoader {
 	/**
 	 *
 	 * @param {String} url - The URL of the .obj file
-	 * @param {Number} [normals=mjsr.CLOCKWISE] - The order of the normals
+	 * @param {mjsr.CLOCKWISE|mjsr.COUNTER_CLOCKWISE} [normals=mjsr.CLOCKWISE] - The order of the normals
 	 * @param {Object3d} [object=new Object3d(constants.TRIANGLES, true)] - The object to which the data should be appended
 	 * @param {Material} [material=new Material("#fff", 128)] - The material that should be used to draw the object
 	 *
@@ -17,7 +17,8 @@ export class OBJLoader {
 		this.object = new Object3d(constants.TRIANGLES, true);
 		this.normals = normals;
 
-		this.object.materials.push(material);
+		if (material instanceof Material) this.object.materials[0] = material;
+		else throw new Error(`${material} is not a valid material`);
 	}
 
 	/**

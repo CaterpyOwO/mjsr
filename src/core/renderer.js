@@ -193,11 +193,27 @@ export class Renderer {
 			shader.uniform1f("u_shinyness", mesh.material.shinyness);
 			shader.uniform3fv("u_colour", mesh.material.colour);
 
-			shader.uniformMatrix4fv(
-				"u_modelobj",
-				false,
-				this.scenes[this.__scene].objects[mesh.object].model
-			);
+			let model = this.scenes[this.__scene].objects[mesh.object].model;
+			if (model) shader.uniformMatrix4fv("u_modelobj", false, model);
+			else
+				shader.uniformMatrix4fv("u_modelobj", false, [
+					1,
+					0,
+					0,
+					0,
+					0,
+					1,
+					0,
+					0,
+					0,
+					0,
+					1,
+					0,
+					0,
+					0,
+					0,
+					1,
+				]);
 
 			let buffers = {
 				position: mesh.data.position,
