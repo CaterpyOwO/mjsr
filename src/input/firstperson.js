@@ -53,17 +53,17 @@ class FirstPerson {
 		if (document.pointerLockElement == canvas || document.mozPointerLockElement == canvas) {
 			let s = dt / 160;
 
-			if (this.keys["q"]) this.camera.pos[1] += s; // q, shift
-			if (this.keys["e"]) this.camera.pos[1] -= s; // e, space
+			if (this.keys["q"]) this.camera.pos[1] -= s; // q, shift
+			if (this.keys["e"]) this.camera.pos[1] += s; // e, space
 
 			let x = s * Math.sin(this.camera.rot[1]),
 				y = s * Math.cos(this.camera.rot[1]);
 
-			if (this.keys["w"]) (this.camera.pos[0] += x), (this.camera.pos[2] -= y); // w
-			if (this.keys["s"]) (this.camera.pos[0] -= x), (this.camera.pos[2] += y); // s
+			if (this.keys["w"]) (this.camera.pos[0] -= x), (this.camera.pos[2] += y); // w
+			if (this.keys["s"]) (this.camera.pos[0] += x), (this.camera.pos[2] -= y); // s
 
-			if (this.keys["a"]) (this.camera.pos[0] -= y), (this.camera.pos[2] -= x); // a
-			if (this.keys["d"]) (this.camera.pos[0] += y), (this.camera.pos[2] += x); // w
+			if (this.keys["a"]) (this.camera.pos[0] += y), (this.camera.pos[2] += x); // a
+			if (this.keys["d"]) (this.camera.pos[0] -= y), (this.camera.pos[2] -= x); // w
 		}
 	}
 }

@@ -574,22 +574,6 @@ var mjsr = (function () {
 
 			return model;
 		}
-		// projectVertex(coords, canvas) {
-		//     let [x, y, z] = coords;
-
-		// 	x -= this.pos[0];
-		// 	y -= this.pos[1];
-		// 	z -= this.pos[2];
-		// 	[x, z] = this.rotateVertex2d([x, z], this.rot[1]);
-		// 	[y, z] = this.rotateVertex2d([y, z], this.rot[0]);
-
-		// 	let f = this.fov / Math.max(0.0, z);
-		// 	x *= f;
-		//     y *= f;
-
-		//     let rect = canvas.getBoundingClientRect();
-		// 	return [(x - rect.left) / canvas.width * 2, 0 - (y - rect.top) / canvas.height * 2, z / 100];
-		// }
 	}
 
 	class Screen {
@@ -731,17 +715,17 @@ var mjsr = (function () {
 			if (document.pointerLockElement == canvas || document.mozPointerLockElement == canvas) {
 				let s = dt / 160;
 
-				if (this.keys["q"]) this.camera.pos[1] += s; // q, shift
-				if (this.keys["e"]) this.camera.pos[1] -= s; // e, space
+				if (this.keys["q"]) this.camera.pos[1] -= s; // q, shift
+				if (this.keys["e"]) this.camera.pos[1] += s; // e, space
 
 				let x = s * Math.sin(this.camera.rot[1]),
 					y = s * Math.cos(this.camera.rot[1]);
 
-				if (this.keys["w"]) (this.camera.pos[0] += x), (this.camera.pos[2] -= y); // w
-				if (this.keys["s"]) (this.camera.pos[0] -= x), (this.camera.pos[2] += y); // s
+				if (this.keys["w"]) (this.camera.pos[0] -= x), (this.camera.pos[2] += y); // w
+				if (this.keys["s"]) (this.camera.pos[0] += x), (this.camera.pos[2] -= y); // s
 
-				if (this.keys["a"]) (this.camera.pos[0] -= y), (this.camera.pos[2] -= x); // a
-				if (this.keys["d"]) (this.camera.pos[0] += y), (this.camera.pos[2] += x); // w
+				if (this.keys["a"]) (this.camera.pos[0] += y), (this.camera.pos[2] += x); // a
+				if (this.keys["d"]) (this.camera.pos[0] -= y), (this.camera.pos[2] -= x); // w
 			}
 		}
 	}
@@ -1421,7 +1405,7 @@ var mjsr = (function () {
 		 */
 		setup(...scenes) {
 			const { gl } = this.screen;
-			
+
 			this.scenes = [];
 			this.__scene = 0;
 
@@ -1498,8 +1482,8 @@ var mjsr = (function () {
 			gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-			for (let sh in this.shaders) {
-				let shader = this.shaders[sh];
+			for (let s in this.shaders) {
+				let shader = this.shaders[s];
 
 				gl.useProgram(shader.glprogram);
 
@@ -1558,7 +1542,7 @@ var mjsr = (function () {
 		update(now) {
 			assert(typeof now == "number", "Invalid timestamp.");
 
-			this.dt = this.last - now;
+			this.dt = now - this.last;
 			this.last = now;
 
 			this.input.update(this.dt);
@@ -1691,7 +1675,7 @@ var mjsr = (function () {
 		 *  @returns {Object3d}
 		 */
 		async load() {
-			let obj = (await this.loadFile()).split(/\n/);
+			const obj = (await loadFile(this.url)).split(/\n/);
 
 			for (let line of obj) {
 				line = line.trim().split(/\s/);
@@ -1718,13 +1702,13 @@ var mjsr = (function () {
 
 			return this.object;
 		}
+	}
 
-		async loadFile() {
-			try {
-				return await (await fetch(this.url)).text();
-			} catch (error) {
-				throw error;
-			}
+	async function loadFile(url) {
+		try {
+			return (await fetch(url)).text();
+		} catch (error) {
+			throw error;
 		}
 	}
 

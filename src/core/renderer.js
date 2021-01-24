@@ -83,7 +83,7 @@ export class Renderer {
 	 */
 	setup(...scenes) {
 		const { gl } = this.screen;
-		
+
 		this.scenes = [];
 		this.__scene = 0;
 
@@ -160,8 +160,8 @@ export class Renderer {
 		gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-		for (let sh in this.shaders) {
-			let shader = this.shaders[sh];
+		for (let s in this.shaders) {
+			let shader = this.shaders[s];
 
 			gl.useProgram(shader.glprogram);
 
@@ -220,7 +220,7 @@ export class Renderer {
 	update(now) {
 		assert(typeof now == "number", "Invalid timestamp.");
 
-		this.dt = this.last - now;
+		this.dt = now - this.last;
 		this.last = now;
 
 		this.input.update(this.dt);
