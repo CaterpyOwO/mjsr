@@ -1426,7 +1426,7 @@ var mjsr = (function () {
 					let object = scene[o];
 					assert(typeof object == "object", "Invalid object in scene.");
 
-					if (!object instanceof Object3d) object = Object3d.from(object);
+					if (!(object instanceof Object3d)) object = Object3d.from(object);
 
 					let meshes = generateMesh(object);
 
