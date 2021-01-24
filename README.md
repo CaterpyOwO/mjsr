@@ -47,12 +47,9 @@ function frame(now) {
 requestAnimationFrame(frame);
 ```
 
-## Examples
+## Documentation
 
-See the [`examples`](examples) folder for more examples.
-
-<img src="https://raw.githubusercontent.com/CaterpyOwO/mjsr/master/examples/donut.png" width="300px" alt="A image of a donut">
-<img src="https://raw.githubusercontent.com/CaterpyOwO/mjsr/master/examples/teapot.png" width="350px" alt="A image of a teapot">
+Visit [the wiki](https://github.com/CaterpyOwO/mjsr/wiki) for documentation.
 
 ## License
 

@@ -9,6 +9,8 @@ import { default as fragment } from "./shaders/frag.js";
 
 import { Object3d } from "../object/object.js";
 
+import { generateMesh } from "../utility/mesh.js";
+
 import * as constants from "../core/constants.js";
 
 export class Renderer {
@@ -60,15 +62,10 @@ export class Renderer {
 		this.screen = screen;
 		this.camera = camera;
 
-		if (
-			assert(
-				inputHandler.setAttributes,
-				"Input handler doesn't have a .setAttributes() method."
-			)
-		)
-			inputHandler.setAttributes(screen, camera);
+		if (assert(inputHandler.attributes, "Input handler doesn't have a .attributes() method."))
+			inputHandler.attributes(screen, camera);
 
-		assert(inputHandler.setupMovement, "Input handler doesn't have a .setupMovement() method.");
+		assert(inputHandler.setup, "Input handler doesn't have a .setup() method.");
 		assert(inputHandler.update, "Input handler doesn't have a .update() method.");
 
 		this.input = inputHandler;
@@ -85,10 +82,16 @@ export class Renderer {
 	 * @param {Object[]} scene - An array of Objects
 	 */
 	setup(...scenes) {
-		this.scenes = [];
-		this._scene = 0;
+		const { gl } = this.screen;
 
-		this.primitives = new Set();
+		this.scenes = [];
+		this.__scene = 0;
+
+		this.primitives = {
+			0: false,
+			1: false,
+			2: false,
+		};
 		this.shaders = {};
 
 		for (let s in scenes) {
@@ -101,45 +104,42 @@ export class Renderer {
 				let object = scene[o];
 				assert(typeof object == "object", "Invalid object in scene.");
 
-				if (!object.generateMesh) object = Object3d.from(object);
+				if (!(object instanceof Object3d)) object = Object3d.from(object);
 
-				let meshes = object.generateMesh(),
-					primitive = meshes[0].data.primitive;
+				let meshes = generateMesh(object);
 
-				this.primitives.add(primitive);
+				this.primitives[meshes[0].data.primitive] = true;
 				sceneMeshes.push(
 					...meshes.map(v => {
 						v.object = o;
 						return v;
 					})
 				);
-				// object.scene = s;
-				// object.object = o;
 			}
 
 			this.scenes.push({ meshes: sceneMeshes, objects: scene });
 		}
 
-		const { gl } = this.screen;
+		for (let primitive in this.primitives) {
+			if (this.primitives[primitive]) {
+				let shader = new Webglu(gl);
 
-		for (let primitive of this.primitives) {
-			let shader = new Webglu(gl);
+				let mode = primitive == 2 ? this.options.lighting : 0;
 
-			let mode = primitive == 2 ? this.options.lighting : 0;
+				shader.vert(vertex({ mode, primitive }));
+				shader.frag(
+					fragment({
+						mode,
+						primitive,
+						mono: this.options.mono,
+						posterization: this.options.posterization,
+					})
+				);
 
-			shader.vert(vertex({ mode, primitive }));
-			shader.frag(
-				fragment({
-					mode,
-					primitive,
-					mono: this.options.mono,
-					posterization: this.options.posterization,
-				})
-			);
+				shader.program();
 
-			shader.program();
-
-			this.shaders[primitive] = shader;
+				this.shaders[primitive] = shader;
+			}
 		}
 
 		gl.clearColor(1.0, 1.0, 1.0, 1.0);
@@ -147,7 +147,7 @@ export class Renderer {
 
 		if (this.options.culling) gl.enable(gl.CULL_FACE);
 
-		this.input.setupMovement();
+		this.input.setup();
 	}
 
 	/**
@@ -160,8 +160,8 @@ export class Renderer {
 		gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-		for (let sh in this.shaders) {
-			let shader = this.shaders[sh];
+		for (let s in this.shaders) {
+			let shader = this.shaders[s];
 
 			gl.useProgram(shader.glprogram);
 
@@ -184,11 +184,9 @@ export class Renderer {
 			gl.useProgram(null);
 		}
 
-		for (let mesh of this.scenes[this._scene].meshes) {
+		for (let mesh of this.scenes[this.__scene].meshes) {
 			const primitive = mesh.data.primitive;
 			const shader = this.shaders[primitive];
-
-			// console.log(this.scenes[this._scene].objects)
 
 			gl.useProgram(shader.glprogram);
 
@@ -198,10 +196,8 @@ export class Renderer {
 			shader.uniformMatrix4fv(
 				"u_modelobj",
 				false,
-				this.scenes[this._scene].objects[mesh.object].model
+				this.scenes[this.__scene].objects[mesh.object].model
 			);
-
-			// gl.uniform1i(gl.getUniformLocation(shader.glprogram, "u_primitive"), primitive);
 
 			let buffers = {
 				position: mesh.data.position,
@@ -224,19 +220,19 @@ export class Renderer {
 	update(now) {
 		assert(typeof now == "number", "Invalid timestamp.");
 
-		this.dt = this.last - now;
+		this.dt = now - this.last;
 		this.last = now;
 
 		this.input.update(this.dt);
 	}
 
 	get scene() {
-		return this._scene;
+		return this.__scene;
 	}
 
 	set scene(index) {
 		if (assert(typeof index == "number" && this.scenes[index], "Invalid scene index."))
-			this._scene = index;
+			this.__scene = index;
 	}
 }
 

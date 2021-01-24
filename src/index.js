@@ -20,11 +20,9 @@ import * as constants from "./core/constants.js";
 /**
  * Mjsr - Minimalistic JavaScript renderer
  *
- * @module
- *
- * @description Mjsr is a 3D WebGL renderer that allows you to access many low level settings and makes it easy to make your own 3d objects.
+ * @description mjsr is a simple, lightweight 3d library for JavaScript.
  */
-export const mjsr = {
+export default {
 	VERSION: version,
 	...constants,
 
@@ -38,7 +36,4 @@ export const mjsr = {
 	OBJLoader,
 };
 
-if (typeof define === "function" && define.amd) define([], () => mjsr);
-else globalThis.mjsr = mjsr;
-
-console.log(`Loaded mjsr version: %c${mjsr.VERSION}`, "text-decoration:underline");
+console.log(`Loaded mjsr version: %c${version}`, "text-decoration:underline");

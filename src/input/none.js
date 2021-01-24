@@ -1,7 +1,7 @@
 class None {
 	update() {}
-	setAttributes() {}
-	setupMovement() {}
+	attributes() {}
+	setup() {}
 }
 
 export { None };
