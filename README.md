@@ -52,6 +52,7 @@ requestAnimationFrame(frame);
 Visit [the wiki](https://github.com/CaterpyOwO/mjsr/wiki) for documentation.
 
 More examples of usage:
+
 -   [`cube`](https://caterpyowo.github.io/mjsr/examples/cube)
 -   [`sheep`](https://caterpyowo.github.io/mjsr/examples/sheep)
 -   [`teapot`](https://caterpyowo.github.io/mjsr/examples/teapot)

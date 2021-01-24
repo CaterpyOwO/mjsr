@@ -1,7 +1,7 @@
 var mjsr = (function () {
 	'use strict';
 
-	var version = "v0.9.8-beta";
+	var version = "v0.9.9-beta";
 
 	/**
 	 * Common utilities
@@ -888,32 +888,32 @@ var mjsr = (function () {
 		}
 
 		buffer32f(data, type) {
-			let buffer = this._bufferInit(type);
+			let buffer = bufferInit(this.gl, type);
 			this.gl.bufferData(type, new Float32Array(data), this.gl.STATIC_DRAW);
 
 			return buffer;
 		}
 
 		buffer16u(data, type) {
-			let buffer = this._bufferInit(type);
+			let buffer = bufferInit(this.gl, type);
 			this.gl.bufferData(type, new Uint16Array(data), this.gl.STATIC_DRAW);
 
 			return buffer;
 		}
 
 		buffer32u(data, type) {
-			let buffer = this._bufferInit(type);
+			let buffer = bufferInit(this.gl, type);
 			this.gl.bufferData(type, new Uint32Array(data), this.gl.STATIC_DRAW);
 
 			return buffer;
 		}
+	}
 
-		_bufferInit(type) {
-			const buffer = this.gl.createBuffer();
-			this.gl.bindBuffer(type, buffer);
+	function bufferInit(gl, type) {
+		const buffer = gl.createBuffer();
+		gl.bindBuffer(type, buffer);
 
-			return buffer;
-		}
+		return buffer;
 	}
 
 	var mono = "float lum=(gl_FragColor.r+gl_FragColor.g+gl_FragColor.b)/3.0;vec2 monoColour=vec2(lum,1.0);gl_FragColor=monoColour.xxxy;";
@@ -1517,9 +1517,8 @@ var mjsr = (function () {
 
 				let model = this.scenes[this.__scene].objects[mesh.object].model;
 				if (model) shader.uniformMatrix4fv("u_modelobj", false, model);
-				else
-					//prettier-ignore
-					shader.uniformMatrix4fv("u_modelobj", false, [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,]);
+				//prettier-ignore
+				else shader.uniformMatrix4fv("u_modelobj", false, [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,]);
 
 				let buffers = {
 					position: mesh.data.position,
