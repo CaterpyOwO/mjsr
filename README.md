@@ -57,7 +57,6 @@ There are also a few simple examples of usage:
 -   [`sheep`](https://caterpyowo.github.io/mjsr/examples/sheep)
 -   [`teapot`](https://caterpyowo.github.io/mjsr/examples/teapot)
 
-
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
