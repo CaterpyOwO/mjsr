@@ -3,6 +3,7 @@ import glsl from "rollup-plugin-glsl";
 import serve from "rollup-plugin-serve";
 import json from "@rollup/plugin-json";
 import resolve from "@rollup/plugin-node-resolve";
+import { wasm } from '@rollup/plugin-wasm';
 
 export default {
 	input: "src/index.js",
@@ -28,5 +29,6 @@ export default {
 		serve("dist"),
 		json(),
 		resolve(),
+		wasm()
 	],
 };
