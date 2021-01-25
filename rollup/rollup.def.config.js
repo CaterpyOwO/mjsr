@@ -2,6 +2,7 @@ import { terser } from "rollup-plugin-terser";
 import glsl from "rollup-plugin-glsl";
 import json from "@rollup/plugin-json";
 import resolve from "@rollup/plugin-node-resolve";
+import { wasm } from '@rollup/plugin-wasm';
 
 export default {
 	input: "src/index.js",
@@ -26,5 +27,6 @@ export default {
 		}),
 		json(),
 		resolve(),
+		wasm()
 	],
 };

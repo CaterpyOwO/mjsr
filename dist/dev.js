@@ -47,12 +47,8 @@ let dt = document.querySelector("#dt");
 teapot.load().then(obj => {
 	teapot = obj;
 	let scene = [teapot];
-	r.setup(scene);
-
-	requestAnimationFrame(frame);
+	r.setup(scene).then(() => frame(0));
 });
-
-
 
 function frame(now) {
 	r.draw();
