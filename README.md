@@ -10,6 +10,7 @@
 [release]: https://img.shields.io/github/v/release/CaterpyOwO/mjsr
 
 `mjsr` is a simple, lightweight 3d library for JavaScript.
+This is an experimental wasm branch.
 
 ## Installation
 

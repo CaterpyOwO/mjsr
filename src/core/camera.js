@@ -32,7 +32,7 @@ export class Camera {
 		return this;
 	}
 
-	vp(canvas, mat4) {
+	vp(canvas) {
 		let projection = perspective(
 			create(),
 			this.fov * (Math.PI / 180),
@@ -50,7 +50,7 @@ export class Camera {
 		return multiply(create(), projection, view);
 	}
 
-	modelit(mat4) {
+	modelit() {
 		let model = this.model;
 		invert(model, model);
 		transpose(model, model);
