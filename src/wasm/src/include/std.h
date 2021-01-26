@@ -1,5 +1,12 @@
-#pragma once
+#ifndef __WASM_STD__
+#define __WASM_STD__
 
+#import <stdarg.h>
+#import "mini-printf.h"
+
+/*
+    WASM Typedefs
+*/
 typedef signed char i8;
 typedef unsigned char u8;
 typedef signed short i16;
@@ -11,14 +18,8 @@ typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
 
-typedef enum
-{
-    true = 1, false = 0
-} bool;
-
-#define export __attribute__((used))
-
-// #define console_log(str) __js_console_log(str, __builtin_strlen(str));
+/* Export definition */
+#define export __attribute__((visibility("default")))
 
 /* Prints to `stdout` with newline */
 #define console_log(str) ({                                         \
@@ -40,3 +41,4 @@ typedef enum
 void __js_console_log(const char* str, int len);
 void __js_console_error(const char* str, int len);
 
+#endif

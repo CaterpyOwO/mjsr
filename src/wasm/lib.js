@@ -6,12 +6,16 @@ export function main() {
 
 	let mem = null;
 
+	imports.memset = function (...args) {
+		console.log("waht is dis", ...args)
+	}
+
 	imports.__js_console_log = function (str, len) {
-		console.log(decoder.decode(mem.subarray(str, str + len)));
+		console.log(decoder.decode(mem.subarray(str, str + len)).trim());
 	};
 
 	imports.__js_console_error = function (str, len) {
-		console.error(decoder.decode(mem.subarray(str, str + len)));
+		console.error(decoder.decode(mem.subarray(str, str + len)).trim());
 	};
 
 	const instance = lib({ env: imports });

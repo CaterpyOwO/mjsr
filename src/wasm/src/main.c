@@ -1,14 +1,11 @@
-#import "std.h"
+#import "include/std.h"
 
-export i32 main()
+export int main()
 {
-    console_log("Logging seems to be in order!");
+    console_log("console.log call");
+    console_error("console.error call");
 
-    int x = 1;
-    char a = x + '0';
+    printf("Testing printf() %d 0x%x.", 111, 0xaa);
 
-    const char *b = &a;
-
-    console_error(b);
     return 0;
 }
