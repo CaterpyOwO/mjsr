@@ -28,7 +28,7 @@ export class Camera {
 		this.model = create();
 		this.view = create();
 		this.projection = create();
-		
+
 		return this;
 	}
 

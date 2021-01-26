@@ -17,8 +17,8 @@ export function main() {
 	const instance = lib({ env: imports });
 	const { main, memory } = instance.exports;
 
-  mem = new Uint8Array(memory.buffer);
-  
-  let code = main();
-  if (code !== 0) console.warn(`The function "main()" exited with code ${code}.`)
+	mem = new Uint8Array(memory.buffer);
+
+	let code = main();
+	if (code !== 0) console.warn(`The function "main()" exited with code ${code}.`);
 }
