@@ -17,6 +17,9 @@ import { OBJLoader } from "./utility/objloader.js";
 
 import * as constants from "./core/constants.js";
 
+import { main } from "./wasm/lib.js";
+main();
+
 /**
  * Mjsr - Minimalistic JavaScript renderer
  *

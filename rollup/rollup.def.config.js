@@ -27,6 +27,8 @@ export default {
 		}),
 		json(),
 		resolve(),
-		wasm()
+		wasm({
+			sync: ["src/wasm/lib.wasm"],
+		})
 	],
 };

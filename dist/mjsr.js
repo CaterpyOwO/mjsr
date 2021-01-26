@@ -1518,7 +1518,7 @@ var mjsr = (function () {
 				let model = this.scenes[this.__scene].objects[mesh.object].model;
 				if (model) shader.uniformMatrix4fv("u_modelobj", false, model);
 				//prettier-ignore
-				else shader.uniformMatrix4fv("u_modelobj", false, [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,]);
+				else shader.uniformMatrix4fv("u_modelobj", false, [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]);
 
 				let buffers = {
 					position: mesh.data.position,
@@ -1712,6 +1712,84 @@ var mjsr = (function () {
 		}
 	}
 
+	function _loadWasmModule (sync, filepath, src, imports) {
+	  function _instantiateOrCompile(source, imports, stream) {
+	    var instantiateFunc = stream ? WebAssembly.instantiateStreaming : WebAssembly.instantiate;
+	    var compileFunc = stream ? WebAssembly.compileStreaming : WebAssembly.compile;
+
+	    if (imports) {
+	      return instantiateFunc(source, imports)
+	    } else {
+	      return compileFunc(source)
+	    }
+	  }
+
+	  var buf = null;
+	  var isNode = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
+
+	  if (filepath && isNode) {
+	    var fs = require("fs");
+	    var path = require("path");
+
+	    return new Promise((resolve, reject) => {
+	      fs.readFile(path.resolve(__dirname, filepath), (error, buffer) => {
+	        if (error != null) {
+	          reject(error);
+	        }
+
+	        resolve(_instantiateOrCompile(buffer, imports, false));
+	      });
+	    });
+	  } else if (filepath) {
+	    return _instantiateOrCompile(fetch(filepath), imports, true)
+	  }
+
+	  if (isNode) {
+	    buf = Buffer.from(src, 'base64');
+	  } else {
+	    var raw = globalThis.atob(src);
+	    var rawLength = raw.length;
+	    buf = new Uint8Array(new ArrayBuffer(rawLength));
+	    for(var i = 0; i < rawLength; i++) {
+	       buf[i] = raw.charCodeAt(i);
+	    }
+	  }
+
+	  if(sync) {
+	    var mod = new WebAssembly.Module(buf);
+	    return imports ? new WebAssembly.Instance(mod, imports) : mod
+	  } else {
+	    return _instantiateOrCompile(buf, imports, false)
+	  }
+	}
+
+	function lib(imports){return _loadWasmModule(1, null, 'AGFzbQEAAAABEwRgAn9/AGAAAGAAAX9gAn9/AX8CMQIDZW52EF9fanNfY29uc29sZV9sb2cAAANlbnYSX19qc19jb25zb2xlX2Vycm9yAAADBAMBAgMEBQFwAQEBBQMBAAIGKwd/AUHAiAQLfwBBgAgLfwBBuggLfwBBgAgLfwBBwIgEC38AQQALfwBBAQsHngELBm1lbW9yeQIAEV9fd2FzbV9jYWxsX2N0b3JzAAIPX19vcmlnaW5hbF9tYWluAAMEbWFpbgAEC19fbWFpbl92b2lkAAMMX19kc29faGFuZGxlAwEKX19kYXRhX2VuZAMCDV9fZ2xvYmFsX2Jhc2UDAwtfX2hlYXBfYmFzZQMEDV9fbWVtb3J5X2Jhc2UDBQxfX3RhYmxlX2Jhc2UDBgouAwIACyAAQYCIgIAAQR0QgICAgABBnoiAgABBGxCBgICAAEEACwgAEIOAgIAACwtBAQBBgAgLOkxvZ2dpbmcgc2VlbXMgdG8gYmUgaW4gb3JkZXIhAGNvbnNvbGVfZXJyb3I6IGludmFsaWQgdHlwZQAAWARuYW1lAVEFABBfX2pzX2NvbnNvbGVfbG9nARJfX2pzX2NvbnNvbGVfZXJyb3ICEV9fd2FzbV9jYWxsX2N0b3JzAw9fX29yaWdpbmFsX21haW4EBG1haW4AJglwcm9kdWNlcnMBDHByb2Nlc3NlZC1ieQEFY2xhbmcGMTEuMC4x', imports)}
+
+	function main() {
+		const imports = {};
+		const decoder = new TextDecoder("utf-8");
+
+		let mem = null;
+
+		imports.__js_console_log = function (str, len) {
+			console.log(decoder.decode(mem.subarray(str, str + len)));
+		};
+
+		imports.__js_console_error = function (str, len) {
+			console.error(decoder.decode(mem.subarray(str, str + len)));
+		};
+
+		const instance = lib({ env: imports });
+		const { main, memory } = instance.exports;
+
+	  mem = new Uint8Array(memory.buffer);
+	  
+	  let code = main();
+	  if (code !== 0) console.warn(`The function "main()" exited with code ${code}.`);
+	}
+
+	main();
+
 	/**
 	 * Mjsr - Minimalistic JavaScript renderer
 	 *
@@ -1731,7 +1809,7 @@ var mjsr = (function () {
 		OBJLoader,
 	};
 
-	console.log(`Loaded mjsr version: %c${version}`, "text-decoration:underline");
+	console.log(`Loaded mjsr version: %c${version} WASM`, "text-decoration:underline");
 
 	return index;
 
