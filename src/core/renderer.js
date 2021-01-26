@@ -13,6 +13,8 @@ import { generateMesh } from "../utility/mesh.js";
 
 import * as constants from "../core/constants.js";
 
+import { mat4 } from "../wasm/mat4.js";
+
 export class Renderer {
 	/**
 	 * Creates a new Renderer
@@ -73,6 +75,8 @@ export class Renderer {
 		this.dt = 0;
 		this.last = 0;
 
+		this.mat4 = new mat4();
+
 		return this;
 	}
 
@@ -81,7 +85,9 @@ export class Renderer {
 	 *
 	 * @param {Object[]} scene - An array of Objects
 	 */
-	setup(...scenes) {
+	async setup(...scenes) {
+		await this.mat4.init();
+
 		const { gl } = this.screen;
 
 		this.scenes = [];
@@ -167,9 +173,9 @@ export class Renderer {
 
 			shader.uniform3fv("u_pos", this.camera.pos);
 
-			shader.uniformMatrix4fv("u_modelit", false, this.camera.modelit());
+			shader.uniformMatrix4fv("u_modelit", false, this.camera.modelit(this.mat4));
 			shader.uniformMatrix4fv("u_model", false, this.camera.model);
-			shader.uniformMatrix4fv("u_vp", false, this.camera.vp(this.screen.canvas));
+			shader.uniformMatrix4fv("u_vp", false, this.camera.vp(this.screen.canvas, this.mat4));
 
 			if (this.options.lighting !== constants.NONE) {
 				shader.uniform3fv("light.position", this.lighting.position);

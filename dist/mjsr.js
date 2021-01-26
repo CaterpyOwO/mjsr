@@ -545,11 +545,11 @@ var mjsr = (function () {
 			this.model = create();
 			this.view = create();
 			this.projection = create();
-
+			
 			return this;
 		}
 
-		vp(canvas) {
+		vp(canvas, mat4) {
 			let projection = perspective(
 				create(),
 				this.fov * (Math.PI / 180),
@@ -567,7 +567,7 @@ var mjsr = (function () {
 			return multiply(create(), projection, view);
 		}
 
-		modelit() {
+		modelit(mat4) {
 			let model = this.model;
 			invert(model, model);
 			transpose(model, model);
@@ -1335,6 +1335,120 @@ var mjsr = (function () {
 		return meshes;
 	}
 
+	function _loadWasmModule (sync, filepath, src, imports) {
+	  function _instantiateOrCompile(source, imports, stream) {
+	    var instantiateFunc = stream ? WebAssembly.instantiateStreaming : WebAssembly.instantiate;
+	    var compileFunc = stream ? WebAssembly.compileStreaming : WebAssembly.compile;
+
+	    if (imports) {
+	      return instantiateFunc(source, imports)
+	    } else {
+	      return compileFunc(source)
+	    }
+	  }
+
+	  var buf = null;
+	  var isNode = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
+
+	  if (filepath && isNode) {
+	    var fs = require("fs");
+	    var path = require("path");
+
+	    return new Promise((resolve, reject) => {
+	      fs.readFile(path.resolve(__dirname, filepath), (error, buffer) => {
+	        if (error != null) {
+	          reject(error);
+	        }
+
+	        resolve(_instantiateOrCompile(buffer, imports, false));
+	      });
+	    });
+	  } else if (filepath) {
+	    return _instantiateOrCompile(fetch(filepath), imports, true)
+	  }
+
+	  if (isNode) {
+	    buf = Buffer.from(src, 'base64');
+	  } else {
+	    var raw = globalThis.atob(src);
+	    var rawLength = raw.length;
+	    buf = new Uint8Array(new ArrayBuffer(rawLength));
+	    for(var i = 0; i < rawLength; i++) {
+	       buf[i] = raw.charCodeAt(i);
+	    }
+	  }
+
+	  if(sync) {
+	    var mod = new WebAssembly.Module(buf);
+	    return imports ? new WebAssembly.Instance(mod, imports) : mod
+	  } else {
+	    return _instantiateOrCompile(buf, imports, false)
+	  }
+	}
+
+	function wasm(imports){return _loadWasmModule(0, null, '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', imports)}
+
+	class mat4 {
+		constructor() {
+			this.exports = {};
+		}
+		
+		async init() {
+			const imports = {};
+			const utf8decoder = new TextDecoder( "utf-8" );
+
+			let memory = null;
+
+			try {
+
+				imports['memory'] = new WebAssembly['Memory']( {'initial':32} );
+				memory = new Uint8Array( imports['memory']['buffer'] );
+
+				function console_log (str, len) {
+					console.log("console.log from C");
+					let arr = memory.subarray( str, str+len );
+					console.log( utf8decoder.decode( arr ) );
+				}
+		
+				imports['sinf'] = n => Math.sin(n);
+				imports['cosf'] = n => Math.cos(n);
+				imports['console_log'] = console_log;
+
+				this.exports =  await wasm({ "env": imports }).then(({instance}) => instance.exports);
+				this.array = new Float32Array(this.exports.memory.buffer, 0, 16);
+			} catch (e) {
+				throw e;
+			}
+
+
+			// console.log(this.exports)
+			this.exports.why();
+		}
+
+		create() {
+			if(this.exports.create(0) === 0) return this.array.slice();
+			else throw new Error("Error while creating matrix.")
+		}
+
+		transpose(matrix) {
+			this.array = matrix;
+			if(this.exports.transpose(0) === 0) return this.array.slice();
+			else throw new Error("Error while transposing matrix.")
+		}
+
+		invert(matrix) {
+			this.array = matrix;
+			if(this.exports.invert(0) === 0) return this.array.slice();
+			else throw new Error("Error while inverting matrix.")
+		}
+
+		rotateX(matrix, rad) {
+			this.array = matrix;
+			if(this.exports.rotateX(0, rad) === 0) return this.array.slice();
+			else throw new Error("Error while rotating matrix.")
+		}
+	}
+
 	class Renderer {
 		/**
 		 * Creates a new Renderer
@@ -1395,6 +1509,8 @@ var mjsr = (function () {
 			this.dt = 0;
 			this.last = 0;
 
+			this.mat4 = new mat4();
+
 			return this;
 		}
 
@@ -1403,7 +1519,9 @@ var mjsr = (function () {
 		 *
 		 * @param {Object[]} scene - An array of Objects
 		 */
-		setup(...scenes) {
+		async setup(...scenes) {
+			await this.mat4.init();
+
 			const { gl } = this.screen;
 
 			this.scenes = [];
@@ -1489,9 +1607,9 @@ var mjsr = (function () {
 
 				shader.uniform3fv("u_pos", this.camera.pos);
 
-				shader.uniformMatrix4fv("u_modelit", false, this.camera.modelit());
+				shader.uniformMatrix4fv("u_modelit", false, this.camera.modelit(this.mat4));
 				shader.uniformMatrix4fv("u_model", false, this.camera.model);
-				shader.uniformMatrix4fv("u_vp", false, this.camera.vp(this.screen.canvas));
+				shader.uniformMatrix4fv("u_vp", false, this.camera.vp(this.screen.canvas, this.mat4));
 
 				if (this.options.lighting !== NONE) {
 					shader.uniform3fv("light.position", this.lighting.position);
