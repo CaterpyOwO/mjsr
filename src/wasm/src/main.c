@@ -7,5 +7,14 @@ export int main()
 
     printf("Testing printf() %d 0x%x.", 111, 0xaa);
 
-    return 0;
+    char str[50];
+
+    strcpy(str,"This is string.h library function");
+    printf(str);
+
+
+    memset(str, '$', 7);
+    printf(str);
+
+    return(0);
 }

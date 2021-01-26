@@ -2,6 +2,7 @@
 #define __WASM_STD__
 
 #import <stdarg.h>
+#import <stddef.h>
 #import "mini-printf.h"
 
 /*
@@ -40,5 +41,10 @@ typedef double f64;
 
 void __js_console_log(const char* str, int len);
 void __js_console_error(const char* str, int len);
+
+char* strcpy (char *destination, const char * source);
+
+// kinda weird behavior
+void* memset(void *str, int chr, size_t len);
 
 #endif
