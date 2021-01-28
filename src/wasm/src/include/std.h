@@ -1,11 +1,11 @@
 #ifndef __WASM_STD__
 #define __WASM_STD__
 
-#import <stdarg.h>
-#import <stddef.h>
-#import "mini-printf.h"
+#include <stdarg.h>
+#include <stddef.h>
+#include "mini-printf.h"
 
-/*
+/**
     WASM Typedefs
 */
 typedef signed char i8;
@@ -21,6 +21,12 @@ typedef double f64;
 
 /* Export definition */
 #define export __attribute__((visibility("default")))
+
+/////////////////////////////////////////////////////////////////////
+
+/**
+ * console.log & console_error macros
+*/
 
 /* Prints to `stdout` with newline */
 #define console_log(str) ({                                         \
@@ -38,13 +44,18 @@ typedef double f64;
         __js_console_error("console_error: invalid type", 27);      \
 })
 
+/////////////////////////////////////////////////////////////////////
+
+/**
+ *   Syms
+ */
 
 void __js_console_log(const char* str, int len);
 void __js_console_error(const char* str, int len);
 
 char* strcpy (char *destination, const char * source);
 
-// kinda weird behavior
+// ! peculiar behavoior
 void* memset(void *str, int chr, size_t len);
 
 #endif

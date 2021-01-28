@@ -1,16 +1,32 @@
 import lib from "./lib.wasm";
+import { format } from "./format.js";
+
+function test() {
+  let i, j, n;
+	 let line = "";
+  
+  for (i = 0; i < 11; i++) {
+    for (j = 0; j < 10; j++) {
+      n = 10 * i + j;
+	  if (n > 109) break;
+
+      line += `\\033[${n}m${new Array(5 - (""+n).length).join(" ")}${n}\\033[0m`
+    }
+    console.log(...format(line));
+    line = "";
+  }
+  return 0;
+}
+
 
 export function main() {
+	let mem = null;
 	const imports = {};
 	const decoder = new TextDecoder("utf-8");
 
-	let mem = null;
 
-	// memset(str, '$', 7);
-	
-	// imports.memset = function (str, char, len) {
-	// 	console.log("memset called: ", str, len)
-	// }
+	test()
+
 
 	imports.memset = function(str, chr, len) {
 		const arr = [];
@@ -23,7 +39,7 @@ export function main() {
 	}
 
 	imports.__js_console_log = function (str, len) {
-		console.log(decoder.decode(mem.subarray(str, str + len)).trim());
+		console.log(...format(decoder.decode(mem.subarray(str, str + len))));
 	};
 
 	imports.__js_console_error = function (str, len) {
