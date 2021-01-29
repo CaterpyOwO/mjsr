@@ -19,5 +19,6 @@ export i32 main()
         printf("\\033[0;%dm %d \\033[0m \\033[0;%dm %d \\033[0m  \\033[%dm %d \\033[0m  \\033[0;%dm %d \\033[0m", i+30,i+30, i+90,i+90, i+40,i+40, i+100,i+100);
     }
 
-    return(0);
+    // sus code
+    return (i32)floorf(sinf(15.5f));
 }
