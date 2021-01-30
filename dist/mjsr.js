@@ -1,7 +1,7 @@
 var mjsr = (function () {
 	'use strict';
 
-	var version = "v0.9.9-beta";
+	var version = "v1.0.0";
 
 	/**
 	 * Common utilities
