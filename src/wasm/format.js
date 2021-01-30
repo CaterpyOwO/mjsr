@@ -18,6 +18,7 @@ const colours = [
     "#FFFFFD",
 ]
 
+
 export function format(text) {
     if (text.indexOf("\\033") === -1) return [ text ];
 

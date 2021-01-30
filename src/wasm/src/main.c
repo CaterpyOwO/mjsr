@@ -1,24 +1,23 @@
 #include "include/std.h"
 
+
 export i32 main()
 {
-    console_log("console.log call");
-    console_error("console.error call");
+    int i, j, n, p = 0;
+    char p_buff[256];
 
-    // char str[50];
+    printf("ANSI escape code test:");
 
-    // strcpy(str,"This is string.h library function");
-    // printf(str);
+    for (i = 0; i < 11; i++) {
 
-    // memset(str, '$', 7);
-    // printf(str);
-
-    printf("Testing printf() %d 0x%x.\nANSI escape code test:", 111, 0xaa);
-
-    for (int i=0; i<=7; i++) {
-        printf("\\033[0;%dm %d \\033[0m \\033[0;%dm %d \\033[0m  \\033[%dm %d \\033[0m  \\033[0;%dm %d \\033[0m", i+30,i+30, i+90,i+90, i+40,i+40, i+100,i+100);
+        for (j = 0; j < 10; j++) {
+            n = 10 * i + j;
+            if (n > 109) break;
+            
+            p += snprintf(p_buff + p, 128, "\\033[%dm %3d\\033[0m", n, n);
+        }
+        
+        printf(p_buff);
+        p = 0;
     }
-
-    // sus code
-    return (i32)floorf(sinf(15.5f));
 }

@@ -36,6 +36,10 @@ extern "C" {
 
 #include <stdarg.h>
 
+/* Write formatted output to sized buffer */
+int mini_snprintf(char *buf, int n, const char *fmt, ...);
+#define snprintf mini_snprintf
+
 /* Prints to `stdout` with newline */
 int mini_printf(const char *fmt, ...);
 #define printf mini_printf

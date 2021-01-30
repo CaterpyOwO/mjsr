@@ -54,8 +54,6 @@ void __js_console_log(const char* str, int len);
 void __js_console_error(const char* str, int len);
 
 char* strcpy (char *destination, const char * source);
-
-// ! peculiar behavoior
-void* memset(void *str, int chr, size_t len);
+void* memset (void *dest, int val, size_t len);
 
 #endif

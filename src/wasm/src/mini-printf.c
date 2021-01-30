@@ -52,7 +52,7 @@ static int mini_strlen(const char *s)
 
 static int mini_itoa(long value, unsigned int radix, int uppercase, int unsig, char *buffer)
 {
-	char	*pbuffer = buffer;
+	char *pbuffer = buffer;
 	int	negative = 0;
 	int	i, len;
 
@@ -243,6 +243,18 @@ int mini_vpprintf(int (*puts)(char* s, int len, void* buf), void* buf, const cha
 	}
 end:
 	return n;
+}
+
+int mini_snprintf(char *buf, int n, const char *fmt, ...)
+{
+	va_list args;
+	int i;
+	
+	va_start(args, fmt);
+	i = vsnprintf(buf, n, fmt, args);
+	va_end(args);
+	
+	return i;
 }
 
 int mini_printf(const char *fmt, ...)
