@@ -105,30 +105,30 @@ export class Webglu {
 	}
 
 	buffer32f(data, type) {
-		let buffer = this._bufferInit(type);
+		let buffer = bufferInit(this.gl, type);
 		this.gl.bufferData(type, new Float32Array(data), this.gl.STATIC_DRAW);
 
 		return buffer;
 	}
 
 	buffer16u(data, type) {
-		let buffer = this._bufferInit(type);
+		let buffer = bufferInit(this.gl, type);
 		this.gl.bufferData(type, new Uint16Array(data), this.gl.STATIC_DRAW);
 
 		return buffer;
 	}
 
 	buffer32u(data, type) {
-		let buffer = this._bufferInit(type);
+		let buffer = bufferInit(this.gl, type);
 		this.gl.bufferData(type, new Uint32Array(data), this.gl.STATIC_DRAW);
 
 		return buffer;
 	}
+}
 
-	_bufferInit(type) {
-		const buffer = this.gl.createBuffer();
-		this.gl.bindBuffer(type, buffer);
+function bufferInit(gl, type) {
+	const buffer = gl.createBuffer();
+	gl.bindBuffer(type, buffer);
 
-		return buffer;
-	}
+	return buffer;
 }

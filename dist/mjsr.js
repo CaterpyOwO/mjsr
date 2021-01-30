@@ -1,7 +1,7 @@
 var mjsr = (function () {
 	'use strict';
 
-	var version = "v0.9.8-beta";
+	var version = "v1.0.0";
 
 	/**
 	 * Common utilities
@@ -888,32 +888,32 @@ var mjsr = (function () {
 		}
 
 		buffer32f(data, type) {
-			let buffer = this._bufferInit(type);
+			let buffer = bufferInit(this.gl, type);
 			this.gl.bufferData(type, new Float32Array(data), this.gl.STATIC_DRAW);
 
 			return buffer;
 		}
 
 		buffer16u(data, type) {
-			let buffer = this._bufferInit(type);
+			let buffer = bufferInit(this.gl, type);
 			this.gl.bufferData(type, new Uint16Array(data), this.gl.STATIC_DRAW);
 
 			return buffer;
 		}
 
 		buffer32u(data, type) {
-			let buffer = this._bufferInit(type);
+			let buffer = bufferInit(this.gl, type);
 			this.gl.bufferData(type, new Uint32Array(data), this.gl.STATIC_DRAW);
 
 			return buffer;
 		}
+	}
 
-		_bufferInit(type) {
-			const buffer = this.gl.createBuffer();
-			this.gl.bindBuffer(type, buffer);
+	function bufferInit(gl, type) {
+		const buffer = gl.createBuffer();
+		gl.bindBuffer(type, buffer);
 
-			return buffer;
-		}
+		return buffer;
 	}
 
 	var mono = "float lum=(gl_FragColor.r+gl_FragColor.g+gl_FragColor.b)/3.0;vec2 monoColour=vec2(lum,1.0);gl_FragColor=monoColour.xxxy;";
@@ -1515,11 +1515,10 @@ var mjsr = (function () {
 				shader.uniform1f("u_shinyness", mesh.material.shinyness);
 				shader.uniform3fv("u_colour", mesh.material.colour);
 
-				shader.uniformMatrix4fv(
-					"u_modelobj",
-					false,
-					this.scenes[this.__scene].objects[mesh.object].model
-				);
+				let model = this.scenes[this.__scene].objects[mesh.object].model;
+				if (model) shader.uniformMatrix4fv("u_modelobj", false, model);
+				//prettier-ignore
+				else shader.uniformMatrix4fv("u_modelobj", false, [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]);
 
 				let buffers = {
 					position: mesh.data.position,
@@ -1655,7 +1654,7 @@ var mjsr = (function () {
 		/**
 		 *
 		 * @param {String} url - The URL of the .obj file
-		 * @param {Number} [normals=mjsr.CLOCKWISE] - The order of the normals
+		 * @param {mjsr.CLOCKWISE|mjsr.COUNTER_CLOCKWISE} [normals=mjsr.CLOCKWISE] - The order of the normals
 		 * @param {Object3d} [object=new Object3d(constants.TRIANGLES, true)] - The object to which the data should be appended
 		 * @param {Material} [material=new Material("#fff", 128)] - The material that should be used to draw the object
 		 *
@@ -1666,7 +1665,8 @@ var mjsr = (function () {
 			this.object = new Object3d(TRIANGLES, true);
 			this.normals = normals;
 
-			this.object.materials.push(material);
+			if (material instanceof Material) this.object.materials[0] = material;
+			else throw new Error(`${material} is not a valid material`);
 		}
 
 		/**

@@ -1,6 +1,6 @@
 {
 	"name": "@caterpyowo/mjsr",
-	"version": "v0.9.8-beta",
+	"version": "v1.0.0",
 	"description": "",
 	"author": "",
 	"license": "MIT",
@@ -12,7 +12,6 @@
 	"devDependencies": {
 		"@rollup/plugin-json": "^4.1.0",
 		"@rollup/plugin-node-resolve": "^11.1.0",
-		"express": "^4.17.1",
 		"jsdoc": "^3.6.6",
 		"prettier": "^2.1.2",
 		"rollup": "^2.36.1",

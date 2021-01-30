@@ -16,7 +16,7 @@
 Using a CDN:
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/caterpyowo/mjsr@v0.9.8-beta/dist/mjsr.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/caterpyowo/mjsr@v1.0.0/dist/mjsr.min.js"></script>
 ```
 
 Using a local copy (See the [releases tab](https://github.com/CaterpyOwO/mjsr/releases/latest) to find the latest version).
@@ -50,6 +50,12 @@ requestAnimationFrame(frame);
 ## Documentation
 
 Visit [the wiki](https://github.com/CaterpyOwO/mjsr/wiki) for documentation.
+
+More examples of usage:
+
+-   [`cube`](https://caterpyowo.github.io/mjsr/examples/cube)
+-   [`sheep`](https://caterpyowo.github.io/mjsr/examples/sheep)
+-   [`teapot`](https://caterpyowo.github.io/mjsr/examples/teapot)
 
 ## License
 
